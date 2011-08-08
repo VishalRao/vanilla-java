@@ -13,6 +13,10 @@ This uses the Sample Data Type below.
 || Generated || 34 bytes|| 139 ns|| 0.0089 seconds||
 || Proxied || 34 bytes|| 1,420 ns|| 0.0102 seconds||
 
+"Generated" uses ObjectWeb ASM to generate byte code.
+
+"Proxied" uses the Proxy class and does not require any additional library.
+
 = Simple example =
 {{{
 interface MutableBoolean {
