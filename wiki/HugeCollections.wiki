@@ -13,6 +13,37 @@ This uses the Sample Data Type below.
 || Generated || 34 bytes|| 139 ns|| 0.0089 seconds||
 || Proxied || 34 bytes|| 1,420 ns|| 0.0102 seconds||
 
+= Simple example =
+{{{
+interface MutableBoolean {
+    public void setFlag(boolean b);
+    public boolean getFlag();
+}
+
+// create a huge array of MutableBoolean
+HugeArrayList<MutableBoolean> hugeList = new HugeArrayBuilder<MutableBoolean>() {}.create();
+List<MutableBoolean> list = hugeList;
+assertEquals(0, list.size());
+
+final long length = 128 * 1000 * 1000 * 1000L; // uses 16 GB
+hugeList.setSize(length);
+
+assertEquals(Integer.MAX_VALUE, list.size());
+assertEquals(length, hugeList.longSize());
+
+boolean b = false;
+for (MutableBoolean mb : list)
+    mb.setFlag(b = !b);
+
+b = false;
+for (MutableBoolean mb : list) {
+    boolean b2 = mb.getFlag();
+    boolean expected = b=!b;
+    if (b2 != expected)
+        assertEquals(expected, b2);
+}
+}}}
+
 = Sample Data Type =
 
 {{{
