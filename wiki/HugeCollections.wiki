@@ -1,0 +1,100 @@
+#summary Library to support collections with millions or billions of entries.
+
+= How does the library differ =
+
+  * Uses long for sizes and indecies.
+  * Uses column based data making the per element overhead minimal and speed up scans over a single or small set of attributes. This reduces memory usages by 2x or more.
+  * Stores attributes in direct memory as much as possible, reducing heap usage dramatically, 10x or more.
+
+= Measures =
+This uses the Sample Data Type below.
+|| Object type || Average size || Average write/read time || Full GC Time for 250M elements ||
+|| JavaBean || 67 bytes|| 123 ns|| 23.3 seconds||
+|| Generated || 34 bytes|| 139 ns|| 0.0089 seconds||
+|| Proxied || 34 bytes|| 1,420 ns|| 0.0102 seconds||
+
+= Sample Data Type =
+
+{{{
+public interface MutableTypes {
+    public void setBoolean(boolean b);
+    public boolean getBoolean();
+
+    public void setBoolean2(Boolean b);
+    public Boolean getBoolean2();
+
+    public void setByte(byte b);
+    public byte getByte();
+
+    public void setByte2(Byte b);
+    public Byte getByte2();
+
+    public void setChar(char ch);
+    public char getChar();
+
+    public void setShort(short s);
+    public short getShort();
+
+    public void setInt(int i);
+    public int getInt();
+
+    public void setFloat(float f);
+    public float getFloat();
+
+    public void setLong(long l);
+    public long getLong();
+
+    public void setDouble(double d);
+    public double getDouble();
+
+    public void setElementType(ElementType elementType);
+    public ElementType getElementType();
+
+    public void setString(String text);
+    public String getString();
+}
+}}}
+
+== Creating an ArrayList==
+
+{{{
+HugeArrayList<MutableTypes> hugeList = new HugeArrayBuilder<MutableTypes>() {}.create();
+List<MutableTypes> list = hugeList;
+
+hugeList.setSize(500*1000*1000); // increase the capacity to 500M
+
+// give all the elements values.
+int i = 0;
+for (MutableTypes mb : list) {
+    mb.setBoolean(i % 2 == 0);
+    mb.setBoolean2(i % 3 == 0 ? null : i % 3 == 1);
+    mb.setByte((byte) i);
+    mb.setByte2(i % 31 == 0 ? null : (byte) i);
+    mb.setChar((char) i);
+    mb.setShort((short) i);
+    mb.setInt(i);
+    mb.setFloat(i);
+    mb.setLong(i);
+    mb.setDouble(i);
+    mb.setElementType(elementTypes[i % elementTypes.length]);
+    mb.setString(strings[i % strings.length]);
+    i++;
+}
+
+// retrieve all the values.
+for (MutableTypes mb : list) {
+    boolean b1 = mb.getBoolean();
+    Boolean b2 = mb.getBoolean2();
+    byte b3 = mb.getByte();
+    Byte b4 = mb.getByte2();
+    char ch = mb.getChar();
+    short s = mb.getShort();
+    int i = mb.getInt();
+    float f = mb.getFloat();
+    long l = mb.getLong();
+    double d = mb.getDouble();
+    ElementType et = mb.getElementType();
+    String text = mb.getString();
+}
+
+}}}
