@@ -10,7 +10,7 @@
 This uses the Sample Data Type below.
 || Object type || Average size || Average write/read time || Full GC Time for 250M elements ||
 || JavaBean || 67 bytes|| 123 ns|| 23.3 seconds||
-|| Generated || 34 bytes|| 139 ns|| 0.0089 seconds||
+|| Generated || 34 bytes|| 129 ns|| 0.0089 seconds||
 || Proxied || 34 bytes|| 1,420 ns|| 0.0102 seconds||
 
 "Generated" uses ObjectWeb ASM to generate byte code.
@@ -36,15 +36,22 @@ assertEquals(Integer.MAX_VALUE, list.size());
 assertEquals(length, hugeList.longSize());
 
 boolean b = false;
-for (MutableBoolean mb : list)
+long count = 0;
+for (MutableBoolean mb : list) {
     mb.setFlag(b = !b);
+    if ((int) count++ == 0)
+        System.out.println("set " + count);
+}
 
 b = false;
+count = 0;
 for (MutableBoolean mb : list) {
     boolean b2 = mb.getFlag();
-    boolean expected = b=!b;
+    boolean expected = b = !b;
     if (b2 != expected)
         assertEquals(expected, b2);
+    if ((int) count++ == 0)
+        System.out.println("get " + count);
 }
 }}}
 
