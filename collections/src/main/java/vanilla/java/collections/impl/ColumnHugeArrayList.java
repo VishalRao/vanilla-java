@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 public class ColumnHugeArrayList<T> extends AbstractList<T> implements HugeArrayList<T> {
-    final TypeModel<T> type;
+    private final TypeModel<T> type;
     private final int allocationSize;
     private final List<Object[]> data = new ArrayList();
     private final List<T> proxies = new ArrayList();

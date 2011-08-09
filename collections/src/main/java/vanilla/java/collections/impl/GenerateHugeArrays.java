@@ -23,7 +23,7 @@ import static org.objectweb.asm.Opcodes.*;
 
 public enum GenerateHugeArrays {
     ;
-    static final String collections = "vanilla/java/collections/";
+    private static final String collections = "vanilla/java/collections/";
 
     public static byte[] dumpArrayList(TypeModel tm) {
         ClassWriter cw = new ClassWriter(0);
@@ -166,7 +166,6 @@ public enum GenerateHugeArrays {
         ClassWriter cw = new ClassWriter(0);
         FieldVisitor fv;
         MethodVisitor mv;
-        AnnotationVisitor av0;
 
         Class interfaceClass = tm.type();
         String name = interfaceClass.getName().replace('.', '/');
@@ -176,7 +175,7 @@ public enum GenerateHugeArrays {
         cw.visitSource(tm.type().getSimpleName() + "Allocation.java", null);
 
         for (FieldModel fm : tm.fields()) {
-            fv = cw.visitField(0, "m_" + fm.fieldName(), "L" + fm.storeType().getName().replace('.', '/') + ';', null, null);
+            fv = cw.visitField(0, "m_" + fm.fieldName(), fm.bcLStoreType(), null, null);
             fv.visitEnd();
         }
         {
@@ -189,10 +188,17 @@ public enum GenerateHugeArrays {
 
             for (FieldModel fm : tm.fields()) {
                 mv.visitVarInsn(ALOAD, 0);
-                mv.visitVarInsn(ILOAD, 1);
-                String type = "L" + fm.storeType().getName().replace('.', '/') + ";";
-                mv.visitMethodInsn(INVOKESTATIC, fm.getClass().getName().replace('.', '/'), "newArrayOfField", "(I)" + type);
-                mv.visitFieldInsn(PUTFIELD, name + "Allocation", "m_" + fm.fieldName(), type);
+
+                if (fm instanceof ObjectFieldModel) {
+                    mv.visitLdcInsn(Type.getType(fm.bcLFieldType()));
+                    mv.visitVarInsn(ILOAD, 1);
+                    mv.visitMethodInsn(INVOKESTATIC, fm.getClass().getName().replace('.', '/'), "newArrayOfField", "(Ljava/lang/Class;I)[Ljava/lang/Object;");
+                    mv.visitTypeInsn(CHECKCAST, fm.bcLStoreType());
+                } else {
+                    mv.visitVarInsn(ILOAD, 1);
+                    mv.visitMethodInsn(INVOKESTATIC, fm.getClass().getName().replace('.', '/'), "newArrayOfField", "(I)" + fm.bcLStoreType());
+                }
+                mv.visitFieldInsn(PUTFIELD, name + "Allocation", "m_" + fm.fieldName(), fm.bcLStoreType());
             }
 
             mv.visitInsn(RETURN);
@@ -200,7 +206,7 @@ public enum GenerateHugeArrays {
             mv.visitLabel(l14);
             mv.visitLocalVariable("this", "L" + name + "Allocation;", null, l0, l14, 0);
             mv.visitLocalVariable("allocationSize", "I", null, l0, l14, 1);
-            mv.visitMaxs(2, 2);
+            mv.visitMaxs(3, 2);
             mv.visitEnd();
         }
         cw.visitEnd();
@@ -213,7 +219,6 @@ public enum GenerateHugeArrays {
         ClassWriter cw = new ClassWriter(0);
         FieldVisitor fv;
         MethodVisitor mv;
-        AnnotationVisitor av0;
 
         String name = tm.bcType();
 
@@ -350,7 +355,10 @@ public enum GenerateHugeArrays {
         }
         cw.visitEnd();
 
-        return cw.toByteArray();
+        final byte[] bytes = cw.toByteArray();
+//        ClassReader cr = new ClassReader(bytes);
+//        cr.accept(new ASMifierClassVisitor(new PrintWriter(System.out)),0);
+        return bytes;
     }
 
     private static final int[] returnForArray = {IRETURN, LRETURN, DRETURN, FRETURN, ARETURN};

@@ -1,4 +1,4 @@
-package vanilla.java.collections;
+package vanilla.java.collections.model;
 
 /*
  * Copyright 2011 Peter Lawrey
@@ -16,8 +16,5 @@ package vanilla.java.collections;
  *    limitations under the License.
  */
 
-public interface HugeElement {
-    void index(long n);
-
-    long index();
+public @interface UsedFromByteCode {
 }

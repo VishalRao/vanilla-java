@@ -39,7 +39,7 @@ public class HugeArrayBuilderTest {
     }
 
     @Ignore
-    @org.junit.Test
+    @Test
     public void testCreate() throws Exception {
         Thread t = monitorThread();
 
@@ -103,6 +103,30 @@ public class HugeArrayBuilderTest {
         assertEquals(length, list.size());
     }
 
+    @Test
+    public void testCreateObjectTypes() throws Exception {
+        gcPrintUsed();
+
+        HugeArrayList<ObjectTypes> hugeList = new HugeArrayBuilder<ObjectTypes>() {{
+            capacity = length;
+        }}.create();
+        List<ObjectTypes> list = hugeList;
+        assertEquals(0, list.size());
+
+        hugeList.setSize(length);
+
+        Thread t = monitorThread();
+
+        assertEquals(length, list.size());
+        assertEquals(length, hugeList.longSize());
+
+        exerciseObjectList(list, length);
+
+        t.interrupt();
+        gcPrintUsed();
+        assertEquals(length, list.size());
+    }
+
     @Ignore
     @Test
     public void testCreateTypes2() throws Exception {
@@ -121,6 +145,25 @@ public class HugeArrayBuilderTest {
 
         exerciseList(list, length);
 
+        t.interrupt();
+        gcPrintUsed();
+        assertEquals(length, list.size());
+    }
+
+    @Ignore
+    @Test
+    public void testCreateObjectTypeJavaBean() throws Exception {
+        gcPrintUsed();
+
+        List<ObjectTypes> list = new ArrayList<ObjectTypes>();
+        assertEquals(0, list.size());
+
+        Thread t = monitorThread();
+
+        for (int i = 0; i < length; i++)
+            list.add(new ObjectTypesJavaBean());
+
+        exerciseObjectList(list, length);
         t.interrupt();
         gcPrintUsed();
         assertEquals(length, list.size());
@@ -394,6 +437,111 @@ public class HugeArrayBuilderTest {
             System.gc();
         } while (System.currentTimeMillis() - start < 60 * 1000);
         System.out.println("Finished");
+    }
+
+    private void exerciseObjectList(List<ObjectTypes> list, long length) {
+        assertEquals(length, list.size());
+        gcPrintUsed();
+
+        ObjectTypes.A a = new ObjectTypes.A();
+        ObjectTypes.B b = new ObjectTypes.B();
+        ObjectTypes.C c = new ObjectTypes.C();
+        ObjectTypes.D d = new ObjectTypes.D();
+
+        long start = System.currentTimeMillis();
+        do {
+            System.out.println("Updating");
+            long startWrite = System.nanoTime();
+            for (ObjectTypes mb : list) {
+                mb.setA(a);
+                mb.setB(b);
+                mb.setC(c);
+                mb.setD(d);
+            }
+            long timeWrite = System.nanoTime() - startWrite;
+            System.out.printf("Took %,d ns per object write%n", timeWrite / list.size());
+
+            System.out.println("Checking");
+            long startRead = System.nanoTime();
+            for (ObjectTypes mb : list) {
+                {
+                    ObjectTypes.A v = mb.getA();
+                    ObjectTypes.A expected = a;
+                    if (v != expected)
+                        assertEquals(expected, v);
+                }
+                {
+                    ObjectTypes.B v = mb.getB();
+                    ObjectTypes.B expected = b;
+                    if (v != expected)
+                        assertEquals(expected, v);
+                }
+                {
+                    ObjectTypes.C v = mb.getC();
+                    ObjectTypes.C expected = c;
+                    if (v != expected)
+                        assertEquals(expected, v);
+                }
+                {
+                    ObjectTypes.D v = mb.getD();
+                    ObjectTypes.D expected = d;
+                    if (v != expected)
+                        assertEquals(expected, v);
+                }
+            }
+            long timeRead = System.nanoTime() - startRead;
+            System.out.printf("Took %,d ns per object read/check%n", timeRead / list.size());
+            System.gc();
+        } while (System.currentTimeMillis() - start < 10 * 1000);
+        System.out.println("Finished");
+    }
+
+
+    static class ObjectTypesJavaBean implements ObjectTypes {
+        private A a;
+        private B b;
+        private C c;
+        private D d;
+
+        @Override
+        public void setA(A a) {
+            this.a = a;
+        }
+
+        @Override
+        public A getA() {
+            return a;
+        }
+
+        @Override
+        public void setB(B b) {
+            this.b = b;
+        }
+
+        @Override
+        public B getB() {
+            return b;
+        }
+
+        @Override
+        public void setC(C c) {
+            this.c = c;
+        }
+
+        @Override
+        public C getC() {
+            return c;
+        }
+
+        @Override
+        public void setD(D d) {
+            this.d = d;
+        }
+
+        @Override
+        public D getD() {
+            return d;
+        }
     }
 
 
