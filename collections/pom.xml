@@ -52,4 +52,8 @@
             </plugin>
         </plugins>
     </build>
+
+    <scm>
+        <developerConnection>scm:svn:https://vanilla-java.googlecode.com/svn/trunk/</developerConnection>
+    </scm>
 </project>
