@@ -83,8 +83,9 @@ public class HugeArrayBuilderTest {
     public void testCreateTypes() throws Exception {
         gcPrintUsed();
 
-        HugeArrayList<MutableTypes> hugeList = new HugeArrayBuilder<MutableTypes>() {
-        }.create();
+        HugeArrayList<MutableTypes> hugeList = new HugeArrayBuilder<MutableTypes>() {{
+            capacity = length;
+        }}.create();
         List<MutableTypes> list = hugeList;
         assertEquals(0, list.size());
 
