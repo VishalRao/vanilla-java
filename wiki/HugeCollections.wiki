@@ -13,6 +13,14 @@ The type needs to be described using an interface so its represented can be chan
 
 The HugeArrayBuilder builds generated classes for the InterfaceType on demand.  The builder can be configured to change how the HugeArrayList is created.
 
+A more complex example is
+{{{
+HugeArrayList<MutableTypes> hugeList = new HugeArrayBuilder<MutableTypes>() {{
+        allocationSize = 1024*1024;
+        classLoader = myClassLoader;
+    }}.create();
+}}}
+
 = How does the library differ from ArrayList=
 
   * Uses long for sizes and indecies.
