@@ -7,7 +7,12 @@
   * Stores attributes in direct memory as much as possible, reducing heap usage dramatically, 10x or more.
 
 = Measures =
-This uses the Sample Data Type below.
+This uses the Sample Class, MutableTypes (see below). The class has 12 fields of various types and can be converted to primitives in different ways. By storing these primitives (or objects encoded as primitives), the time to perform GCs is almost eliminated.
+
+Data Types with reference Objects which cannot be encoded as a primitive are also supported, however the benefit is reduced. If none of the fields can be encoded.
+
+http://vanilla-java.googlecode.com/svn/wiki/images/huge-collection-gc-times.png
+
 || Object type || Average size || Average write/read time || Full GC Time for 250M elements ||
 || JavaBean || 67 bytes|| 123 ns|| 23.3 seconds||
 || Generated || 34 bytes|| 129 ns|| 0.0089 seconds||
