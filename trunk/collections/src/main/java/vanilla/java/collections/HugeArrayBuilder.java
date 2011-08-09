@@ -16,6 +16,7 @@ package vanilla.java.collections;
  *    limitations under the License.
  */
 
+import org.objectweb.asm.ClassWriter;
 import vanilla.java.collections.api.HugeArrayList;
 import vanilla.java.collections.impl.ColumnHugeArrayList;
 import vanilla.java.collections.impl.GenerateHugeArrays;
@@ -41,6 +42,12 @@ public class HugeArrayBuilder<T> {
                 getGenericSuperclass()).getActualTypeArguments()[0];
         typeModel = new TypeModel<T>(type);
         classLoader = getClass().getClassLoader();
+        try {
+            Class classWriter = ClassWriter.class;
+            disableCodeGeneration = false;
+        } catch (NoClassDefFoundError ignored) {
+            disableCodeGeneration = true;
+        }
     }
 
     public HugeArrayBuilder(Class<T> type) {
