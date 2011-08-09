@@ -16,18 +16,11 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
-public class Byte2FieldModel implements FieldModel<Byte> {
-    private final String fieldName;
-    private final int fieldNumber;
-    private Method setter;
-    private Method getter;
-
+public class Byte2FieldModel extends AbstractFieldModel<Byte> {
     public Byte2FieldModel(String fieldName, int fieldNumber) {
-        this.fieldName = fieldName;
-        this.fieldNumber = fieldNumber;
+        super(fieldName, fieldNumber);
     }
 
     @Override
@@ -37,6 +30,12 @@ public class Byte2FieldModel implements FieldModel<Byte> {
 
     public static ByteBuffer newArrayOfField(int size) {
         return ByteBuffer.allocateDirect(size * 9 / 8);
+    }
+
+
+    @Override
+    public Class storeType() {
+        return ByteBuffer.class;
     }
 
     @Override
@@ -71,32 +70,12 @@ public class Byte2FieldModel implements FieldModel<Byte> {
     }
 
     @Override
-    public void setter(Method setter) {
-        this.setter = setter;
-    }
-
-    @Override
-    public void getter(Method getter) {
-        this.getter = getter;
-    }
-
-    @Override
-    public int fieldNumber() {
-        return fieldNumber;
-    }
-
-    @Override
-    public Method setter() {
-        return setter;
-    }
-
-    @Override
-    public Method getter() {
-        return getter;
-    }
-
-    @Override
     public Class<Byte> type() {
-        return (Class) byte.class;
+        return Byte.class;
+    }
+
+    @Override
+    public BCType bcType() {
+        return BCType.Reference;
     }
 }

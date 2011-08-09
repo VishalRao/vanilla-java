@@ -16,25 +16,23 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.LongBuffer;
 
-public class LongFieldModel implements FieldModel<Long> {
-    private final String fieldName;
-    private final int fieldNumber;
-    private Method setter;
-    private Method getter;
-
+public class LongFieldModel extends AbstractFieldModel<Long> {
     public LongFieldModel(String fieldName, int fieldNumber) {
-        this.fieldName = fieldName;
-        this.fieldNumber = fieldNumber;
+        super(fieldName, fieldNumber);
     }
 
     @Override
     public Object arrayOfField(int size) {
         return newArrayOfField(size);
+    }
+
+    @Override
+    public Class storeType() {
+        return LongBuffer.class;
     }
 
     public static LongBuffer newArrayOfField(int size) {
@@ -62,32 +60,22 @@ public class LongFieldModel implements FieldModel<Long> {
     }
 
     @Override
-    public void setter(Method setter) {
-        this.setter = setter;
-    }
-
-    @Override
-    public void getter(Method getter) {
-        this.getter = getter;
-    }
-
-    @Override
-    public int fieldNumber() {
-        return fieldNumber;
-    }
-
-    @Override
-    public Method setter() {
-        return setter;
-    }
-
-    @Override
-    public Method getter() {
-        return getter;
-    }
-
-    @Override
     public Class<Long> type() {
         return (Class) long.class;
+    }
+
+    @Override
+    public int bcFieldSize() {
+        return 2;
+    }
+
+    @Override
+    public String bcLFieldType() {
+        return "J";
+    }
+
+    @Override
+    public BCType bcType() {
+        return BCType.Long;
     }
 }

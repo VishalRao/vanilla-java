@@ -16,18 +16,11 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
-public class ByteFieldModel implements FieldModel<Byte> {
-    private final String fieldName;
-    private final int fieldNumber;
-    private Method setter;
-    private Method getter;
-
+public class ByteFieldModel extends AbstractFieldModel<Byte> {
     public ByteFieldModel(String fieldName, int fieldNumber) {
-        this.fieldName = fieldName;
-        this.fieldNumber = fieldNumber;
+        super(fieldName, fieldNumber);
     }
 
     @Override
@@ -39,13 +32,20 @@ public class ByteFieldModel implements FieldModel<Byte> {
         return ByteBuffer.allocateDirect(size);
     }
 
+
+    @Override
+    public Class storeType() {
+        return ByteBuffer.class;
+    }
+
+
     @Override
     public Byte getAllocation(Object[] arrays, int index) {
         ByteBuffer array = (ByteBuffer) arrays[fieldNumber];
         return get(array, index);
     }
 
-    public static Byte get(ByteBuffer array, int index) {
+    public static byte get(ByteBuffer array, int index) {
         return array.get(index);
     }
 
@@ -55,37 +55,18 @@ public class ByteFieldModel implements FieldModel<Byte> {
         set(array, index, value);
     }
 
-    public static void set(ByteBuffer array, int index, Byte value) {
+    public static void set(ByteBuffer array, int index, byte value) {
         array.put(index, value);
-    }
-
-    @Override
-    public void setter(Method setter) {
-        this.setter = setter;
-    }
-
-    @Override
-    public void getter(Method getter) {
-        this.getter = getter;
-    }
-
-    @Override
-    public int fieldNumber() {
-        return fieldNumber;
-    }
-
-    @Override
-    public Method setter() {
-        return setter;
-    }
-
-    @Override
-    public Method getter() {
-        return getter;
     }
 
     @Override
     public Class<Byte> type() {
         return (Class) byte.class;
     }
+
+    @Override
+    public String bcLFieldType() {
+        return "B";
+    }
+
 }

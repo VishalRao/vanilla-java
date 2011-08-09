@@ -1,4 +1,4 @@
-package vanilla.java.collections;
+package vanilla.java.collections.hand;
 
 /*
  * Copyright 2011 Peter Lawrey
@@ -16,24 +16,18 @@ package vanilla.java.collections;
  *    limitations under the License.
  */
 
+import vanilla.java.collections.MutableTypes;
+import vanilla.java.collections.impl.AbstractHugeArrayList;
+import vanilla.java.collections.impl.AbstractHugeElement;
 import vanilla.java.collections.model.*;
 
 import java.lang.annotation.ElementType;
 
-public class MutableTypesElement implements MutableTypes {
-    private static final Enum8FieldModel<ElementType> ELEMENT_TYPE_FIELD_MODEL
-            = new Enum8FieldModel<ElementType>("elementType", ElementType.class, 10, ElementType.values());
-    private static final Enumerated16FieldModel<String> STRING_ENUMERATED_16_FIELD_MODEL
-            = new Enumerated16FieldModel<String>("text", String.class, 11);
-    private final MutableTypeArrayList list;
+public class MutableTypesElement extends AbstractHugeElement<MutableTypesAllocation> implements MutableTypes {
     MutableTypesAllocation allocation = null;
-    long index;
-    int offset;
 
-    public MutableTypesElement(MutableTypeArrayList list, long n) {
-        this.list = list;
-        index = n;
-        updateAllocation();
+    public MutableTypesElement(AbstractHugeArrayList<MutableTypes, MutableTypesAllocation, MutableTypesElement> list, long n) {
+        super(list, n);
     }
 
     @Override
@@ -138,53 +132,26 @@ public class MutableTypesElement implements MutableTypes {
 
     @Override
     public void setElementType(ElementType elementType) {
-        ELEMENT_TYPE_FIELD_MODEL.set(allocation.m_elementType, offset, elementType);
+        ((MutableTypesArrayList) list).elementTypeFieldModel.set(allocation.m_elementType, offset, elementType);
     }
 
     @Override
     public ElementType getElementType() {
-        return ELEMENT_TYPE_FIELD_MODEL.get(allocation.m_elementType, offset);
+        return ((MutableTypesArrayList) list).elementTypeFieldModel.get(allocation.m_elementType, offset);
     }
 
     @Override
     public void setString(String text) {
-        STRING_ENUMERATED_16_FIELD_MODEL.set(allocation.m_string, offset, text);
+        ((MutableTypesArrayList) list).stringEnumerated16FieldModel.set(allocation.m_string, offset, text);
     }
 
     @Override
     public String getString() {
-        return STRING_ENUMERATED_16_FIELD_MODEL.get(allocation.m_string, offset);
+        return ((MutableTypesArrayList) list).stringEnumerated16FieldModel.get(allocation.m_string, offset);
     }
 
-    public void index(long n) {
-        index = n;
-        offset = (int) (index % list.allocationSize);
-        if (offset < 0) offset += list.allocationSize;
-    }
-
-    void next() {
-        if (index >= list.longSize)
-            list.ensureCapacity(index);
-        index++;
-        if (++offset >= list.allocationSize)
-            updateAllocation();
-    }
-
-    public MutableTypes previous() {
-        index--;
-        if (offset > 0) {
-            offset--;
-        } else {
-            updateAllocation();
-        }
-        return this;
-    }
-
-    private void updateAllocation() {
-        int allocationSize = list.allocationSize;
-        if (index >= 0)
-            allocation = list.allocations.get((int) (index / allocationSize));
-        offset = (int) (index % allocationSize);
-        if (offset < 0) offset += allocationSize;
+    @Override
+    protected void updateAllocation0(int allocationSize) {
+        allocation = list.getAllocation(index);
     }
 }

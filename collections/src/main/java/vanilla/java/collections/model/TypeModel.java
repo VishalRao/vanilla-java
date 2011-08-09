@@ -55,4 +55,8 @@ public class TypeModel<T> {
     public MethodModel method(Method method) {
         return methodMap.get(method);
     }
+
+    public String bcType() {
+        return type().getName().replace('.', '/');
+    }
 }

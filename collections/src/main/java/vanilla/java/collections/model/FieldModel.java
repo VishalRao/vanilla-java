@@ -36,4 +36,30 @@ public interface FieldModel<T> {
     Method getter();
 
     Class<T> type();
+
+    String fieldName();
+
+    Class storeType();
+
+    String titleFieldName();
+
+    String bcModelType();
+
+    String bcLModelType();
+
+    String bcStoreType();
+
+    String bcLStoreType();
+
+    String bcFieldType();
+
+    String bcLFieldType();
+
+    String bcLSetType();
+
+    int bcFieldSize();
+
+    BCType bcType();
+
+    boolean virtualGetSet();
 }

@@ -82,14 +82,14 @@ public class MethodModel<T> {
                 } else if (Enum.class.isAssignableFrom(fieldType)) {
                     Enum[] values = (Enum[]) fieldType.getEnumConstants();
                     if (values.length < 256)
-                        fieldModel = new Enum8FieldModel(fieldName, fieldType, fieldNumber, values);
+                        fieldModel = new Enum8FieldModel(fieldName, fieldNumber, fieldType, values);
                     else
-                        fieldModel = new ObjectFieldModel<T>(fieldName, fieldType, fieldNumber);
+                        fieldModel = new ObjectFieldModel<T>(fieldName, fieldNumber, fieldType);
                 } else {
                     if (Comparable.class.isAssignableFrom(fieldType))
-                        fieldModel = new Enumerated16FieldModel<T>(fieldName, fieldType, fieldNumber);
+                        fieldModel = new Enumerated16FieldModel<T>(fieldName, fieldNumber, fieldType);
                     else
-                        fieldModel = new ObjectFieldModel<T>(fieldName, fieldType, fieldNumber);
+                        fieldModel = new ObjectFieldModel<T>(fieldName, fieldNumber, fieldType);
                 }
                 fields.put(fieldName, fieldModel);
             }

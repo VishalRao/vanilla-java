@@ -1,4 +1,4 @@
-package vanilla.java.collections;
+package vanilla.java.collections.impl;
 
 /*
  * Copyright 2011 Peter Lawrey
@@ -16,6 +16,7 @@ package vanilla.java.collections;
  *    limitations under the License.
  */
 
+import vanilla.java.collections.HugeListIterator;
 import vanilla.java.collections.api.HugeArrayList;
 import vanilla.java.collections.api.HugeIterator;
 
@@ -24,22 +25,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-public class MutableTypeArrayList extends AbstractList<MutableTypes> implements HugeArrayList<MutableTypes> {
-    final int allocationSize;
-    final List<MutableTypesAllocation> allocations = new ArrayList<MutableTypesAllocation>();
-    private final List<MutableTypesElement> proxies = new ArrayList<MutableTypesElement>();
-    long longSize;
+public abstract class AbstractHugeArrayList<T, TA, TE extends AbstractHugeElement<TA>> extends AbstractList<T> implements HugeArrayList<T> {
+    protected final int allocationSize;
+    protected final List<TA> allocations = new ArrayList<TA>();
+    protected final List<TE> proxies = new ArrayList<TE>();
+    protected long longSize;
 
-    public MutableTypeArrayList(int allocationSize) {
+    public AbstractHugeArrayList(int allocationSize) {
         this.allocationSize = allocationSize;
     }
 
     public void ensureCapacity(long size) {
         long blocks = (size + allocationSize - 1) / allocationSize;
         while (blocks > allocations.size()) {
-            allocations.add(new MutableTypesAllocation(allocationSize));
+            allocations.add(createAllocation());
         }
     }
+
+    protected abstract TA createAllocation();
 
     @Override
     public int size() {
@@ -58,53 +61,58 @@ public class MutableTypeArrayList extends AbstractList<MutableTypes> implements 
     }
 
     @Override
-    public MutableTypes get(long n) throws IndexOutOfBoundsException {
-        return acquireElement(n);
+    public T get(long n) throws IndexOutOfBoundsException {
+        return (T) acquireElement(n);
     }
 
-    MutableTypesElement acquireElement(long n) {
+    TE acquireElement(long n) {
         if (proxies.isEmpty())
-            return new MutableTypesElement(this, n);
-        MutableTypesElement mte = proxies.remove(proxies.size() - 1);
+            return createElement(n);
+        TE mte = proxies.remove(proxies.size() - 1);
         mte.index(n);
         return mte;
     }
 
+    protected abstract TE createElement(long n);
+
     @Override
-    public HugeIterator<MutableTypes> iterator() {
+    public HugeIterator<T> iterator() {
         return listIterator();
     }
 
     @Override
-    public HugeIterator<MutableTypes> listIterator() {
-        return new MutableTypesListIterator(this);
+    public HugeListIterator<T> listIterator() {
+        return new HugeListIteratorImpl<T, TA, TE>(this);
     }
 
     @Override
-    public ListIterator<MutableTypes> listIterator(int index) {
-        HugeIterator<MutableTypes> iterator = listIterator();
+    public ListIterator<T> listIterator(int index) {
+        HugeListIterator<T> iterator = listIterator();
         iterator.index(index);
         return iterator;
     }
 
     @Override
-    public void recycle(MutableTypes t) {
-        if (t instanceof MutableTypesElement)
-            proxies.add((MutableTypesElement) t);
+    public void recycle(T t) {
+        proxies.add((TE) t);
     }
 
     @Override
-    public MutableTypes get(int index) {
+    public T get(int index) {
         return get(index & 0xFFFFFFFFL);
     }
 
     @Override
-    public MutableTypes set(int index, MutableTypes element) {
+    public T set(int index, T element) {
         return set((long) index, element);
     }
 
     @Override
-    public MutableTypes set(long n, MutableTypes mutableTypes) throws IndexOutOfBoundsException {
+    public T set(long n, T mutableTypes) throws IndexOutOfBoundsException {
         throw new UnsupportedOperationException();
+    }
+
+    public TA getAllocation(long index) {
+        return allocations.get((int) (index / allocationSize));
     }
 }

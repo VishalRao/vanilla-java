@@ -16,25 +16,23 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
-public class FloatFieldModel implements FieldModel<Float> {
-    private final String fieldName;
-    private final int fieldNumber;
-    private Method setter;
-    private Method getter;
-
+public class FloatFieldModel extends AbstractFieldModel<Float> {
     public FloatFieldModel(String fieldName, int fieldNumber) {
-        this.fieldName = fieldName;
-        this.fieldNumber = fieldNumber;
+        super(fieldName, fieldNumber);
     }
 
     @Override
     public Object arrayOfField(int size) {
         return newArrayOfField(size);
+    }
+
+    @Override
+    public Class storeType() {
+        return FloatBuffer.class;
     }
 
     public static FloatBuffer newArrayOfField(int size) {
@@ -47,7 +45,7 @@ public class FloatFieldModel implements FieldModel<Float> {
         return get(array, index);
     }
 
-    public static Float get(FloatBuffer array, int index) {
+    public static float get(FloatBuffer array, int index) {
         return array.get(index);
     }
 
@@ -57,37 +55,23 @@ public class FloatFieldModel implements FieldModel<Float> {
         set(array, index, value);
     }
 
-    public static void set(FloatBuffer array, int index, Float value) {
+    public static void set(FloatBuffer array, int index, float value) {
         array.put(index, value);
-    }
-
-    @Override
-    public void setter(Method setter) {
-        this.setter = setter;
-    }
-
-    @Override
-    public void getter(Method getter) {
-        this.getter = getter;
-    }
-
-    @Override
-    public int fieldNumber() {
-        return fieldNumber;
-    }
-
-    @Override
-    public Method setter() {
-        return setter;
-    }
-
-    @Override
-    public Method getter() {
-        return getter;
     }
 
     @Override
     public Class<Float> type() {
         return (Class) float.class;
     }
+
+    @Override
+    public String bcLFieldType() {
+        return "F";
+    }
+
+    @Override
+    public BCType bcType() {
+        return BCType.Float;
+    }
+
 }

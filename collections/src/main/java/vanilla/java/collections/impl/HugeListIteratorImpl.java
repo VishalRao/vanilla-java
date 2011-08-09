@@ -1,4 +1,4 @@
-package vanilla.java.collections;
+package vanilla.java.collections.impl;
 
 /*
  * Copyright 2011 Peter Lawrey
@@ -16,13 +16,13 @@ package vanilla.java.collections;
  *    limitations under the License.
  */
 
-import vanilla.java.collections.api.HugeIterator;
+import vanilla.java.collections.HugeListIterator;
 
-public class MutableTypesListIterator implements HugeIterator<MutableTypes> {
-    private final MutableTypeArrayList list;
-    private final MutableTypesElement mte;
+public class HugeListIteratorImpl<T, TA, TE extends AbstractHugeElement<TA>> implements HugeListIterator<T> {
+    private final AbstractHugeArrayList<T, TA, TE> list;
+    private final TE mte;
 
-    public MutableTypesListIterator(MutableTypeArrayList list) {
+    public HugeListIteratorImpl(AbstractHugeArrayList<T, TA, TE> list) {
         this.list = list;
         mte = list.acquireElement(-1);
     }
@@ -33,9 +33,9 @@ public class MutableTypesListIterator implements HugeIterator<MutableTypes> {
     }
 
     @Override
-    public MutableTypes next() {
+    public T next() {
         mte.next();
-        return mte;
+        return (T) mte;
     }
 
     @Override
@@ -44,8 +44,9 @@ public class MutableTypesListIterator implements HugeIterator<MutableTypes> {
     }
 
     @Override
-    public MutableTypes previous() {
-        return mte.previous();
+    public T previous() {
+        mte.previous();
+        return (T) mte;
     }
 
     @Override
@@ -63,27 +64,19 @@ public class MutableTypesListIterator implements HugeIterator<MutableTypes> {
     }
 
     @Override
-    public void set(MutableTypes mutableTypes) {
-    }
-
-    @Override
-    public void add(MutableTypes mutableTypes) {
-    }
-
-    @Override
-    public HugeIterator<MutableTypes> toStart() {
+    public HugeListIterator<T> toStart() {
         mte.index(-1);
         return this;
     }
 
     @Override
-    public HugeIterator<MutableTypes> toEnd() {
+    public HugeListIterator<T> toEnd() {
         mte.index(list.longSize);
         return this;
     }
 
     @Override
-    public HugeIterator<MutableTypes> index(long n) {
+    public HugeListIterator<T> index(long n) {
         mte.index(n);
         return this;
     }
@@ -100,5 +93,20 @@ public class MutableTypesListIterator implements HugeIterator<MutableTypes> {
 
     @Override
     public void recycle() {
+    }
+
+    @Override
+    public void index(int index) {
+        mte.index(index);
+    }
+
+    @Override
+    public void set(T t) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void add(T t) {
+        throw new UnsupportedOperationException();
     }
 }
