@@ -16,25 +16,23 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.DoubleBuffer;
 
-public class DoubleFieldModel implements FieldModel<Double> {
-    private final String fieldName;
-    private final int fieldNumber;
-    private Method setter;
-    private Method getter;
-
+public class DoubleFieldModel extends AbstractFieldModel<Double> {
     public DoubleFieldModel(String fieldName, int fieldNumber) {
-        this.fieldName = fieldName;
-        this.fieldNumber = fieldNumber;
+        super(fieldName, fieldNumber);
     }
 
     @Override
     public Object arrayOfField(int size) {
         return newArrayOfField(size);
+    }
+
+    @Override
+    public Class storeType() {
+        return DoubleBuffer.class;
     }
 
     public static DoubleBuffer newArrayOfField(int size) {
@@ -47,7 +45,7 @@ public class DoubleFieldModel implements FieldModel<Double> {
         return get(array, index);
     }
 
-    public static Double get(DoubleBuffer array, int index) {
+    public static double get(DoubleBuffer array, int index) {
         return array.get(index);
     }
 
@@ -57,37 +55,27 @@ public class DoubleFieldModel implements FieldModel<Double> {
         set(array, index, value);
     }
 
-    public static void set(DoubleBuffer array, int index, Double value) {
+    public static void set(DoubleBuffer array, int index, double value) {
         array.put(index, value);
-    }
-
-    @Override
-    public void setter(Method setter) {
-        this.setter = setter;
-    }
-
-    @Override
-    public void getter(Method getter) {
-        this.getter = getter;
-    }
-
-    @Override
-    public int fieldNumber() {
-        return fieldNumber;
-    }
-
-    @Override
-    public Method setter() {
-        return setter;
-    }
-
-    @Override
-    public Method getter() {
-        return getter;
     }
 
     @Override
     public Class<Double> type() {
         return (Class) double.class;
+    }
+
+    @Override
+    public int bcFieldSize() {
+        return 2;
+    }
+
+    @Override
+    public String bcLFieldType() {
+        return "D";
+    }
+
+    @Override
+    public BCType bcType() {
+        return BCType.Double;
     }
 }

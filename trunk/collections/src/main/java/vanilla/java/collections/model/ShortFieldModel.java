@@ -16,25 +16,23 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 
-public class ShortFieldModel implements FieldModel<Short> {
-    private final String fieldName;
-    private final int fieldNumber;
-    private Method setter;
-    private Method getter;
-
+public class ShortFieldModel extends AbstractFieldModel<Short> {
     public ShortFieldModel(String fieldName, int fieldNumber) {
-        this.fieldName = fieldName;
-        this.fieldNumber = fieldNumber;
+        super(fieldName, fieldNumber);
     }
 
     @Override
     public Object arrayOfField(int size) {
         return newArrayOfField(size);
+    }
+
+    @Override
+    public Class storeType() {
+        return ShortBuffer.class;
     }
 
     public static ShortBuffer newArrayOfField(int size) {
@@ -63,32 +61,12 @@ public class ShortFieldModel implements FieldModel<Short> {
     }
 
     @Override
-    public void setter(Method setter) {
-        this.setter = setter;
-    }
-
-    @Override
-    public void getter(Method getter) {
-        this.getter = getter;
-    }
-
-    @Override
-    public int fieldNumber() {
-        return fieldNumber;
-    }
-
-    @Override
-    public Method setter() {
-        return setter;
-    }
-
-    @Override
-    public Method getter() {
-        return getter;
-    }
-
-    @Override
     public Class<Short> type() {
         return (Class) short.class;
+    }
+
+    @Override
+    public String bcLFieldType() {
+        return "S";
     }
 }

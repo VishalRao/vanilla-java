@@ -16,7 +16,6 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
@@ -24,24 +23,24 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Enumerated16FieldModel<T> implements FieldModel<T> {
-    private final String fieldName;
+public class Enumerated16FieldModel<T> extends AbstractFieldModel<T> {
     private final Class<T> type;
     private final Map<T, Character> map = new LinkedHashMap<T, Character>();
     private final List<T> list = new ArrayList<T>();
-    private final int fieldNumber;
-    private Method setter;
-    private Method getter;
 
-    public Enumerated16FieldModel(String fieldName, Class<T> type, int fieldNumber) {
-        this.fieldName = fieldName;
+    public Enumerated16FieldModel(String fieldName, int fieldNumber, Class<T> type) {
+        super(fieldName, fieldNumber);
         this.type = type;
-        this.fieldNumber = fieldNumber;
     }
 
     @Override
     public Object arrayOfField(int size) {
         return newArrayOfField(size);
+    }
+
+    @Override
+    public Class storeType() {
+        return CharBuffer.class;
     }
 
     public static CharBuffer newArrayOfField(int size) {
@@ -75,32 +74,22 @@ public class Enumerated16FieldModel<T> implements FieldModel<T> {
     }
 
     @Override
-    public void setter(Method setter) {
-        this.setter = setter;
-    }
-
-    @Override
-    public void getter(Method getter) {
-        this.getter = getter;
-    }
-
-    @Override
-    public int fieldNumber() {
-        return fieldNumber;
-    }
-
-    @Override
-    public Method setter() {
-        return setter;
-    }
-
-    @Override
-    public Method getter() {
-        return getter;
-    }
-
-    @Override
     public Class<T> type() {
         return type;
+    }
+
+    @Override
+    public BCType bcType() {
+        return BCType.Reference;
+    }
+
+    @Override
+    public String bcLSetType() {
+        return "Ljava/lang/Object;";
+    }
+
+    @Override
+    public boolean virtualGetSet() {
+        return true;
     }
 }

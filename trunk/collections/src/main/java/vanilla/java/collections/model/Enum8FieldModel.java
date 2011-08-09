@@ -16,20 +16,14 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
-public class Enum8FieldModel<E extends Enum<E>> implements FieldModel<E> {
-    private final String fieldName;
-    private final int fieldNumber;
+public class Enum8FieldModel<E extends Enum<E>> extends AbstractFieldModel<E> {
     private final Class<E> type;
     private final E[] values;
-    private Method setter;
-    private Method getter;
 
-    public Enum8FieldModel(String fieldName, Class<E> type, int fieldNumber, E[] values) {
-        this.fieldName = fieldName;
-        this.fieldNumber = fieldNumber;
+    public Enum8FieldModel(String fieldName, int fieldNumber, Class<E> type, E[] values) {
+        super(fieldName, fieldNumber);
         this.type = type;
         this.values = values;
     }
@@ -41,6 +35,11 @@ public class Enum8FieldModel<E extends Enum<E>> implements FieldModel<E> {
 
     public static ByteBuffer newArrayOfField(int size) {
         return ByteBuffer.allocateDirect(size);
+    }
+
+    @Override
+    public Class storeType() {
+        return ByteBuffer.class;
     }
 
     @Override
@@ -59,37 +58,29 @@ public class Enum8FieldModel<E extends Enum<E>> implements FieldModel<E> {
         set(array, index, value);
     }
 
+    // mv.visitMethodInsn(INVOKEVIRTUAL, collections + "model/Enum8FieldModel", "set", "(Ljava/nio/ByteBuffer;ILjava/lang/Enum;)V");
     public void set(ByteBuffer array, int index, E value) {
         array.put(index, (byte) value.ordinal());
     }
 
     @Override
-    public void setter(Method setter) {
-        this.setter = setter;
-    }
-
-    @Override
-    public void getter(Method getter) {
-        this.getter = getter;
-    }
-
-    @Override
-    public int fieldNumber() {
-        return fieldNumber;
-    }
-
-    @Override
-    public Method setter() {
-        return setter;
-    }
-
-    @Override
-    public Method getter() {
-        return getter;
+    public String bcLSetType() {
+        return "Ljava/lang/Enum;";
     }
 
     @Override
     public Class<E> type() {
         return type;
+    }
+
+    @Override
+    public BCType bcType() {
+        return BCType.Reference;
+    }
+
+
+    @Override
+    public boolean virtualGetSet() {
+        return true;
     }
 }

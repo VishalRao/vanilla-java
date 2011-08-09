@@ -16,25 +16,23 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
-public class IntFieldModel implements FieldModel<Integer> {
-    private final String fieldName;
-    private final int fieldNumber;
-    private Method setter;
-    private Method getter;
-
+public class IntFieldModel extends AbstractFieldModel<Integer> {
     public IntFieldModel(String fieldName, int fieldNumber) {
-        this.fieldName = fieldName;
-        this.fieldNumber = fieldNumber;
+        super(fieldName, fieldNumber);
     }
 
     @Override
     public Object arrayOfField(int size) {
         return newArrayOfField(size);
+    }
+
+    @Override
+    public Class storeType() {
+        return IntBuffer.class;
     }
 
     public static IntBuffer newArrayOfField(int size) {
@@ -62,32 +60,13 @@ public class IntFieldModel implements FieldModel<Integer> {
     }
 
     @Override
-    public void setter(Method setter) {
-        this.setter = setter;
-    }
-
-    @Override
-    public void getter(Method getter) {
-        this.getter = getter;
-    }
-
-    @Override
-    public int fieldNumber() {
-        return fieldNumber;
-    }
-
-    @Override
-    public Method setter() {
-        return setter;
-    }
-
-    @Override
-    public Method getter() {
-        return getter;
-    }
-
-    @Override
     public Class<Integer> type() {
         return (Class) int.class;
     }
+
+    @Override
+    public String bcLFieldType() {
+        return "I";
+    }
+
 }

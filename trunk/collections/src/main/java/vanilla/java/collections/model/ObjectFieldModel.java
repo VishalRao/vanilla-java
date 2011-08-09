@@ -17,24 +17,23 @@ package vanilla.java.collections.model;
  */
 
 import java.lang.reflect.Array;
-import java.lang.reflect.Method;
 
-public class ObjectFieldModel<T> implements FieldModel<T> {
-    private final String fieldName;
+public class ObjectFieldModel<T> extends AbstractFieldModel<T> {
     private final Class<T> type;
-    private final int fieldNumber;
-    private Method setter;
-    private Method getter;
 
-    public ObjectFieldModel(String fieldName, Class<T> type, int fieldNumber) {
-        this.fieldName = fieldName;
+    public ObjectFieldModel(String fieldName, int fieldNumber, Class<T> type) {
+        super(fieldName, fieldNumber);
         this.type = type;
-        this.fieldNumber = fieldNumber;
     }
 
     @Override
     public Object arrayOfField(int size) {
         return newArrayOfField(type, size);
+    }
+
+    @Override
+    public Class storeType() {
+        return Object[].class;
     }
 
     public static <T> T[] newArrayOfField(Class<T> type, int size) {
@@ -62,32 +61,12 @@ public class ObjectFieldModel<T> implements FieldModel<T> {
     }
 
     @Override
-    public void setter(Method setter) {
-        this.setter = setter;
-    }
-
-    @Override
-    public void getter(Method getter) {
-        this.getter = getter;
-    }
-
-    @Override
-    public int fieldNumber() {
-        return fieldNumber;
-    }
-
-    @Override
-    public Method setter() {
-        return setter;
-    }
-
-    @Override
-    public Method getter() {
-        return getter;
-    }
-
-    @Override
     public Class<T> type() {
         return type;
+    }
+
+    @Override
+    public BCType bcType() {
+        return BCType.Reference;
     }
 }

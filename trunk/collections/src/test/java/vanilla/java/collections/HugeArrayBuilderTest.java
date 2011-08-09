@@ -16,8 +16,10 @@ package vanilla.java.collections;
  *    limitations under the License.
  */
 
+import org.junit.Ignore;
 import org.junit.Test;
 import vanilla.java.collections.api.HugeArrayList;
+import vanilla.java.collections.hand.MutableTypesArrayList;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
@@ -28,7 +30,7 @@ import static junit.framework.Assert.assertEquals;
 
 public class HugeArrayBuilderTest {
     private static final ElementType[] elementTypes = ElementType.values();
-    private static final long length = 500 * 1000 * 1000L;
+    private static final long length = 10 * 1000 * 1000L;
 
     interface MutableBoolean {
         public void setFlag(boolean b);
@@ -36,13 +38,16 @@ public class HugeArrayBuilderTest {
         public boolean getFlag();
     }
 
+    @Ignore
     @org.junit.Test
     public void testCreate() throws Exception {
         Thread t = monitorThread();
 
-        final long length = 128 * 1000 * 1000 * 1000L;
-        HugeArrayList<MutableBoolean> hugeList = new HugeArrayBuilder<MutableBoolean>() {
-        }.create();
+//        final long length = 128 * 1000 * 1000 * 1000L;
+        final long length = 10 * 1000 * 1000 * 1000L;
+        HugeArrayList<MutableBoolean> hugeList = new HugeArrayBuilder<MutableBoolean>() {{
+            capacity = length;
+        }}.create();
         List<MutableBoolean> list = hugeList;
         assertEquals(0, list.size());
 
@@ -54,15 +59,22 @@ public class HugeArrayBuilderTest {
         assertEquals(length, hugeList.longSize());
 
         boolean b = false;
-        for (MutableBoolean mb : list)
+        long count = 0;
+        for (MutableBoolean mb : list) {
             mb.setFlag(b = !b);
+            if ((int) count++ == 0)
+                System.out.println("set " + count);
+        }
 
         b = false;
+        count = 0;
         for (MutableBoolean mb : list) {
             boolean b2 = mb.getFlag();
             boolean expected = b = !b;
             if (b2 != expected)
                 assertEquals(expected, b2);
+            if ((int) count++ == 0)
+                System.out.println("get " + count);
         }
         t.interrupt();
     }
@@ -90,11 +102,12 @@ public class HugeArrayBuilderTest {
         assertEquals(length, list.size());
     }
 
+    @Ignore
     @Test
     public void testCreateTypes2() throws Exception {
         gcPrintUsed();
 
-        HugeArrayList<MutableTypes> hugeList = new MutableTypeArrayList(1024 * 1024);
+        HugeArrayList<MutableTypes> hugeList = new MutableTypesArrayList(1024 * 1024);
         List<MutableTypes> list = hugeList;
         assertEquals(0, list.size());
 
@@ -112,6 +125,7 @@ public class HugeArrayBuilderTest {
         assertEquals(length, list.size());
     }
 
+    @Ignore
     @Test
     public void testCreateJavaBean() throws Exception {
         gcPrintUsed();

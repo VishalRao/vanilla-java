@@ -16,20 +16,14 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
-public class Boolean2FieldModel implements FieldModel<Boolean> {
-    private final String fieldName;
-    private final int fieldNumber;
-    private Method setter;
-    private Method getter;
+public class Boolean2FieldModel extends AbstractFieldModel<Boolean> {
 
     public Boolean2FieldModel(String fieldName, int fieldNumber) {
-        this.fieldName = fieldName;
-        this.fieldNumber = fieldNumber;
+        super(fieldName, fieldNumber);
     }
 
     @Override
@@ -39,6 +33,11 @@ public class Boolean2FieldModel implements FieldModel<Boolean> {
 
     public static IntBuffer newArrayOfField(int size) {
         return ByteBuffer.allocateDirect(size / 4).order(ByteOrder.nativeOrder()).asIntBuffer();
+    }
+
+    @Override
+    public Class storeType() {
+        return IntBuffer.class;
     }
 
     @Override
@@ -77,32 +76,12 @@ public class Boolean2FieldModel implements FieldModel<Boolean> {
     }
 
     @Override
-    public void setter(Method setter) {
-        this.setter = setter;
-    }
-
-    @Override
-    public void getter(Method getter) {
-        this.getter = getter;
-    }
-
-    @Override
-    public int fieldNumber() {
-        return fieldNumber;
-    }
-
-    @Override
-    public Method setter() {
-        return setter;
-    }
-
-    @Override
-    public Method getter() {
-        return getter;
-    }
-
-    @Override
     public Class<Boolean> type() {
-        return (Class) boolean.class;
+        return Boolean.class;
+    }
+
+    @Override
+    public BCType bcType() {
+        return BCType.Reference;
     }
 }

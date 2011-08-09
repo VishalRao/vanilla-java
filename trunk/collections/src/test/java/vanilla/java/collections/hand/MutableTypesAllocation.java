@@ -1,4 +1,4 @@
-package vanilla.java.collections;
+package vanilla.java.collections.hand;
 
 /*
  * Copyright 2011 Peter Lawrey
