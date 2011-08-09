@@ -43,6 +43,7 @@ public class HugeArrayBuilder<T> {
         typeModel = new TypeModel<T>(type);
         classLoader = getClass().getClassLoader();
         try {
+            @SuppressWarnings({"UnusedDeclaration"})
             Class classWriter = ClassWriter.class;
             disableCodeGeneration = false;
         } catch (NoClassDefFoundError ignored) {

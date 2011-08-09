@@ -36,6 +36,7 @@ public class ObjectFieldModel<T> extends AbstractFieldModel<T> {
         return Object[].class;
     }
 
+    @UsedFromByteCode
     public static <T> T[] newArrayOfField(Class<T> type, int size) {
         return (T[]) Array.newInstance(type, size);
     }
@@ -46,6 +47,7 @@ public class ObjectFieldModel<T> extends AbstractFieldModel<T> {
         return get(array, index);
     }
 
+    @UsedFromByteCode
     public static <T> T get(T[] array, int index) {
         return array[index];
     }
@@ -56,8 +58,34 @@ public class ObjectFieldModel<T> extends AbstractFieldModel<T> {
         set(array, index, value);
     }
 
+    @UsedFromByteCode
     public static <T> void set(T[] array, int index, T value) {
         array[index] = value;
+    }
+
+    @Override
+    public String bcStoreType() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String bcLStoreType() {
+        return "[Ljava/lang/Object;";
+    }
+
+    @Override
+    public String bcFieldType() {
+        return type().getName().replace('.', '/');
+    }
+
+    @Override
+    public String bcLFieldType() {
+        return "L" + bcFieldType() + ";";
+    }
+
+    @Override
+    public String bcLSetType() {
+        return "Ljava/lang/Object;";
     }
 
     @Override

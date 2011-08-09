@@ -16,8 +16,32 @@ package vanilla.java.collections;
  *    limitations under the License.
  */
 
-public interface HugeElement {
-    void index(long n);
+public interface ObjectTypes {
+    public void setA(A a);
 
-    long index();
+    public A getA();
+
+    public void setB(B b);
+
+    public B getB();
+
+    public void setC(C c);
+
+    public C getC();
+
+    public void setD(D d);
+
+    public D getD();
+
+    public class A {
+    }
+
+    public class B {
+    }
+
+    public class C {
+    }
+
+    public class D {
+    }
 }

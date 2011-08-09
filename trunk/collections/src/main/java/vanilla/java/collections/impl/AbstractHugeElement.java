@@ -35,6 +35,11 @@ public abstract class AbstractHugeElement<TA> implements HugeElement {
         if (offset < 0) offset += list.allocationSize;
     }
 
+    @Override
+    public long index() {
+        return index;
+    }
+
     void next() {
         if (index >= list.longSize)
             list.ensureCapacity(index);
