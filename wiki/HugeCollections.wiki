@@ -26,6 +26,7 @@ HugeArrayList<MutableTypes> hugeList = new HugeArrayBuilder<MutableTypes>() {{
   * Uses long for sizes and indecies.
   * Uses column based data making the per element overhead minimal and speed up scans over a single or small set of attributes. This reduces memory usages by 2x or more.
   * Stores attributes in direct memory as much as possible, reducing heap usage dramatically, 10x or more.
+  * Allocates blocks of data for consistent add() times, rather than exponentially growing an underlying store (with exponentially increasing delays on a grow of capacity)
 
 = Measures =
 == Encoded and Primitive Fields ==
