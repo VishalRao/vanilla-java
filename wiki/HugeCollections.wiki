@@ -21,6 +21,13 @@ HugeArrayList<MutableTypes> hugeList = new HugeArrayBuilder<MutableTypes>() {{
     }}.create();
 }}}
 
+= The source =
+The best way to get the whole source, including tests is to use subversion.
+
+{{{
+svn co http://vanilla-java.googlecode.com/svn/trunk/collections/ vanilla-java-collections
+}}}
+
 = How does the library differ from ArrayList=
 
   * Uses long for sizes and indecies.
