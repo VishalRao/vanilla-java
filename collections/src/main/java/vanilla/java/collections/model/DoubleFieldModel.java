@@ -85,6 +85,11 @@ public class DoubleFieldModel extends AbstractFieldModel<Double> {
     }
 
     @UsedFromByteCode
+    public static boolean notEquals(double d1, double d2) {
+        return Double.doubleToLongBits(d1) != Double.doubleToLongBits(d2);
+    }
+
+    @UsedFromByteCode
     public static int hashCode(double d) {
         return LongFieldModel.hashCode(Double.doubleToLongBits(d));
     }

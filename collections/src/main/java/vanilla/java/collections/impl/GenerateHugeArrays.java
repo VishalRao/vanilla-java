@@ -434,15 +434,10 @@ public enum GenerateHugeArrays {
                 mv.visitMethodInsn(INVOKEVIRTUAL, name + "Element", "get" + fm.titleFieldName(), "()" + fm.bcLFieldType());
                 Label l5 = new Label();
                 if (fm.isCallsNotEquals()) {
-                    mv.visitMethodInsn(INVOKESTATIC, collections + "impl/GenerateHugeArrays", "notEquals", "(" + fm.bcLSetType() + fm.bcLSetType() + ")Z");
+                    mv.visitMethodInsn(INVOKESTATIC, fm.bcLModelType(), "notEquals", "(" + fm.bcLSetType() + fm.bcLSetType() + ")Z");
                     mv.visitJumpInsn(IFEQ, l5);
                 } else {
-                    if (fm.type() == long.class) {
-                        mv.visitInsn(LCMP);
-                        mv.visitJumpInsn(IFEQ, l5);
-                    } else {
-                        mv.visitJumpInsn(IF_ICMPEQ, l5);
-                    }
+                    mv.visitJumpInsn(IF_ICMPEQ, l5);
                 }
                 mv.visitInsn(ICONST_0);
                 mv.visitInsn(IRETURN);
@@ -467,23 +462,14 @@ public enum GenerateHugeArrays {
             int count = 0;
             for (FieldModel fm : tm.fields()) {
 //                if (count > 5) break;
-                System.out.println(fm.fieldName());
+//                System.out.println(fm.fieldName());
                 if (count > 0) {
                     mv.visitIntInsn(BIPUSH, 31);
                     mv.visitInsn(IMUL);
                 }
                 mv.visitVarInsn(ALOAD, 0);
                 mv.visitMethodInsn(INVOKEVIRTUAL, name + "Element", "get" + fm.titleFieldName(), "()" + fm.bcLFieldType());
-                if (fm.type() == boolean.class) {
-                    Label l1 = new Label();
-                    mv.visitJumpInsn(IFEQ, l1);
-                    mv.visitInsn(ICONST_1);
-                    Label l2 = new Label();
-                    mv.visitJumpInsn(GOTO, l2);
-                    mv.visitLabel(l1);
-                    mv.visitInsn(ICONST_0);
-                    mv.visitLabel(l2);
-                } else if (fm.isCallsHashCode()) {
+                if (fm.isCallsHashCode()) {
                     mv.visitMethodInsn(INVOKESTATIC, fm.bcLModelType(), "hashCode", "(" + fm.bcLSetType() + ")I");
                 }
 
@@ -522,17 +508,5 @@ public enum GenerateHugeArrays {
 
     private static int storeFor(BCType bcType) {
         return storeForArray[bcType.ordinal()];
-    }
-
-    public static boolean notEquals(float d1, float d2) {
-        return Float.floatToIntBits(d1) != Float.floatToIntBits(d2);
-    }
-
-    public static boolean notEquals(double d1, double d2) {
-        return Double.doubleToLongBits(d1) != Double.doubleToLongBits(d2);
-    }
-
-    public static <T> boolean notEquals(T t1, T t2) {
-        return t1 == null ? t2 != null : !t1.equals(t2);
     }
 }

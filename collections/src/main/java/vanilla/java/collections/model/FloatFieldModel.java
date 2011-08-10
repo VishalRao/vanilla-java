@@ -79,6 +79,12 @@ public class FloatFieldModel extends AbstractFieldModel<Float> {
         return true;
     }
 
+    @UsedFromByteCode
+    public static boolean notEquals(float d1, float d2) {
+        return Float.floatToIntBits(d1) != Float.floatToIntBits(d2);
+    }
+
+    @UsedFromByteCode
     public static int hashCode(float f) {
         return Float.floatToIntBits(f);
     }

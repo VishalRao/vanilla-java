@@ -80,8 +80,12 @@ public class LongFieldModel extends AbstractFieldModel<Long> {
     }
 
     @Override
-    public boolean isCallsHashCode() {
+    public boolean isCallsNotEquals() {
         return true;
+    }
+
+    public static boolean equals(long l1, long l2) {
+        return l1 == l2;
     }
 
     public static int hashCode(long l) {

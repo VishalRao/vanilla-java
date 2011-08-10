@@ -91,6 +91,11 @@ public class Boolean2FieldModel extends AbstractFieldModel<Boolean> {
     }
 
     @UsedFromByteCode
+    public static boolean notEquals(Boolean t1, Boolean t2) {
+        return t1 == null ? t2 != null : !t1.equals(t2);
+    }
+
+    @UsedFromByteCode
     public static int hashCode(Boolean b) {
         return b == null ? 0 : b.hashCode();
     }
