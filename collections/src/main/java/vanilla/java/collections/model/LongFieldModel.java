@@ -78,4 +78,13 @@ public class LongFieldModel extends AbstractFieldModel<Long> {
     public BCType bcType() {
         return BCType.Long;
     }
+
+    @Override
+    public boolean isCallsHashCode() {
+        return true;
+    }
+
+    public static int hashCode(long l) {
+        return (int) (l >>> 32 ^ l);
+    }
 }

@@ -29,7 +29,7 @@ public class HugeListIteratorImpl<T, TA, TE extends AbstractHugeElement<TA>> imp
 
     @Override
     public boolean hasNext() {
-        return mte.index < list.longSize;
+        return mte.index + 1 < list.longSize;
     }
 
     @Override

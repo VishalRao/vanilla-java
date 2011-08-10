@@ -19,6 +19,7 @@ package vanilla.java.collections.hand;
 import vanilla.java.collections.MutableTypes;
 import vanilla.java.collections.impl.AbstractHugeArrayList;
 import vanilla.java.collections.impl.AbstractHugeElement;
+import vanilla.java.collections.impl.GenerateHugeArrays;
 import vanilla.java.collections.model.*;
 
 import java.lang.annotation.ElementType;
@@ -150,8 +151,68 @@ public class MutableTypesElement extends AbstractHugeElement<MutableTypesAllocat
         return ((MutableTypesArrayList) list).stringEnumerated16FieldModel.get(allocation.m_string, offset);
     }
 
+
     @Override
     protected void updateAllocation0(int allocationSize) {
         allocation = list.getAllocation(index);
+    }
+
+
+    @Override
+    public String toString() {
+        return "MutableTypesElement{" +
+                "boolean=" + getBoolean() +
+                ", boolean2=" + getBoolean2() +
+                ", byte=" + getByte() +
+                ", byte2=" + getByte2() +
+                ", char=" + getChar() +
+                ", short=" + getShort() +
+                ", int=" + getInt() +
+                ", float=" + getFloat() +
+                ", long=" + getLong() +
+                ", double=" + getDouble() +
+                ", elementType=" + getElementType() +
+                ", string='" + getString() + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MutableTypesElement that = (MutableTypesElement) o;
+
+        if (getBoolean() != that.getBoolean()) return false;
+        if (GenerateHugeArrays.notEquals(getBoolean2(), that.getBoolean2())) return false;
+        if (getByte() != that.getByte()) return false;
+        if (GenerateHugeArrays.notEquals(getByte2(), that.getByte2())) return false;
+        if (getChar() != that.getChar()) return false;
+        if (getShort() != that.getShort()) return false;
+        if (getInt() != that.getInt()) return false;
+        if (GenerateHugeArrays.notEquals(getFloat(), that.getFloat())) return false;
+        if (getLong() != that.getLong()) return false;
+        if (GenerateHugeArrays.notEquals(getDouble(), that.getDouble())) return false;
+        if (getElementType() != that.getElementType()) return false;
+        if (GenerateHugeArrays.notEquals(getString(), that.getString())) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return (((((((((((
+                getBoolean() ? 1 : 0) * 31 +
+                Boolean2FieldModel.hashCode(getBoolean2())) * 31 +
+                getByte()) * 31 +
+                Byte2FieldModel.hashCode(getByte2())) * 31 +
+                getChar()) * 31 +
+                getShort()) * 31 +
+                getInt()) * 31 +
+                FloatFieldModel.hashCode(getFloat())) * 31 +
+                LongFieldModel.hashCode(getLong())) * 31 +
+                DoubleFieldModel.hashCode(getDouble())) * 31 +
+                Enumerated16FieldModel.hashCode(getElementType())) * 31 +
+                ObjectFieldModel.hashCode(getString());
     }
 }

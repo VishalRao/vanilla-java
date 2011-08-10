@@ -112,4 +112,14 @@ public abstract class AbstractFieldModel<T> implements FieldModel<T> {
     public boolean virtualGetSet() {
         return false;
     }
+
+    @Override
+    public boolean isCallsNotEquals() {
+        return false;
+    }
+
+    @Override
+    public boolean isCallsHashCode() {
+        return isCallsNotEquals();
+    }
 }

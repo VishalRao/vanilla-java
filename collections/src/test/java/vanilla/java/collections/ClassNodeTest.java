@@ -28,8 +28,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class ClassNodeTest {
-    static final String collections = "vanilla/java/collections/";
-
     @Test
     @Ignore
     public void test() throws IOException {

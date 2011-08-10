@@ -74,4 +74,12 @@ public class FloatFieldModel extends AbstractFieldModel<Float> {
         return BCType.Float;
     }
 
+    @Override
+    public boolean isCallsNotEquals() {
+        return true;
+    }
+
+    public static int hashCode(float f) {
+        return Float.floatToIntBits(f);
+    }
 }

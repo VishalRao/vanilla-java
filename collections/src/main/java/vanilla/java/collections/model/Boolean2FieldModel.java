@@ -84,4 +84,15 @@ public class Boolean2FieldModel extends AbstractFieldModel<Boolean> {
     public BCType bcType() {
         return BCType.Reference;
     }
+
+    @Override
+    public boolean isCallsNotEquals() {
+        return true;
+    }
+
+    @UsedFromByteCode
+    public static int hashCode(Boolean b) {
+        return b == null ? 0 : b.hashCode();
+    }
+
 }

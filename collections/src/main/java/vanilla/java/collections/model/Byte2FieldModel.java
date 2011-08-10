@@ -78,4 +78,14 @@ public class Byte2FieldModel extends AbstractFieldModel<Byte> {
     public BCType bcType() {
         return BCType.Reference;
     }
+
+    @Override
+    public boolean isCallsNotEquals() {
+        return true;
+    }
+
+    @UsedFromByteCode
+    public static int hashCode(Byte b) {
+        return b == null ? Integer.MIN_VALUE : b;
+    }
 }

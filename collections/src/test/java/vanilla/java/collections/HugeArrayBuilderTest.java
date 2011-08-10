@@ -24,9 +24,12 @@ import vanilla.java.collections.hand.MutableTypesArrayList;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
 
 public class HugeArrayBuilderTest {
     private static final ElementType[] elementTypes = ElementType.values();
@@ -328,6 +331,21 @@ public class HugeArrayBuilderTest {
         }
     }
 
+    @Test
+    public void testToStringHashCodeEquals() {
+        final int size = 32 * 1024;
+        HugeArrayList<MutableTypes> list = new HugeArrayBuilder<MutableTypes>() {{
+            capacity = size;
+        }}.create();
+        list.setSize(size);
+        populate(list);
+        assertFalse(list.get(63).equals(list.get(64)));
+        Set<Integer> hashCodes = new LinkedHashSet<Integer>();
+        for (int n = 0; n < size; n++)
+            hashCodes.add(list.get(n).hashCode());
+        assertEquals(size, hashCodes.size());
+    }
+
     private static void exerciseList(List<MutableTypes> list, long length) {
         assertEquals(length, list.size());
         gcPrintUsed();
@@ -340,6 +358,9 @@ public class HugeArrayBuilderTest {
             int i;
             long timeWrite = System.nanoTime() - startWrite;
             System.out.printf("Took %,d ns per object write%n", timeWrite / list.size());
+
+            assertEquals("MutableTypes{boolean=true, byte=64, short=64, char=@, int=64, long=64, float=64.0, double=64.0, string=64, boolean2=true, byte2=64, elementType=TYPE}"
+                    , list.get(64).toString());
 
             System.out.println("Checking");
             long startRead = System.nanoTime();

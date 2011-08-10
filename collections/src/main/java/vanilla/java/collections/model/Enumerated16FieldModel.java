@@ -92,4 +92,14 @@ public class Enumerated16FieldModel<T> extends AbstractFieldModel<T> {
     public boolean virtualGetSet() {
         return true;
     }
+
+    @Override
+    public boolean isCallsNotEquals() {
+        return true;
+    }
+
+    @UsedFromByteCode
+    public static <T> int hashCode(T elementType) {
+        return elementType == null ? Integer.MIN_VALUE : elementType.hashCode();
+    }
 }

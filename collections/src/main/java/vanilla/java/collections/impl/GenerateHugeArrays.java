@@ -347,11 +347,162 @@ public enum GenerateHugeArrays {
             mv.visitMaxs(4, 2);
             mv.visitEnd();
         }
+
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "toString", "()Ljava/lang/String;", null, null);
+            mv.visitCode();
+            Label l0 = new Label();
+            mv.visitLabel(l0);
+            mv.visitLineNumber(163, l0);
+            mv.visitTypeInsn(NEW, "java/lang/StringBuilder");
+            mv.visitInsn(DUP);
+            mv.visitMethodInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "()V");
+            mv.visitLdcInsn(tm.type().getSimpleName() + "{");
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+
+            String sep = "";
+            for (FieldModel fm : tm.fields()) {
+                boolean text = CharSequence.class.isAssignableFrom(tm.type());
+
+                mv.visitLdcInsn(sep + fm.fieldName() + "=" + (text ? "'" : ""));
+                mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+                mv.visitVarInsn(ALOAD, 0);
+                mv.visitMethodInsn(INVOKEVIRTUAL, name + "Element", "get" + fm.titleFieldName(), "()" + fm.bcLFieldType());
+                String appendType = "Ljava/lang/Object;";
+                final Class fmType = fm.type();
+                if (fmType.isPrimitive()) {
+                    if (fmType == byte.class || fmType == short.class)
+                        appendType = "I";
+                    else
+                        appendType = fm.bcLFieldType();
+                }
+                mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(" + appendType + ")Ljava/lang/StringBuilder;");
+                sep = text ? "', " : ", ";
+            }
+            if (sep.startsWith("'")) {
+                mv.visitIntInsn(BIPUSH, 39);
+                mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;");
+            }
+            mv.visitIntInsn(BIPUSH, 125);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;");
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;");
+            mv.visitInsn(ARETURN);
+            Label l1 = new Label();
+            mv.visitLabel(l1);
+            mv.visitLocalVariable("this", "L" + name + "Element;", null, l0, l1, 0);
+            mv.visitMaxs(3, 1);
+            mv.visitEnd();
+        }
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "equals", "(Ljava/lang/Object;)Z", null, null);
+            mv.visitCode();
+            Label l0 = new Label();
+            mv.visitLabel(l0);
+            mv.visitLineNumber(181, l0);
+            mv.visitVarInsn(ALOAD, 0);
+            mv.visitVarInsn(ALOAD, 1);
+            Label l1 = new Label();
+            mv.visitJumpInsn(IF_ACMPNE, l1);
+            mv.visitInsn(ICONST_1);
+            mv.visitInsn(IRETURN);
+            mv.visitLabel(l1);
+            mv.visitLineNumber(182, l1);
+            mv.visitVarInsn(ALOAD, 1);
+            Label l2 = new Label();
+            mv.visitJumpInsn(IFNULL, l2);
+            mv.visitVarInsn(ALOAD, 0);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;");
+            mv.visitVarInsn(ALOAD, 1);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;");
+            Label l3 = new Label();
+            mv.visitJumpInsn(IF_ACMPEQ, l3);
+            mv.visitLabel(l2);
+            mv.visitInsn(ICONST_0);
+            mv.visitInsn(IRETURN);
+            mv.visitLabel(l3);
+            mv.visitLineNumber(184, l3);
+            mv.visitVarInsn(ALOAD, 1);
+            mv.visitTypeInsn(CHECKCAST, name + "Element");
+            mv.visitVarInsn(ASTORE, 2);
+            Label l4 = new Label();
+            mv.visitLabel(l4);
+            for (FieldModel fm : tm.fields()) {
+//                System.out.println(fm.fieldName());
+                mv.visitVarInsn(ALOAD, 0);
+                mv.visitMethodInsn(INVOKEVIRTUAL, name + "Element", "get" + fm.titleFieldName(), "()" + fm.bcLFieldType());
+                mv.visitVarInsn(ALOAD, 2);
+                mv.visitMethodInsn(INVOKEVIRTUAL, name + "Element", "get" + fm.titleFieldName(), "()" + fm.bcLFieldType());
+                Label l5 = new Label();
+                if (fm.isCallsNotEquals()) {
+                    mv.visitMethodInsn(INVOKESTATIC, collections + "impl/GenerateHugeArrays", "notEquals", "(" + fm.bcLSetType() + fm.bcLSetType() + ")Z");
+                    mv.visitJumpInsn(IFEQ, l5);
+                } else {
+                    if (fm.type() == long.class) {
+                        mv.visitInsn(LCMP);
+                        mv.visitJumpInsn(IFEQ, l5);
+                    } else {
+                        mv.visitJumpInsn(IF_ICMPEQ, l5);
+                    }
+                }
+                mv.visitInsn(ICONST_0);
+                mv.visitInsn(IRETURN);
+                mv.visitLabel(l5);
+            }
+
+            mv.visitInsn(ICONST_1);
+            mv.visitInsn(IRETURN);
+            Label l17 = new Label();
+            mv.visitLabel(l17);
+            mv.visitLocalVariable("this", "L" + name + "Element;", null, l0, l17, 0);
+            mv.visitLocalVariable("o", "Ljava/lang/Object;", null, l0, l17, 1);
+            mv.visitLocalVariable("that", "L" + name + "Element;", null, l4, l17, 2);
+            mv.visitMaxs(4, 3);
+            mv.visitEnd();
+        }
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "hashCode", "()I", null, null);
+            mv.visitCode();
+            Label l0 = new Label();
+            mv.visitLabel(l0);
+            int count = 0;
+            for (FieldModel fm : tm.fields()) {
+//                if (count > 5) break;
+                System.out.println(fm.fieldName());
+                if (count > 0) {
+                    mv.visitIntInsn(BIPUSH, 31);
+                    mv.visitInsn(IMUL);
+                }
+                mv.visitVarInsn(ALOAD, 0);
+                mv.visitMethodInsn(INVOKEVIRTUAL, name + "Element", "get" + fm.titleFieldName(), "()" + fm.bcLFieldType());
+                if (fm.type() == boolean.class) {
+                    Label l1 = new Label();
+                    mv.visitJumpInsn(IFEQ, l1);
+                    mv.visitInsn(ICONST_1);
+                    Label l2 = new Label();
+                    mv.visitJumpInsn(GOTO, l2);
+                    mv.visitLabel(l1);
+                    mv.visitInsn(ICONST_0);
+                    mv.visitLabel(l2);
+                } else if (fm.isCallsHashCode()) {
+                    mv.visitMethodInsn(INVOKESTATIC, fm.bcLModelType(), "hashCode", "(" + fm.bcLSetType() + ")I");
+                }
+
+                if (count > 0)
+                    mv.visitInsn(IADD);
+                count++;
+            }
+            mv.visitInsn(IRETURN);
+            Label l3 = new Label();
+            mv.visitLabel(l3);
+            mv.visitLocalVariable("this", "L" + name + "Element;", null, l0, l3, 0);
+            mv.visitMaxs(3, 1);
+            mv.visitEnd();
+        }
         cw.visitEnd();
 
         final byte[] bytes = cw.toByteArray();
 //        ClassReader cr = new ClassReader(bytes);
-//        cr.accept(new ASMifierClassVisitor(new PrintWriter(System.out)),0);
+//        cr.accept(new ASMifierClassVisitor(new PrintWriter(System.out)), 0);
         return bytes;
     }
 
@@ -371,5 +522,17 @@ public enum GenerateHugeArrays {
 
     private static int storeFor(BCType bcType) {
         return storeForArray[bcType.ordinal()];
+    }
+
+    public static boolean notEquals(float d1, float d2) {
+        return Float.floatToIntBits(d1) != Float.floatToIntBits(d2);
+    }
+
+    public static boolean notEquals(double d1, double d2) {
+        return Double.doubleToLongBits(d1) != Double.doubleToLongBits(d2);
+    }
+
+    public static <T> boolean notEquals(T t1, T t2) {
+        return t1 == null ? t2 != null : !t1.equals(t2);
     }
 }

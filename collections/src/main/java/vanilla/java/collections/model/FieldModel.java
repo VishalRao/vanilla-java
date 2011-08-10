@@ -62,4 +62,8 @@ public interface FieldModel<T> {
     BCType bcType();
 
     boolean virtualGetSet();
+
+    boolean isCallsNotEquals();
+
+    boolean isCallsHashCode();
 }
