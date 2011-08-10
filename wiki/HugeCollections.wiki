@@ -26,6 +26,8 @@ The best way to get the whole source, including tests is to use subversion.
 
 {{{
 svn co http://vanilla-java.googlecode.com/svn/trunk/collections/ vanilla-java-collections
+cd vanilla-java-collections
+mvn test
 }}}
 
 = How does the library differ from ArrayList=
