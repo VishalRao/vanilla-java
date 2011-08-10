@@ -16,9 +16,9 @@ package vanilla.java.collections.impl;
  *    limitations under the License.
  */
 
-import vanilla.java.collections.HugeListIterator;
 import vanilla.java.collections.api.HugeArrayList;
 import vanilla.java.collections.api.HugeIterator;
+import vanilla.java.collections.api.HugeListIterator;
 
 import java.util.AbstractList;
 import java.util.ArrayList;

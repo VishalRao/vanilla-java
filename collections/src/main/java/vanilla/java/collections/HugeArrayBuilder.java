@@ -119,9 +119,15 @@ public class HugeArrayBuilder<T> {
         }
         if (disableCodeGeneration)
             return new ColumnHugeArrayList<T>(typeModel, allocationSize, capacity);
-        defineClass(GenerateHugeArrays.dumpElement(typeModel));
-        defineClass(GenerateHugeArrays.dumpAllocation(typeModel));
-        Class arrayListClass = defineClass(GenerateHugeArrays.dumpArrayList(typeModel));
+        Class arrayListClass;
+        try {
+            arrayListClass = classLoader().loadClass(typeModel.type().getName() + "ArrayList");
+
+        } catch (ClassNotFoundException e) {
+            defineClass(GenerateHugeArrays.dumpElement(typeModel));
+            defineClass(GenerateHugeArrays.dumpAllocation(typeModel));
+            arrayListClass = defineClass(GenerateHugeArrays.dumpArrayList(typeModel));
+        }
         try {
             return (HugeArrayList<T>) arrayListClass.getConstructor(int.class).newInstance(allocationSize);
         } catch (NoSuchMethodException e) {

@@ -83,6 +83,11 @@ public class HugeArrayBuilderTest {
     public void testCreateTypes() throws Exception {
         gcPrintUsed();
 
+        // test the class can be create more than once.
+        HugeArrayList<MutableTypes> hugeList0 = new HugeArrayBuilder<MutableTypes>() {{
+            capacity = 1024 * 1024;
+        }}.create();
+
         HugeArrayList<MutableTypes> hugeList = new HugeArrayBuilder<MutableTypes>() {{
             capacity = length;
         }}.create();
@@ -327,30 +332,12 @@ public class HugeArrayBuilderTest {
         assertEquals(length, list.size());
         gcPrintUsed();
 
-        String[] strings = new String[1024];
-        for (int i = 0; i < strings.length; i++)
-            strings[i] = Integer.toString(i);
-
         long start = System.currentTimeMillis();
         do {
             System.out.println("Updating");
-            int i = 0;
             long startWrite = System.nanoTime();
-            for (MutableTypes mb : list) {
-                mb.setBoolean(i % 2 == 0);
-                mb.setBoolean2(i % 3 == 0 ? null : i % 3 == 1);
-                mb.setByte((byte) i);
-                mb.setByte2(i % 31 == 0 ? null : (byte) i);
-                mb.setChar((char) i);
-                mb.setShort((short) i);
-                mb.setInt(i);
-                mb.setFloat(i);
-                mb.setLong(i);
-                mb.setDouble(i);
-                mb.setElementType(elementTypes[i % elementTypes.length]);
-                mb.setString(strings[i % strings.length]);
-                i++;
-            }
+            populate(list);
+            int i;
             long timeWrite = System.nanoTime() - startWrite;
             System.out.printf("Took %,d ns per object write%n", timeWrite / list.size());
 
@@ -358,85 +345,134 @@ public class HugeArrayBuilderTest {
             long startRead = System.nanoTime();
             i = 0;
             for (MutableTypes mb : list) {
-                {
-                    boolean v = mb.getBoolean();
-                    boolean expected = i % 2 == 0;
-                    if (v != expected)
-                        assertEquals(expected, v);
-                }
-                {
-                    Boolean v = mb.getBoolean2();
-                    Boolean expected = i % 3 == 0 ? null : i % 3 == 1;
-                    if (v != expected)
-                        assertEquals(expected, v);
-                }
-                {
-                    byte v = mb.getByte();
-                    byte expected = (byte) i;
-                    if (v != expected)
-                        assertEquals(expected, v);
-                }
-                {
-                    Byte v = mb.getByte2();
-                    Byte expected = i % 31 == 0 ? null : (byte) i;
-                    if (v != expected)
-                        assertEquals(expected, v);
-                }
-                {
-                    char v = mb.getChar();
-                    char expected = (char) i;
-                    if (v != expected)
-                        assertEquals(expected, v);
-                }
-                {
-                    short v = mb.getShort();
-                    short expected = (short) i;
-                    if (v != expected)
-                        assertEquals(expected, v);
-                }
-                {
-                    int v = mb.getInt();
-                    int expected = i;
-                    if (v != expected)
-                        assertEquals(expected, v);
-                }
-                {
-                    float v = mb.getFloat();
-                    float expected = i;
-                    if (v != expected)
-                        assertEquals(expected, v);
-                }
-                {
-                    long v = mb.getLong();
-                    long expected = i;
-                    if (v != expected)
-                        assertEquals(expected, v);
-                }
-                {
-                    double v = mb.getDouble();
-                    double expected = i;
-                    if (v != expected)
-                        assertEquals(expected, v);
-                }
-                {
-                    ElementType v = mb.getElementType();
-                    ElementType expected = elementTypes[i % elementTypes.length];
-                    if (v != expected)
-                        assertEquals(expected, v);
-                }
-                {
-                    String v = mb.getString();
-                    String expected = strings[i % strings.length];
-                    if (v != expected)
-                        assertEquals(expected, v);
-                }
+                validate(mb, i);
                 i++;
             }
             long timeRead = System.nanoTime() - startRead;
             System.out.printf("Took %,d ns per object read/check%n", timeRead / list.size());
+
+            long scanStart = System.nanoTime();
+            for (MutableTypes mb : list) {
+                if (mb.getInt() == i - 1)
+                    break;
+            }
+            long scanTime = System.nanoTime() - scanStart;
+            System.out.printf("Took %,d ns per field to scan%n", scanTime / list.size());
+
+            long randomStart = System.nanoTime();
+            for (int n = list.size() / 10, len = list.size(), p = 0; n > 0; n--) {
+                p = (p + 101912) % len;
+                final MutableTypes mt = list.get(p);
+                validate(mt, p);
+                if (list instanceof HugeArrayList)
+                    ((HugeArrayList) list).recycle(mt);
+            }
+            long randomTime = System.nanoTime() - randomStart;
+            System.out.printf("Took %,d ns per object to access randomly%n", randomTime * 10 / list.size());
             System.gc();
-        } while (System.currentTimeMillis() - start < 60 * 1000);
+        } while (System.currentTimeMillis() - start < 10 * 1000);
         System.out.println("Finished");
+    }
+
+    private static void validate(MutableTypes mb, int i) {
+        {
+            boolean v = mb.getBoolean();
+            boolean expected = i % 2 == 0;
+            if (v != expected)
+                assertEquals(expected, v);
+        }
+        {
+            Boolean v = mb.getBoolean2();
+            Boolean expected = i % 3 == 0 ? null : i % 3 == 1;
+            if (v != expected)
+                assertEquals(expected, v);
+        }
+        {
+            byte v = mb.getByte();
+            byte expected = (byte) i;
+            if (v != expected)
+                assertEquals(expected, v);
+        }
+        {
+            Byte v = mb.getByte2();
+            Byte expected = i % 31 == 0 ? null : (byte) i;
+            if (v != expected)
+                assertEquals(expected, v);
+        }
+        {
+            char v = mb.getChar();
+            char expected = (char) i;
+            if (v != expected)
+                assertEquals(expected, v);
+        }
+        {
+            short v = mb.getShort();
+            short expected = (short) i;
+            if (v != expected)
+                assertEquals(expected, v);
+        }
+        {
+            int v = mb.getInt();
+            int expected = i;
+            if (v != expected)
+                assertEquals(expected, v);
+        }
+        {
+            float v = mb.getFloat();
+            float expected = i;
+            if (v != expected)
+                assertEquals(expected, v);
+        }
+        {
+            long v = mb.getLong();
+            long expected = i;
+            if (v != expected)
+                assertEquals(expected, v);
+        }
+        {
+            double v = mb.getDouble();
+            double expected = i;
+            if (v != expected)
+                assertEquals(expected, v);
+        }
+        {
+            ElementType v = mb.getElementType();
+            ElementType expected = elementTypes[i % elementTypes.length];
+            if (v != expected)
+                assertEquals(expected, v);
+        }
+        {
+            String v = mb.getString();
+            String expected = strings[i % strings.length];
+            if (v != expected)
+                assertEquals(expected, v);
+        }
+    }
+
+    static final String[] strings = new String[1024];
+
+    static {
+        for (int i = 0; i < strings.length; i++)
+            strings[i] = Integer.toString(i);
+    }
+
+    private static void populate(List<MutableTypes> list) {
+        int i = 0;
+        for (MutableTypes mb : list) {
+            mb.setBoolean(i % 2 == 0);
+            mb.setBoolean2(i % 3 == 0 ? null : i % 3 == 1);
+            mb.setByte((byte) i);
+            mb.setByte2(i % 31 == 0 ? null : (byte) i);
+            mb.setChar((char) i);
+            mb.setShort((short) i);
+            mb.setInt(i);
+            mb.setFloat(i);
+            mb.setLong(i);
+            mb.setDouble(i);
+            mb.setElementType(elementTypes[i % elementTypes.length]);
+            mb.setString(strings[i % strings.length]);
+            i++;
+        }
     }
 
     private void exerciseObjectList(List<ObjectTypes> list, long length) {

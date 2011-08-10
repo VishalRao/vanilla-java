@@ -1,4 +1,4 @@
-package vanilla.java.collections;
+package vanilla.java.collections.api;
 
 /*
  * Copyright 2011 Peter Lawrey
@@ -16,10 +16,10 @@ package vanilla.java.collections;
  *    limitations under the License.
  */
 
-import vanilla.java.collections.api.HugeIterator;
+import java.lang.annotation.*;
 
-import java.util.ListIterator;
-
-public interface HugeListIterator<T> extends HugeIterator<T>, ListIterator<T> {
-    void index(int index);
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Id {
 }

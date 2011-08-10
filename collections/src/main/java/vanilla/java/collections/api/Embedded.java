@@ -1,4 +1,4 @@
-package vanilla.java.collections;
+package vanilla.java.collections.api;
 
 /*
  * Copyright 2011 Peter Lawrey
@@ -16,8 +16,10 @@ package vanilla.java.collections;
  *    limitations under the License.
  */
 
-public interface HugeElement {
-    void index(long n);
+import java.lang.annotation.*;
 
-    long index();
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Embedded {
 }

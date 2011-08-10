@@ -16,9 +16,16 @@ package vanilla.java.collections;
  *    limitations under the License.
  */
 
+import vanilla.java.collections.api.Id;
+
 import java.lang.annotation.ElementType;
 
 public interface MutableTypes {
+    public void setInt(int i);
+
+    @Id
+    public int getInt();
+
     public void setBoolean(boolean b);
 
     public boolean getBoolean();
@@ -42,10 +49,6 @@ public interface MutableTypes {
     public void setShort(short s);
 
     public short getShort();
-
-    public void setInt(int i);
-
-    public int getInt();
 
     public void setFloat(float f);
 
