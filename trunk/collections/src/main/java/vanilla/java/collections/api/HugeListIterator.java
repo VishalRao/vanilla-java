@@ -1,4 +1,4 @@
-package vanilla.java.collections;
+package vanilla.java.collections.api;
 
 /*
  * Copyright 2011 Peter Lawrey
@@ -16,36 +16,8 @@ package vanilla.java.collections;
  *    limitations under the License.
  */
 
-public interface MockData {
-    public MockData setBoolean(boolean b);
+import java.util.ListIterator;
 
-    public boolean getBoolean();
-
-    public MockData setByte(byte b);
-
-    public byte getByte();
-
-    public MockData setShort(short s);
-
-    public short getShort();
-
-    public MockData setChar(char ch);
-
-    public char getChar();
-
-    public MockData setInt(int i);
-
-    public int getInt();
-
-    public MockData setFloat(float f);
-
-    public float getFloat();
-
-    public MockData setLong(long l);
-
-    public long getLong();
-
-    public MockData setDouble(double d);
-
-    public double getDouble();
+public interface HugeListIterator<T> extends HugeIterator<T>, ListIterator<T> {
+    void index(int index);
 }

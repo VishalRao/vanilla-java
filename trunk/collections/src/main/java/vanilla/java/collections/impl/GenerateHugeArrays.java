@@ -240,12 +240,6 @@ public enum GenerateHugeArrays {
             mv.visitVarInsn(ALOAD, 1);
             mv.visitVarInsn(LLOAD, 2);
             mv.visitMethodInsn(INVOKESPECIAL, collections + "impl/AbstractHugeElement", "<init>", "(L" + collections + "impl/AbstractHugeArrayList;J)V");
-            Label l1 = new Label();
-            mv.visitLabel(l1);
-            mv.visitLineNumber(30, l1);
-            mv.visitVarInsn(ALOAD, 0);
-            mv.visitInsn(ACONST_NULL);
-            mv.visitFieldInsn(PUTFIELD, name + "Element", "allocation", "L" + name + "Allocation;");
             Label l2 = new Label();
             mv.visitLabel(l2);
             mv.visitLineNumber(34, l2);

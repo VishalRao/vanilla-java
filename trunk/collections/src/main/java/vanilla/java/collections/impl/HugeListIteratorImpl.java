@@ -16,7 +16,7 @@ package vanilla.java.collections.impl;
  *    limitations under the License.
  */
 
-import vanilla.java.collections.HugeListIterator;
+import vanilla.java.collections.api.HugeListIterator;
 
 public class HugeListIteratorImpl<T, TA, TE extends AbstractHugeElement<TA>> implements HugeListIterator<T> {
     private final AbstractHugeArrayList<T, TA, TE> list;
