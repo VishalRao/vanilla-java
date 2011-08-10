@@ -78,4 +78,14 @@ public class DoubleFieldModel extends AbstractFieldModel<Double> {
     public BCType bcType() {
         return BCType.Double;
     }
+
+    @Override
+    public boolean isCallsNotEquals() {
+        return true;
+    }
+
+    @UsedFromByteCode
+    public static int hashCode(double d) {
+        return LongFieldModel.hashCode(Double.doubleToLongBits(d));
+    }
 }

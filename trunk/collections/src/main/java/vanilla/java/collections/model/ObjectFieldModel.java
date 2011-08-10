@@ -97,4 +97,15 @@ public class ObjectFieldModel<T> extends AbstractFieldModel<T> {
     public BCType bcType() {
         return BCType.Reference;
     }
+
+    @Override
+    public boolean isCallsNotEquals() {
+        return true;
+    }
+
+    @UsedFromByteCode
+    public static <T> int hashCode(T t) {
+        return t == null ? 0 : t.hashCode();
+    }
+
 }

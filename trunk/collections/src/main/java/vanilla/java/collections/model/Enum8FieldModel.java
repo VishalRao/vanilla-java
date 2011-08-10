@@ -83,4 +83,14 @@ public class Enum8FieldModel<E extends Enum<E>> extends AbstractFieldModel<E> {
     public boolean virtualGetSet() {
         return true;
     }
+
+    @Override
+    public boolean isCallsNotEquals() {
+        return true;
+    }
+
+    @UsedFromByteCode
+    public static int hashCode(Enum elementType) {
+        return elementType == null ? Integer.MIN_VALUE : elementType.ordinal();
+    }
 }
