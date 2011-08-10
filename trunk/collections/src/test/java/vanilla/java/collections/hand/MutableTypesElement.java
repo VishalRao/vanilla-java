@@ -19,7 +19,6 @@ package vanilla.java.collections.hand;
 import vanilla.java.collections.MutableTypes;
 import vanilla.java.collections.impl.AbstractHugeArrayList;
 import vanilla.java.collections.impl.AbstractHugeElement;
-import vanilla.java.collections.impl.GenerateHugeArrays;
 import vanilla.java.collections.model.*;
 
 import java.lang.annotation.ElementType;
@@ -184,17 +183,17 @@ public class MutableTypesElement extends AbstractHugeElement<MutableTypesAllocat
         MutableTypesElement that = (MutableTypesElement) o;
 
         if (getBoolean() != that.getBoolean()) return false;
-        if (GenerateHugeArrays.notEquals(getBoolean2(), that.getBoolean2())) return false;
+        if (Boolean2FieldModel.notEquals(getBoolean2(), that.getBoolean2())) return false;
         if (getByte() != that.getByte()) return false;
-        if (GenerateHugeArrays.notEquals(getByte2(), that.getByte2())) return false;
+        if (Byte2FieldModel.notEquals(getByte2(), that.getByte2())) return false;
         if (getChar() != that.getChar()) return false;
         if (getShort() != that.getShort()) return false;
         if (getInt() != that.getInt()) return false;
-        if (GenerateHugeArrays.notEquals(getFloat(), that.getFloat())) return false;
+        if (FloatFieldModel.notEquals(getFloat(), that.getFloat())) return false;
         if (getLong() != that.getLong()) return false;
-        if (GenerateHugeArrays.notEquals(getDouble(), that.getDouble())) return false;
+        if (DoubleFieldModel.notEquals(getDouble(), that.getDouble())) return false;
         if (getElementType() != that.getElementType()) return false;
-        if (GenerateHugeArrays.notEquals(getString(), that.getString())) return false;
+        if (ObjectFieldModel.notEquals(getString(), that.getString())) return false;
 
         return true;
     }

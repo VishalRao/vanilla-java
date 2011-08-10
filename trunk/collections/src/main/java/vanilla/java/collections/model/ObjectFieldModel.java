@@ -104,6 +104,11 @@ public class ObjectFieldModel<T> extends AbstractFieldModel<T> {
     }
 
     @UsedFromByteCode
+    public static <T> boolean notEquals(T t1, T t2) {
+        return t1 == null ? t2 != null : !t1.equals(t2);
+    }
+
+    @UsedFromByteCode
     public static <T> int hashCode(T t) {
         return t == null ? 0 : t.hashCode();
     }

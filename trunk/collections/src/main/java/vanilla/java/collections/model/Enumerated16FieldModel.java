@@ -99,6 +99,11 @@ public class Enumerated16FieldModel<T> extends AbstractFieldModel<T> {
     }
 
     @UsedFromByteCode
+    public static <T> boolean notEquals(T t1, T t2) {
+        return t1 == null ? t2 != null : !t1.equals(t2);
+    }
+
+    @UsedFromByteCode
     public static <T> int hashCode(T elementType) {
         return elementType == null ? Integer.MIN_VALUE : elementType.hashCode();
     }

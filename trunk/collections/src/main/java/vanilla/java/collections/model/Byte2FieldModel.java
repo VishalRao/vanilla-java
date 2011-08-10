@@ -84,6 +84,10 @@ public class Byte2FieldModel extends AbstractFieldModel<Byte> {
         return true;
     }
 
+    public static boolean notEquals(Byte t1, Byte t2) {
+        return t1 == null ? t2 != null : !t1.equals(t2);
+    }
+
     @UsedFromByteCode
     public static int hashCode(Byte b) {
         return b == null ? Integer.MIN_VALUE : b;

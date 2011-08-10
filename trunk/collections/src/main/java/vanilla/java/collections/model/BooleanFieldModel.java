@@ -72,4 +72,13 @@ public class BooleanFieldModel extends AbstractFieldModel<Boolean> {
     public String bcLFieldType() {
         return "Z";
     }
+
+    @Override
+    public boolean isCallsHashCode() {
+        return true;
+    }
+
+    public static int hashCode(boolean b) {
+        return b ? 1 : 0;
+    }
 }

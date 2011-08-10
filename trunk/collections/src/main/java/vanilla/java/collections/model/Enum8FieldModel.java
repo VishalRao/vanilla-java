@@ -90,6 +90,11 @@ public class Enum8FieldModel<E extends Enum<E>> extends AbstractFieldModel<E> {
     }
 
     @UsedFromByteCode
+    public static <T extends Enum<T>> boolean notEquals(T t1, T t2) {
+        return t1 == null ? t2 != null : !t1.equals(t2);
+    }
+
+    @UsedFromByteCode
     public static int hashCode(Enum elementType) {
         return elementType == null ? Integer.MIN_VALUE : elementType.ordinal();
     }
