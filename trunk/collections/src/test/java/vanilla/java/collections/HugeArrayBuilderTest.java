@@ -341,8 +341,11 @@ public class HugeArrayBuilderTest {
         populate(list);
         assertFalse(list.get(63).equals(list.get(64)));
         Set<Integer> hashCodes = new LinkedHashSet<Integer>();
-        for (int n = 0; n < size; n++)
-            hashCodes.add(list.get(n).hashCode());
+        for (int n = 0; n < size; n++) {
+            final MutableTypes mt = list.get(n);
+            hashCodes.add(mt.hashCode());
+            list.recycle(mt);
+        }
         assertEquals(size, hashCodes.size());
     }
 
