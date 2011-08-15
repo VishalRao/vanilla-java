@@ -23,7 +23,7 @@ import vanilla.java.collections.model.*;
 
 import java.lang.annotation.ElementType;
 
-public class MutableTypesElement extends AbstractHugeElement<MutableTypesAllocation> implements MutableTypes {
+public class MutableTypesElement extends AbstractHugeElement<MutableTypes, MutableTypesAllocation> implements MutableTypes {
     MutableTypesAllocation allocation = null;
 
     public MutableTypesElement(AbstractHugeArrayList<MutableTypes, MutableTypesAllocation, MutableTypesElement> list, long n) {
@@ -213,5 +213,40 @@ public class MutableTypesElement extends AbstractHugeElement<MutableTypesAllocat
                 DoubleFieldModel.hashCode(getDouble())) * 31 +
                 Enumerated16FieldModel.hashCode(getElementType())) * 31 +
                 ObjectFieldModel.hashCode(getString());
+    }
+
+    @Override
+    public void copyOf(MutableTypes t) {
+        do {
+            setBoolean(t.getBoolean());
+            setBoolean2(t.getBoolean2());
+            setByte2(t.getByte2());
+
+            if (t instanceof MutableTypesElement) {
+                MutableTypesElement mte = (MutableTypesElement) t;
+                if (mte.list == list) {
+
+                    allocation.m_byte.put(offset, mte.allocation.m_byte.get(mte.offset));
+                    allocation.m_char.put(offset, mte.allocation.m_char.get(mte.offset));
+                    allocation.m_double.put(offset, mte.allocation.m_double.get(mte.offset));
+                    allocation.m_elementType.put(offset, mte.allocation.m_elementType.get(mte.offset));
+                    allocation.m_float.put(offset, mte.allocation.m_float.get(mte.offset));
+                    allocation.m_int.put(offset, mte.allocation.m_int.get(mte.offset));
+                    allocation.m_long.put(offset, mte.allocation.m_long.get(mte.offset));
+                    allocation.m_short.put(offset, mte.allocation.m_short.get(mte.offset));
+                    allocation.m_string.put(offset, mte.allocation.m_string.get(mte.offset));
+                    break;
+                }
+            }
+            setByte(t.getByte());
+            setChar(t.getChar());
+            setDouble(t.getDouble());
+            setElementType(t.getElementType());
+            setFloat(t.getFloat());
+            setInt(t.getInt());
+            setLong(t.getLong());
+            setShort(t.getShort());
+            setString(t.getString());
+        } while (false);
     }
 }

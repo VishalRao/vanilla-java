@@ -109,6 +109,11 @@ public class ColumnHugeArrayList<T> extends AbstractList<T> implements HugeArray
         return get(index & 0xFFFFFFFFL);
     }
 
+    @Override
+    public T remove(long n) throws IndexOutOfBoundsException {
+        throw new UnsupportedOperationException();
+    }
+
     private T acquireProxy(long n) {
         if (proxies.isEmpty()) {
             MyInvocationHandler<T> h = new MyInvocationHandler<T>(this, n);

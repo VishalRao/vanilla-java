@@ -29,8 +29,8 @@ public class MutableTypesArrayList extends AbstractHugeArrayList<MutableTypes, M
     final Enumerated16FieldModel<String> stringEnumerated16FieldModel
             = new Enumerated16FieldModel<String>("text", 11, String.class);
 
-    public MutableTypesArrayList(int allocationSize) {
-        super(allocationSize);
+    public MutableTypesArrayList(int allocationSize, boolean setRemoveReturnsNull) {
+        super(allocationSize, setRemoveReturnsNull);
     }
 
     @Override
@@ -41,5 +41,17 @@ public class MutableTypesArrayList extends AbstractHugeArrayList<MutableTypes, M
     @Override
     protected MutableTypesElement createElement(long n) {
         return new MutableTypesElement(this, n);
+    }
+
+    @Override
+    protected MutableTypes createImpl() {
+        return new MutableTypesImpl();
+    }
+
+    @Override
+    public void clear() {
+        super.clear();
+        elementTypeFieldModel.clear();
+        stringEnumerated16FieldModel.clear();
     }
 }

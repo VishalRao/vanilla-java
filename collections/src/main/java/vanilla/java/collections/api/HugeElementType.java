@@ -16,12 +16,6 @@ package vanilla.java.collections.api;
  *    limitations under the License.
  */
 
-public interface HugeElement<T> {
-    HugeElementType hugeElementType();
-
-    void copyOf(T t);
-
-    void index(long n);
-
-    long index();
+public enum HugeElementType {
+    Element, BeanImpl
 }

@@ -16,14 +16,16 @@ package vanilla.java.collections.impl;
  *    limitations under the License.
  */
 
+import vanilla.java.collections.api.HugeAllocation;
 import vanilla.java.collections.api.HugeElement;
+import vanilla.java.collections.api.HugeElementType;
 
-public abstract class AbstractHugeElement<TA> implements HugeElement {
-    protected final AbstractHugeArrayList<?, TA, ?> list;
+public abstract class AbstractHugeElement<T, TA extends HugeAllocation> implements HugeElement<T> {
+    protected final AbstractHugeArrayList<T, TA, ?> list;
     protected long index;
     protected int offset;
 
-    public AbstractHugeElement(AbstractHugeArrayList<?, TA, ?> list, long n) {
+    public AbstractHugeElement(AbstractHugeArrayList<T, TA, ?> list, long n) {
         this.list = list;
         final int allocationSize = list.allocationSize;
         index = n;
@@ -74,6 +76,11 @@ public abstract class AbstractHugeElement<TA> implements HugeElement {
         if (index >= 0)
             updateAllocation0(allocationSize);
         offset(index, allocationSize);
+    }
+
+    @Override
+    public HugeElementType hugeElementType() {
+        return HugeElementType.Element;
     }
 
     protected abstract void updateAllocation0(int allocationSize);

@@ -16,23 +16,24 @@ package vanilla.java.collections.impl;
  *    limitations under the License.
  */
 
-import vanilla.java.collections.api.HugeArrayList;
-import vanilla.java.collections.api.HugeIterator;
-import vanilla.java.collections.api.HugeListIterator;
+import vanilla.java.collections.api.*;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-public abstract class AbstractHugeArrayList<T, TA, TE extends AbstractHugeElement<TA>> extends AbstractList<T> implements HugeArrayList<T> {
+public abstract class AbstractHugeArrayList<T, TA extends HugeAllocation, TE extends AbstractHugeElement<T, TA>> extends AbstractList<T> implements HugeArrayList<T> {
     protected final int allocationSize;
+    protected final boolean setRemoveReturnsNull;
     protected final List<TA> allocations = new ArrayList<TA>();
-    protected final List<TE> proxies = new ArrayList<TE>();
+    protected final List<TE> elements = new ArrayList<TE>();
+    protected final List<T> impls = new ArrayList<T>();
     protected long longSize;
 
-    public AbstractHugeArrayList(int allocationSize) {
+    public AbstractHugeArrayList(int allocationSize, boolean setRemoveReturnsNull) {
         this.allocationSize = allocationSize;
+        this.setRemoveReturnsNull = setRemoveReturnsNull;
     }
 
     public void ensureCapacity(long size) {
@@ -66,9 +67,9 @@ public abstract class AbstractHugeArrayList<T, TA, TE extends AbstractHugeElemen
     }
 
     TE acquireElement(long n) {
-        if (proxies.isEmpty())
+        if (elements.isEmpty())
             return createElement(n);
-        TE mte = proxies.remove(proxies.size() - 1);
+        TE mte = elements.remove(elements.size() - 1);
         mte.index(n);
         return mte;
     }
@@ -94,7 +95,17 @@ public abstract class AbstractHugeArrayList<T, TA, TE extends AbstractHugeElemen
 
     @Override
     public void recycle(T t) {
-        proxies.add((TE) t);
+        if (t == null) return;
+        switch (((HugeElement) t).hugeElementType()) {
+            case Element:
+                if (elements.size() < allocationSize)
+                    elements.add((TE) t);
+                break;
+            case BeanImpl:
+                if (impls.size() < allocationSize)
+                    impls.add(t);
+                break;
+        }
     }
 
     @Override
@@ -108,11 +119,87 @@ public abstract class AbstractHugeArrayList<T, TA, TE extends AbstractHugeElemen
     }
 
     @Override
-    public T set(long n, T mutableTypes) throws IndexOutOfBoundsException {
-        throw new UnsupportedOperationException();
+    public T set(long index, T element) throws IndexOutOfBoundsException {
+        if (index > longSize) throw new IndexOutOfBoundsException();
+        if (index == longSize) longSize++;
+        ensureCapacity(longSize);
+        if (setRemoveReturnsNull) {
+            final T t = get(index);
+            ((HugeElement<T>) t).copyOf(element);
+            return null;
+        }
+        final T t0 = acquireImpl();
+        final T t = get(index);
+        ((HugeElement<T>) t0).copyOf(t);
+        ((HugeElement<T>) t).copyOf(element);
+        recycle(t);
+        return t0;
     }
 
     public TA getAllocation(long index) {
         return allocations.get((int) (index / allocationSize));
     }
+
+    @Override
+    public boolean add(T t) {
+        set(longSize(), t);
+        return true;
+    }
+
+    @Override
+    public void add(int index, T element) {
+        add((long) index, element);
+    }
+
+    public void add(long index, T element) {
+        if (index != size())
+            throw new UnsupportedOperationException();
+        set(index, element);
+    }
+
+    @Override
+    public void clear() {
+        for (TA allocation : allocations) {
+            allocation.clear();
+        }
+        longSize = 0;
+    }
+
+    @Override
+    public T remove(int index) {
+        return remove((long) index);
+    }
+
+    @Override
+    public T remove(long index) {
+        if (index > longSize) throw new IndexOutOfBoundsException();
+        if (setRemoveReturnsNull) {
+            final T t = get(index);
+            if (index < longSize - 1) {
+                final T t2 = get(index);
+                ((HugeElement) t).copyOf(t2);
+                recycle(t2);
+            }
+            recycle(t);
+            return null;
+        }
+        T impl = acquireImpl();
+        final T t = get(index);
+        ((HugeElement<T>) impl).copyOf(t);
+        if (index < longSize - 1) {
+            final T t2 = get(index);
+            ((HugeElement) t).copyOf(t2);
+            recycle(t2);
+        }
+        recycle(t);
+        return impl;
+    }
+
+    protected T acquireImpl() {
+        if (impls.isEmpty())
+            return createImpl();
+        return impls.remove(impls.size() - 1);
+    }
+
+    protected abstract T createImpl();
 }

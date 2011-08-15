@@ -92,4 +92,9 @@ public class Byte2FieldModel extends AbstractFieldModel<Byte> {
     public static int hashCode(Byte b) {
         return b == null ? Integer.MIN_VALUE : b;
     }
+
+    @Override
+    public boolean copySimpleValue() {
+        return false;
+    }
 }

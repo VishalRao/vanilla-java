@@ -25,6 +25,8 @@ public interface HugeArrayList<T> extends List<T> {
 
     public T get(long n) throws IndexOutOfBoundsException;
 
+    public T remove(long n) throws IndexOutOfBoundsException;
+
     public T set(long n, T t) throws IndexOutOfBoundsException;
 
     public HugeIterator<T> iterator();

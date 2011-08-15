@@ -81,4 +81,10 @@ public class BooleanFieldModel extends AbstractFieldModel<Boolean> {
     public static int hashCode(boolean b) {
         return b ? 1 : 0;
     }
+
+
+    @Override
+    public boolean copySimpleValue() {
+        return false;
+    }
 }

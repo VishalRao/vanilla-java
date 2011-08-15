@@ -100,4 +100,9 @@ public class Boolean2FieldModel extends AbstractFieldModel<Boolean> {
         return b == null ? 0 : b.hashCode();
     }
 
+    @Override
+    public boolean copySimpleValue() {
+        return false;
+    }
+
 }

@@ -63,7 +63,11 @@ public interface FieldModel<T> {
 
     boolean virtualGetSet();
 
+    boolean copySimpleValue();
+
     boolean isCallsNotEquals();
 
     boolean isCallsHashCode();
+
+    public void clear();
 }

@@ -16,11 +16,13 @@ package vanilla.java.collections.hand;
  *    limitations under the License.
  */
 
+import vanilla.java.collections.api.HugeAllocation;
 import vanilla.java.collections.model.*;
 
 import java.nio.*;
+import java.util.Arrays;
 
-public class MutableTypesAllocation {
+public class MutableTypesAllocation implements HugeAllocation {
     IntBuffer m_boolean;
     IntBuffer m_boolean2;
     ByteBuffer m_byte;
@@ -33,6 +35,7 @@ public class MutableTypesAllocation {
     DoubleBuffer m_double;
     ByteBuffer m_elementType;
     CharBuffer m_string;
+    Object[] m_objectSample;  // sample added.
 
     public MutableTypesAllocation(int allocationSize) {
         m_boolean = BooleanFieldModel.newArrayOfField(allocationSize);
@@ -47,5 +50,9 @@ public class MutableTypesAllocation {
         m_double = DoubleFieldModel.newArrayOfField(allocationSize);
         m_elementType = Enum8FieldModel.newArrayOfField(allocationSize);
         m_string = Enumerated16FieldModel.newArrayOfField(allocationSize);
+    }
+
+    public void clear() {
+        Arrays.fill(m_objectSample, null);
     }
 }

@@ -17,7 +17,12 @@ package vanilla.java.collections.impl;
  */
 
 import org.objectweb.asm.*;
+import org.objectweb.asm.util.ASMifierClassVisitor;
 import vanilla.java.collections.model.*;
+
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -46,37 +51,44 @@ public enum GenerateHugeArrays {
                 fv.visitEnd();
             }
         }
+        List<FieldModel> fields = new ArrayList<FieldModel>();
         {
-            mv = cw.visitMethod(ACC_PUBLIC, "<init>", "(I)V", null, null);
+            mv = cw.visitMethod(ACC_PUBLIC, "<init>", "(IZ)V", null, null);
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
-            mv.visitLineNumber(23, l0);
+            mv.visitLineNumber(33, l0);
             mv.visitVarInsn(ALOAD, 0);
             mv.visitVarInsn(ILOAD, 1);
-            mv.visitMethodInsn(INVOKESPECIAL, collections + "impl/AbstractHugeArrayList", "<init>", "(I)V");
+            mv.visitVarInsn(ILOAD, 2);
+            mv.visitMethodInsn(INVOKESPECIAL, collections + "impl/AbstractHugeArrayList", "<init>", "(IZ)V");
+            Label l1 = new Label();
+            mv.visitLabel(l1);
+            mv.visitLineNumber(27, l1);
 
             for (FieldModel fm : tm.fields()) {
                 if (fm instanceof Enum8FieldModel) {
                     mv.visitVarInsn(ALOAD, 0);
-                    mv.visitTypeInsn(NEW, collections + "model/Enum8FieldModel");
+                    mv.visitTypeInsn(NEW, fm.bcModelType());
                     mv.visitInsn(DUP);
                     mv.visitLdcInsn(fm.fieldName());
                     mv.visitIntInsn(BIPUSH, fm.fieldNumber());
                     mv.visitLdcInsn(Type.getType(fm.bcLFieldType()));
                     mv.visitMethodInsn(INVOKESTATIC, fm.bcFieldType(), "values", "()[" + fm.bcLFieldType());
-                    mv.visitMethodInsn(INVOKESPECIAL, collections + "model/Enum8FieldModel", "<init>", "(Ljava/lang/String;ILjava/lang/Class;[Ljava/lang/Enum;)V");
-                    mv.visitFieldInsn(PUTFIELD, name + "ArrayList", fm.fieldName() + "FieldModel", 'L' + collections + "model/Enum8FieldModel;");
+                    mv.visitMethodInsn(INVOKESPECIAL, fm.bcModelType(), "<init>", "(Ljava/lang/String;ILjava/lang/Class;[Ljava/lang/Enum;)V");
+                    mv.visitFieldInsn(PUTFIELD, name + "ArrayList", fm.fieldName() + "FieldModel", fm.bcLModelType());
+                    fields.add(fm);
 
                 } else if (fm instanceof Enumerated16FieldModel) {
                     mv.visitVarInsn(ALOAD, 0);
-                    mv.visitTypeInsn(NEW, collections + "model/Enumerated16FieldModel");
+                    mv.visitTypeInsn(NEW, fm.bcModelType());
                     mv.visitInsn(DUP);
                     mv.visitLdcInsn(fm.fieldName());
                     mv.visitIntInsn(BIPUSH, fm.fieldNumber());
                     mv.visitLdcInsn(Type.getType(fm.bcLFieldType()));
-                    mv.visitMethodInsn(INVOKESPECIAL, collections + "model/Enumerated16FieldModel", "<init>", "(Ljava/lang/String;ILjava/lang/Class;)V");
-                    mv.visitFieldInsn(PUTFIELD, name + "ArrayList", fm.fieldName() + "FieldModel", 'L' + collections + "model/Enumerated16FieldModel;");
+                    mv.visitMethodInsn(INVOKESPECIAL, fm.bcModelType(), "<init>", "(Ljava/lang/String;ILjava/lang/Class;)V");
+                    mv.visitFieldInsn(PUTFIELD, name + "ArrayList", fm.fieldName() + "FieldModel", fm.bcLModelType());
+                    fields.add(fm);
                 }
             }
 
@@ -85,7 +97,7 @@ public enum GenerateHugeArrays {
             mv.visitLabel(l4);
             mv.visitLocalVariable("this", "L" + name + "ArrayList;", null, l0, l4, 0);
             mv.visitLocalVariable("allocationSize", "I", null, l0, l4, 1);
-            mv.visitMaxs(7, 2);
+            mv.visitMaxs(7, 3);
             mv.visitEnd();
         }
         {
@@ -93,7 +105,7 @@ public enum GenerateHugeArrays {
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
-            mv.visitLineNumber(37, l0);
+            mv.visitLineNumber(38, l0);
             mv.visitTypeInsn(NEW, name + "Allocation");
             mv.visitInsn(DUP);
             mv.visitVarInsn(ALOAD, 0);
@@ -111,12 +123,12 @@ public enum GenerateHugeArrays {
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
-            mv.visitLineNumber(42, l0);
+            mv.visitLineNumber(43, l0);
             mv.visitTypeInsn(NEW, name + "Element");
             mv.visitInsn(DUP);
             mv.visitVarInsn(ALOAD, 0);
             mv.visitVarInsn(LLOAD, 1);
-            mv.visitMethodInsn(INVOKESPECIAL, name + "Element", "<init>", "(Lvanilla/java/collections/impl/AbstractHugeArrayList;J)V");
+            mv.visitMethodInsn(INVOKESPECIAL, name + "Element", "<init>", "(L" + collections + "impl/AbstractHugeArrayList;J)V");
             mv.visitInsn(ARETURN);
             Label l1 = new Label();
             mv.visitLabel(l1);
@@ -126,11 +138,63 @@ public enum GenerateHugeArrays {
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PROTECTED + ACC_BRIDGE + ACC_SYNTHETIC, "createElement", "(J)Lvanilla/java/collections/impl/AbstractHugeElement;", null, null);
+            mv = cw.visitMethod(ACC_PROTECTED, "createImpl", "()L" + name + ";", null, null);
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
-            mv.visitLineNumber(25, l0);
+            mv.visitLineNumber(48, l0);
+            mv.visitTypeInsn(NEW, name + "Impl");
+            mv.visitInsn(DUP);
+            mv.visitMethodInsn(INVOKESPECIAL, name + "Impl", "<init>", "()V");
+            mv.visitInsn(ARETURN);
+            Label l1 = new Label();
+            mv.visitLabel(l1);
+            mv.visitLocalVariable("this", "L" + name + "ArrayList;", null, l0, l1, 0);
+            mv.visitMaxs(2, 1);
+            mv.visitEnd();
+        }
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "clear", "()V", null, null);
+            mv.visitCode();
+            Label l0 = new Label();
+            mv.visitLabel(l0);
+            mv.visitLineNumber(48, l0);
+            for (FieldModel fm : fields) {
+                mv.visitVarInsn(ALOAD, 0);
+                mv.visitFieldInsn(GETFIELD, name + "ArrayList", fm.fieldName() + "FieldModel", fm.bcLModelType());
+                mv.visitMethodInsn(INVOKEVIRTUAL, fm.bcModelType(), "clear", "()V");
+            }
+            Label l3 = new Label();
+            mv.visitLabel(l3);
+            mv.visitLineNumber(51, l3);
+            mv.visitInsn(RETURN);
+            Label l4 = new Label();
+            mv.visitLabel(l4);
+            mv.visitLocalVariable("this", "L" + name + "ArrayList;", null, l0, l4, 0);
+            mv.visitMaxs(1, 1);
+            mv.visitEnd();
+        }
+        {
+            mv = cw.visitMethod(ACC_PROTECTED + ACC_BRIDGE + ACC_SYNTHETIC, "createImpl", "()Ljava/lang/Object;", null, null);
+            mv.visitCode();
+            Label l0 = new Label();
+            mv.visitLabel(l0);
+            mv.visitLineNumber(26, l0);
+            mv.visitVarInsn(ALOAD, 0);
+            mv.visitMethodInsn(INVOKEVIRTUAL, name + "ArrayList", "createImpl", "()L" + name + ";");
+            mv.visitInsn(ARETURN);
+            Label l1 = new Label();
+            mv.visitLabel(l1);
+            mv.visitLocalVariable("this", "L" + name + "ArrayList;", null, l0, l1, 0);
+            mv.visitMaxs(1, 1);
+            mv.visitEnd();
+        }
+        {
+            mv = cw.visitMethod(ACC_PROTECTED + ACC_BRIDGE + ACC_SYNTHETIC, "createElement", "(J)L" + collections + "impl/AbstractHugeElement;", null, null);
+            mv.visitCode();
+            Label l0 = new Label();
+            mv.visitLabel(l0);
+            mv.visitLineNumber(26, l0);
             mv.visitVarInsn(ALOAD, 0);
             mv.visitVarInsn(LLOAD, 1);
             mv.visitMethodInsn(INVOKEVIRTUAL, name + "ArrayList", "createElement", "(J)L" + name + "Element;");
@@ -143,11 +207,11 @@ public enum GenerateHugeArrays {
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PROTECTED + ACC_BRIDGE + ACC_SYNTHETIC, "createAllocation", "()Ljava/lang/Object;", null, null);
+            mv = cw.visitMethod(ACC_PROTECTED + ACC_BRIDGE + ACC_SYNTHETIC, "createAllocation", "()L" + collections + "api/HugeAllocation;", null, null);
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
-            mv.visitLineNumber(25, l0);
+            mv.visitLineNumber(26, l0);
             mv.visitVarInsn(ALOAD, 0);
             mv.visitMethodInsn(INVOKEVIRTUAL, name + "ArrayList", "createAllocation", "()L" + name + "Allocation;");
             mv.visitInsn(ARETURN);
@@ -158,7 +222,10 @@ public enum GenerateHugeArrays {
             mv.visitEnd();
         }
         cw.visitEnd();
-        return cw.toByteArray();
+        final byte[] bytes = cw.toByteArray();
+//        ClassReader cr = new ClassReader(bytes);
+//        cr.accept(new ASMifierClassVisitor(new PrintWriter(System.out)), 0);
+        return bytes;
     }
 
     public static byte[] dumpAllocation(TypeModel tm) {
@@ -170,7 +237,7 @@ public enum GenerateHugeArrays {
         Class interfaceClass = tm.type();
         String name = interfaceClass.getName().replace('.', '/');
 
-        cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, name + "Allocation", null, "java/lang/Object", null);
+        cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, name + "Allocation", null, "java/lang/Object", new String[]{collections + "api/HugeAllocation"});
 
         cw.visitSource(tm.type().getSimpleName() + "Allocation.java", null);
 
@@ -192,11 +259,11 @@ public enum GenerateHugeArrays {
                 if (fm instanceof ObjectFieldModel) {
                     mv.visitLdcInsn(Type.getType(fm.bcLFieldType()));
                     mv.visitVarInsn(ILOAD, 1);
-                    mv.visitMethodInsn(INVOKESTATIC, fm.getClass().getName().replace('.', '/'), "newArrayOfField", "(Ljava/lang/Class;I)[Ljava/lang/Object;");
+                    mv.visitMethodInsn(INVOKESTATIC, fm.bcModelType(), "newArrayOfField", "(Ljava/lang/Class;I)[Ljava/lang/Object;");
                     mv.visitTypeInsn(CHECKCAST, fm.bcLStoreType());
                 } else {
                     mv.visitVarInsn(ILOAD, 1);
-                    mv.visitMethodInsn(INVOKESTATIC, fm.getClass().getName().replace('.', '/'), "newArrayOfField", "(I)" + fm.bcLStoreType());
+                    mv.visitMethodInsn(INVOKESTATIC, fm.bcModelType(), "newArrayOfField", "(I)" + fm.bcLStoreType());
                 }
                 mv.visitFieldInsn(PUTFIELD, name + "Allocation", "m_" + fm.fieldName(), fm.bcLStoreType());
             }
@@ -207,6 +274,30 @@ public enum GenerateHugeArrays {
             mv.visitLocalVariable("this", "L" + name + "Allocation;", null, l0, l14, 0);
             mv.visitLocalVariable("allocationSize", "I", null, l0, l14, 1);
             mv.visitMaxs(3, 2);
+            mv.visitEnd();
+        }
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "clear", "()V", null, null);
+            mv.visitCode();
+            Label l0 = new Label();
+            mv.visitLabel(l0);
+            mv.visitLineNumber(56, l0);
+            for (FieldModel fm : tm.fields()) {
+                if (fm instanceof ObjectFieldModel) {
+                    mv.visitVarInsn(ALOAD, 0);
+                    mv.visitFieldInsn(GETFIELD, name + "Allocation", "m_" + fm.fieldName(), fm.bcLStoreType());
+                    mv.visitInsn(ACONST_NULL);
+                    mv.visitMethodInsn(INVOKESTATIC, "java/util/Arrays", "fill", "([Ljava/lang/Object;Ljava/lang/Object;)V");
+                }
+            }
+            Label l1 = new Label();
+            mv.visitLabel(l1);
+            mv.visitLineNumber(57, l1);
+            mv.visitInsn(RETURN);
+            Label l2 = new Label();
+            mv.visitLabel(l2);
+            mv.visitLocalVariable("this", "L" + name + "Allocation;", null, l0, l2, 0);
+            mv.visitMaxs(2, 1);
             mv.visitEnd();
         }
         cw.visitEnd();
@@ -235,14 +326,14 @@ public enum GenerateHugeArrays {
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
-            mv.visitLineNumber(33, l0);
+            mv.visitLineNumber(30, l0);
             mv.visitVarInsn(ALOAD, 0);
             mv.visitVarInsn(ALOAD, 1);
             mv.visitVarInsn(LLOAD, 2);
             mv.visitMethodInsn(INVOKESPECIAL, collections + "impl/AbstractHugeElement", "<init>", "(L" + collections + "impl/AbstractHugeArrayList;J)V");
             Label l2 = new Label();
             mv.visitLabel(l2);
-            mv.visitLineNumber(34, l2);
+            mv.visitLineNumber(31, l2);
             mv.visitInsn(RETURN);
             Label l3 = new Label();
             mv.visitLabel(l3);
@@ -321,24 +412,23 @@ public enum GenerateHugeArrays {
             mv.visitMaxs(4, 2);
             mv.visitEnd();
         }
-
         {
             mv = cw.visitMethod(ACC_PROTECTED, "updateAllocation0", "(I)V", null, null);
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
-            mv.visitLineNumber(158, l0);
+            mv.visitLineNumber(156, l0);
             mv.visitVarInsn(ALOAD, 0);
             mv.visitVarInsn(ALOAD, 0);
             mv.visitFieldInsn(GETFIELD, name + "Element", "list", "L" + collections + "impl/AbstractHugeArrayList;");
             mv.visitVarInsn(ALOAD, 0);
             mv.visitFieldInsn(GETFIELD, name + "Element", "index", "J");
-            mv.visitMethodInsn(INVOKEVIRTUAL, collections + "impl/AbstractHugeArrayList", "getAllocation", "(J)Ljava/lang/Object;");
+            mv.visitMethodInsn(INVOKEVIRTUAL, collections + "impl/AbstractHugeArrayList", "getAllocation", "(J)L" + collections + "api/HugeAllocation;");
             mv.visitTypeInsn(CHECKCAST, name + "Allocation");
             mv.visitFieldInsn(PUTFIELD, name + "Element", "allocation", "L" + name + "Allocation;");
             Label l1 = new Label();
             mv.visitLabel(l1);
-            mv.visitLineNumber(159, l1);
+            mv.visitLineNumber(157, l1);
             mv.visitInsn(RETURN);
             Label l2 = new Label();
             mv.visitLabel(l2);
@@ -347,13 +437,24 @@ public enum GenerateHugeArrays {
             mv.visitMaxs(4, 2);
             mv.visitEnd();
         }
+        appendToStringHashCodeEqualsCopyOf(tm, cw, name + "Element");
+        cw.visitEnd();
 
+        final byte[] bytes = cw.toByteArray();
+        ClassReader cr = new ClassReader(bytes);
+        cr.accept(new ASMifierClassVisitor(new PrintWriter(System.out)), 0);
+        return bytes;
+    }
+
+    private static void appendToStringHashCodeEqualsCopyOf(TypeModel tm, ClassWriter cw, String name2) {
+        String name = tm.bcType();
+        MethodVisitor mv;
         {
             mv = cw.visitMethod(ACC_PUBLIC, "toString", "()Ljava/lang/String;", null, null);
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
-            mv.visitLineNumber(163, l0);
+            mv.visitLineNumber(162, l0);
             mv.visitTypeInsn(NEW, "java/lang/StringBuilder");
             mv.visitInsn(DUP);
             mv.visitMethodInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "()V");
@@ -367,7 +468,7 @@ public enum GenerateHugeArrays {
                 mv.visitLdcInsn(sep + fm.fieldName() + "=" + (text ? "'" : ""));
                 mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;");
                 mv.visitVarInsn(ALOAD, 0);
-                mv.visitMethodInsn(INVOKEVIRTUAL, name + "Element", "get" + fm.titleFieldName(), "()" + fm.bcLFieldType());
+                mv.visitMethodInsn(INVOKEVIRTUAL, name2, "get" + fm.titleFieldName(), "()" + fm.bcLFieldType());
                 String appendType = "Ljava/lang/Object;";
                 final Class fmType = fm.type();
                 if (fmType.isPrimitive()) {
@@ -389,7 +490,7 @@ public enum GenerateHugeArrays {
             mv.visitInsn(ARETURN);
             Label l1 = new Label();
             mv.visitLabel(l1);
-            mv.visitLocalVariable("this", "L" + name + "Element;", null, l0, l1, 0);
+            mv.visitLocalVariable("this", "L" + name2 + ";", null, l0, l1, 0);
             mv.visitMaxs(3, 1);
             mv.visitEnd();
         }
@@ -398,7 +499,7 @@ public enum GenerateHugeArrays {
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
-            mv.visitLineNumber(181, l0);
+            mv.visitLineNumber(180, l0);
             mv.visitVarInsn(ALOAD, 0);
             mv.visitVarInsn(ALOAD, 1);
             Label l1 = new Label();
@@ -406,7 +507,7 @@ public enum GenerateHugeArrays {
             mv.visitInsn(ICONST_1);
             mv.visitInsn(IRETURN);
             mv.visitLabel(l1);
-            mv.visitLineNumber(182, l1);
+            mv.visitLineNumber(181, l1);
             mv.visitVarInsn(ALOAD, 1);
             Label l2 = new Label();
             mv.visitJumpInsn(IFNULL, l2);
@@ -420,18 +521,19 @@ public enum GenerateHugeArrays {
             mv.visitInsn(ICONST_0);
             mv.visitInsn(IRETURN);
             mv.visitLabel(l3);
-            mv.visitLineNumber(184, l3);
+            mv.visitLineNumber(183, l3);
             mv.visitVarInsn(ALOAD, 1);
-            mv.visitTypeInsn(CHECKCAST, name + "Element");
+            mv.visitTypeInsn(CHECKCAST, name2);
             mv.visitVarInsn(ASTORE, 2);
             Label l4 = new Label();
             mv.visitLabel(l4);
+            mv.visitLineNumber(185, l4);
             for (FieldModel fm : tm.fields()) {
 //                System.out.println(fm.fieldName());
                 mv.visitVarInsn(ALOAD, 0);
-                mv.visitMethodInsn(INVOKEVIRTUAL, name + "Element", "get" + fm.titleFieldName(), "()" + fm.bcLFieldType());
+                mv.visitMethodInsn(INVOKEVIRTUAL, name2, "get" + fm.titleFieldName(), "()" + fm.bcLFieldType());
                 mv.visitVarInsn(ALOAD, 2);
-                mv.visitMethodInsn(INVOKEVIRTUAL, name + "Element", "get" + fm.titleFieldName(), "()" + fm.bcLFieldType());
+                mv.visitMethodInsn(INVOKEVIRTUAL, name2, "get" + fm.titleFieldName(), "()" + fm.bcLFieldType());
                 Label l5 = new Label();
                 if (fm.isCallsNotEquals()) {
                     mv.visitMethodInsn(INVOKESTATIC, fm.bcLModelType(), "notEquals", "(" + fm.bcLSetType() + fm.bcLSetType() + ")Z");
@@ -448,9 +550,9 @@ public enum GenerateHugeArrays {
             mv.visitInsn(IRETURN);
             Label l17 = new Label();
             mv.visitLabel(l17);
-            mv.visitLocalVariable("this", "L" + name + "Element;", null, l0, l17, 0);
+            mv.visitLocalVariable("this", "L" + name2 + ";", null, l0, l17, 0);
             mv.visitLocalVariable("o", "Ljava/lang/Object;", null, l0, l17, 1);
-            mv.visitLocalVariable("that", "L" + name + "Element;", null, l4, l17, 2);
+            mv.visitLocalVariable("that", "L" + name2 + ";", null, l4, l17, 2);
             mv.visitMaxs(4, 3);
             mv.visitEnd();
         }
@@ -468,7 +570,7 @@ public enum GenerateHugeArrays {
                     mv.visitInsn(IMUL);
                 }
                 mv.visitVarInsn(ALOAD, 0);
-                mv.visitMethodInsn(INVOKEVIRTUAL, name + "Element", "get" + fm.titleFieldName(), "()" + fm.bcLFieldType());
+                mv.visitMethodInsn(INVOKEVIRTUAL, name2, "get" + fm.titleFieldName(), "()" + fm.bcLFieldType());
                 if (fm.isCallsHashCode()) {
                     mv.visitMethodInsn(INVOKESTATIC, fm.bcLModelType(), "hashCode", "(" + fm.bcLSetType() + ")I");
                 }
@@ -480,8 +582,228 @@ public enum GenerateHugeArrays {
             mv.visitInsn(IRETURN);
             Label l3 = new Label();
             mv.visitLabel(l3);
-            mv.visitLocalVariable("this", "L" + name + "Element;", null, l0, l3, 0);
+            mv.visitLocalVariable("this", "L" + name2 + ";", null, l0, l3, 0);
             mv.visitMaxs(3, 1);
+            mv.visitEnd();
+        }
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "copyOf", "(L" + name + ";)V", null, null);
+            mv.visitCode();
+            Label l0 = new Label();
+            mv.visitLabel(l0);
+            mv.visitLineNumber(220, l0);
+            boolean copySimpleValues = false;
+            for (FieldModel fm : tm.fields()) {
+//                if (!fm.copySimpleValue()) {
+                if (true) {
+                    mv.visitVarInsn(ALOAD, 0);
+                    mv.visitVarInsn(ALOAD, 1);
+                    mv.visitMethodInsn(INVOKEINTERFACE, name, "get" + fm.titleFieldName(), "()" + fm.bcLFieldType());
+                    mv.visitMethodInsn(INVOKEVIRTUAL, name2, "set" + fm.titleFieldName(), "(" + fm.bcLFieldType() + ")V");
+                } else {
+                    copySimpleValues = true;
+                }
+            }
+            Label l4 = new Label();
+            Label l6 = new Label();
+            if (copySimpleValues) {
+                Label l3 = new Label();
+                mv.visitLabel(l3);
+                mv.visitLineNumber(225, l3);
+                mv.visitVarInsn(ALOAD, 1);
+                mv.visitTypeInsn(INSTANCEOF, name + "Element");
+                mv.visitJumpInsn(IFEQ, l4);
+                Label l5 = new Label();
+                mv.visitLabel(l5);
+                mv.visitLineNumber(226, l5);
+                mv.visitVarInsn(ALOAD, 1);
+                mv.visitTypeInsn(CHECKCAST, name + "Element");
+                mv.visitVarInsn(ASTORE, 2);
+                mv.visitLabel(l6);
+                mv.visitLineNumber(227, l6);
+                mv.visitVarInsn(ALOAD, 2);
+                mv.visitFieldInsn(GETFIELD, name + "Element", "list", "L" + collections + "impl/AbstractHugeArrayList;");
+                mv.visitVarInsn(ALOAD, 0);
+                mv.visitFieldInsn(GETFIELD, name + "Element", "list", "L" + collections + "impl/AbstractHugeArrayList;");
+                mv.visitJumpInsn(IF_ACMPNE, l4);
+                for (FieldModel fm : tm.fields()) {
+                    if (fm.copySimpleValue()) {
+                        mv.visitVarInsn(ALOAD, 0);
+                        mv.visitFieldInsn(GETFIELD, name + "Element", "allocation", "L" + name + "Allocation;");
+                        mv.visitFieldInsn(GETFIELD, name + "Allocation", "m_" + fm.fieldName(), fm.bcLStoreType());
+                        mv.visitVarInsn(ALOAD, 0);
+                        mv.visitFieldInsn(GETFIELD, name + "Element", "offset", "I");
+                        mv.visitVarInsn(ALOAD, 2);
+                        mv.visitFieldInsn(GETFIELD, name + "Element", "allocation", "L" + name + "Allocation;");
+                        mv.visitFieldInsn(GETFIELD, name + "Allocation", "m_" + fm.fieldName(), fm.bcLStoreType());
+                        mv.visitVarInsn(ALOAD, 2);
+                        mv.visitFieldInsn(GETFIELD, name + "Element", "offset", "I");
+                        mv.visitMethodInsn(INVOKEVIRTUAL, "java/nio/ByteBuffer", "get", "(I)" + fm.bcLFieldType());
+                        mv.visitMethodInsn(INVOKEVIRTUAL, "java/nio/ByteBuffer", "put", "(I" + fm.bcLFieldType() + ")" + fm.bcLStoreType());
+                        mv.visitInsn(POP);
+                    }
+                }
+
+            }
+            Label l16 = new Label();
+            mv.visitLabel(l16);
+            mv.visitLineNumber(238, l16);
+            Label l17 = new Label();
+            mv.visitJumpInsn(GOTO, l17);
+            mv.visitLabel(l4);
+            mv.visitLineNumber(241, l4);
+            for (FieldModel fm : tm.fields()) {
+                if (fm.copySimpleValue()) {
+                    mv.visitVarInsn(ALOAD, 0);
+                    mv.visitVarInsn(ALOAD, 1);
+                    mv.visitMethodInsn(INVOKEINTERFACE, name, "get" + fm.titleFieldName(), "()" + fm.bcLFieldType());
+                    mv.visitMethodInsn(INVOKEVIRTUAL, name2, "set" + fm.titleFieldName(), "(" + fm.bcLFieldType() + ")V");
+                }
+            }
+
+            mv.visitLabel(l17);
+            mv.visitLineNumber(251, l17);
+            mv.visitInsn(RETURN);
+            Label l13 = new Label();
+            mv.visitLabel(l13);
+            mv.visitLocalVariable("this", "L" + name2 + ";", null, l0, l13, 0);
+            mv.visitLocalVariable("t", "L" + name + ";", null, l0, l13, 1);
+            if (copySimpleValues) {
+                mv.visitLocalVariable("mte", "L" + name + "Element;", null, l6, l4, 2);
+            }
+            mv.visitMaxs(4, 3);
+            mv.visitEnd();
+        }
+        {
+            mv = cw.visitMethod(ACC_PUBLIC + ACC_BRIDGE + ACC_SYNTHETIC, "copyOf", "(Ljava/lang/Object;)V", null, null);
+            mv.visitCode();
+            Label l0 = new Label();
+            mv.visitLabel(l0);
+            mv.visitLineNumber(26, l0);
+            mv.visitVarInsn(ALOAD, 0);
+            mv.visitVarInsn(ALOAD, 1);
+            mv.visitTypeInsn(CHECKCAST, name);
+            mv.visitMethodInsn(INVOKEVIRTUAL, name2, "copyOf", "(L" + name + ";)V");
+            mv.visitInsn(RETURN);
+            Label l1 = new Label();
+            mv.visitLabel(l1);
+            mv.visitLocalVariable("this", "L" + name2 + ";", null, l0, l1, 0);
+            mv.visitLocalVariable("x0", "Ljava/lang/Object;", null, l0, l1, 1);
+            mv.visitMaxs(2, 2);
+            mv.visitEnd();
+        }
+    }
+
+    public static byte[] dumpImpl(TypeModel tm) {
+
+        ClassWriter cw = new ClassWriter(0);
+        FieldVisitor fv;
+        MethodVisitor mv;
+
+        String name = tm.bcType();
+
+        cw.visit(V1_6, ACC_PUBLIC + ACC_SUPER, name + "Impl", "Ljava/lang/Object;L" + name + ";L" + collections + "api/HugeElement<L" + name + ";>;", "java/lang/Object", new String[]{name, collections + "api/HugeElement"});
+
+        cw.visitSource(tm.getClass().getSimpleName() + "Impl.java", null);
+
+        for (FieldModel fm : tm.fields()) {
+            fv = cw.visitField(ACC_PRIVATE, "m_" + fm.fieldName(), fm.bcLFieldType(), null, null);
+            fv.visitEnd();
+        }
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
+            mv.visitCode();
+            Label l0 = new Label();
+            mv.visitLabel(l0);
+            mv.visitLineNumber(24, l0);
+            mv.visitVarInsn(ALOAD, 0);
+            mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V");
+            mv.visitInsn(RETURN);
+            Label l1 = new Label();
+            mv.visitLabel(l1);
+            mv.visitLocalVariable("this", "L" + name + "Impl;", null, l0, l1, 0);
+            mv.visitMaxs(1, 1);
+            mv.visitEnd();
+        }
+        for (FieldModel fm : tm.fields()) {
+            mv = cw.visitMethod(ACC_PUBLIC, "set" + fm.titleFieldName(), "(" + fm.bcLFieldType() + ")V", null, null);
+            mv.visitCode();
+            Label l0 = new Label();
+            mv.visitLabel(l0);
+            mv.visitLineNumber(40, l0);
+            mv.visitVarInsn(ALOAD, 0);
+            mv.visitVarInsn(loadFor(fm.bcType()), 1);
+            mv.visitFieldInsn(PUTFIELD, name + "Impl", "m_" + fm.fieldName(), fm.bcLFieldType());
+            Label l1 = new Label();
+            mv.visitLabel(l1);
+            mv.visitLineNumber(41, l1);
+            mv.visitInsn(RETURN);
+            Label l2 = new Label();
+            mv.visitLabel(l2);
+            mv.visitLocalVariable("this", "L" + name + "Impl;", null, l0, l2, 0);
+            mv.visitLocalVariable("b", fm.bcLFieldType(), null, l0, l2, 1);
+            mv.visitMaxs(1 + fm.bcFieldSize(), 1 + fm.bcFieldSize());
+            mv.visitEnd();
+
+            mv = cw.visitMethod(ACC_PUBLIC, "get" + fm.titleFieldName(), "()" + fm.bcLFieldType(), null, null);
+            mv.visitCode();
+            Label l3 = new Label();
+            mv.visitLabel(l3);
+            mv.visitLineNumber(45, l3);
+            mv.visitVarInsn(ALOAD, 0);
+            mv.visitFieldInsn(GETFIELD, name + "Impl", "m_" + fm.fieldName(), fm.bcLFieldType());
+            mv.visitInsn(returnFor(fm.bcType()));
+            Label l4 = new Label();
+            mv.visitLabel(l4);
+            mv.visitLocalVariable("this", "L" + name + "Impl;", null, l3, l4, 0);
+            mv.visitMaxs(1 + fm.bcFieldSize(), 1);
+            mv.visitEnd();
+        }
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "index", "(J)V", null, null);
+            mv.visitCode();
+            Label l0 = new Label();
+            mv.visitLabel(l0);
+            mv.visitLineNumber(160, l0);
+            mv.visitTypeInsn(NEW, "java/lang/UnsupportedOperationException");
+            mv.visitInsn(DUP);
+            mv.visitMethodInsn(INVOKESPECIAL, "java/lang/UnsupportedOperationException", "<init>", "()V");
+            mv.visitInsn(ATHROW);
+            Label l1 = new Label();
+            mv.visitLabel(l1);
+            mv.visitLocalVariable("this", "L" + name + "Impl;", null, l0, l1, 0);
+            mv.visitLocalVariable("n", "J", null, l0, l1, 1);
+            mv.visitMaxs(2, 3);
+            mv.visitEnd();
+        }
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "index", "()J", null, null);
+            mv.visitCode();
+            Label l0 = new Label();
+            mv.visitLabel(l0);
+            mv.visitLineNumber(165, l0);
+            mv.visitInsn(LCONST_0);
+            mv.visitInsn(LRETURN);
+            Label l1 = new Label();
+            mv.visitLabel(l1);
+            mv.visitLocalVariable("this", "L" + name + "Impl;", null, l0, l1, 0);
+            mv.visitMaxs(2, 1);
+            mv.visitEnd();
+        }
+        appendToStringHashCodeEqualsCopyOf(tm, cw, name + "Impl");
+
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "hugeElementType", "()L" + collections + "api/HugeElementType;", null, null);
+            mv.visitCode();
+            Label l0 = new Label();
+            mv.visitLabel(l0);
+            mv.visitLineNumber(187, l0);
+            mv.visitFieldInsn(GETSTATIC, collections + "api/HugeElementType", "BeanImpl", "L" + collections + "api/HugeElementType;");
+            mv.visitInsn(ARETURN);
+            Label l1 = new Label();
+            mv.visitLabel(l1);
+            mv.visitLocalVariable("this", "L" + name + "Impl;", null, l0, l1, 0);
+            mv.visitMaxs(1, 1);
             mv.visitEnd();
         }
         cw.visitEnd();
@@ -489,8 +811,10 @@ public enum GenerateHugeArrays {
         final byte[] bytes = cw.toByteArray();
 //        ClassReader cr = new ClassReader(bytes);
 //        cr.accept(new ASMifierClassVisitor(new PrintWriter(System.out)), 0);
+
         return bytes;
     }
+
 
     private static final int[] returnForArray = {IRETURN, LRETURN, DRETURN, FRETURN, ARETURN};
 

@@ -107,4 +107,9 @@ public class Enumerated16FieldModel<T> extends AbstractFieldModel<T> {
     public static <T> int hashCode(T elementType) {
         return elementType == null ? Integer.MIN_VALUE : elementType.hashCode();
     }
+
+    public void clear() {
+        map.clear();
+        list.clear();
+    }
 }
