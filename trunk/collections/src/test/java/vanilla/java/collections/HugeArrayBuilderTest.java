@@ -19,7 +19,9 @@ package vanilla.java.collections;
 import org.junit.Ignore;
 import org.junit.Test;
 import vanilla.java.collections.api.HugeArrayList;
+import vanilla.java.collections.api.HugeElement;
 import vanilla.java.collections.hand.MutableTypesArrayList;
+import vanilla.java.collections.hand.MutableTypesImpl;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
@@ -33,7 +35,7 @@ import static junit.framework.Assert.assertFalse;
 
 public class HugeArrayBuilderTest {
     private static final ElementType[] elementTypes = ElementType.values();
-    private static final long length = 10 * 1000 * 1000L;
+    private static final long length = 1000 * 1000L;
 
     interface MutableBoolean {
         public void setFlag(boolean b);
@@ -112,6 +114,69 @@ public class HugeArrayBuilderTest {
     }
 
     @Test
+    public void testAddTypes() throws Exception {
+        gcPrintUsed();
+
+        final HugeArrayBuilder<MutableTypes> builder = new HugeArrayBuilder<MutableTypes>() {{
+            capacity = length;
+        }};
+        final MutableTypes bean = builder.createBean();
+        final MutableTypes bean2 = builder.createBean();
+        HugeArrayList<MutableTypes> hugeList = builder.create();
+        List<MutableTypes> list = hugeList;
+        assertEquals(0, list.size());
+
+        final int elements = 2;
+        for (int i = 0; i < elements; i++) {
+            setFields(bean, i + 1);
+            ((HugeElement) bean2).copyOf(bean);
+            final String expected = bean.toString();
+            final String actual0 = bean2.toString();
+            assertEquals(expected, actual0);
+
+            list.add(bean);
+            final String actual = list.get(i).toString();
+            assertEquals(expected, actual);
+        }
+        assertEquals(elements, list.size());
+        for (int i = 0; i < elements; i++) {
+            final MutableTypes mt = list.get(i);
+            assertEquals(i + 1, mt.getInt());
+            hugeList.recycle(mt);
+        }
+        assertEquals(elements, list.size());
+    }
+
+    @Test
+    public void testRemoveTypes() throws Exception {
+        gcPrintUsed();
+
+        final HugeArrayBuilder<MutableTypes> builder = new HugeArrayBuilder<MutableTypes>() {{
+            capacity = length;
+            setRemoveReturnsNull = true;
+        }};
+        final MutableTypes bean = builder.createBean();
+        HugeArrayList<MutableTypes> hugeList = builder.create();
+        List<MutableTypes> list = hugeList;
+        assertEquals(0, list.size());
+
+        final int elements = 2;
+        for (int i = 0; i < elements; i++) {
+            setFields(bean, i + 1);
+            list.add(bean);
+        }
+        assertEquals(elements, list.size());
+
+        Set<Integer> integers = new LinkedHashSet<Integer>();
+        for (int i = 0; i < elements; i++) {
+            MutableTypes mt = list.remove(i);
+            integers.add(mt.getInt());
+            hugeList.recycle(mt);
+        }
+        assertEquals(elements, list.size());
+    }
+
+    @Test
     public void testCreateObjectTypes() throws Exception {
         gcPrintUsed();
 
@@ -135,12 +200,13 @@ public class HugeArrayBuilderTest {
         assertEquals(length, list.size());
     }
 
+
     @Ignore
     @Test
     public void testCreateTypes2() throws Exception {
         gcPrintUsed();
 
-        HugeArrayList<MutableTypes> hugeList = new MutableTypesArrayList(1024 * 1024);
+        HugeArrayList<MutableTypes> hugeList = new MutableTypesArrayList(1024 * 1024, false);
         List<MutableTypes> list = hugeList;
         assertEquals(0, list.size());
 
@@ -179,6 +245,46 @@ public class HugeArrayBuilderTest {
 
     @Ignore
     @Test
+    public void testRemoveAll() throws Exception {
+        gcPrintUsed();
+
+        HugeArrayList<MutableTypes> hugeList = new HugeArrayBuilder<MutableTypes>() {{
+            capacity = length;
+            setRemoveReturnsNull = true;
+        }}.create();
+        List<MutableTypes> list = hugeList;
+        assertEquals(0, list.size());
+        hugeList.setSize(length);
+
+        Thread t = monitorThread();
+
+        removeFromList(list);
+        t.interrupt();
+        gcPrintUsed();
+        assertEquals(length, list.size());
+    }
+
+    @Ignore
+    @Test
+    public void testRemoveAllJavaBean() throws Exception {
+        gcPrintUsed();
+
+        List<MutableTypes> list = new ArrayList<MutableTypes>();
+        assertEquals(0, list.size());
+
+        Thread t = monitorThread();
+
+        for (int i = 0; i < length; i++)
+            list.add(new MutableTypesImpl());
+
+        removeFromList(list);
+        t.interrupt();
+        gcPrintUsed();
+        assertEquals(length, list.size());
+    }
+
+    @Ignore
+    @Test
     public void testCreateJavaBean() throws Exception {
         gcPrintUsed();
 
@@ -194,141 +300,6 @@ public class HugeArrayBuilderTest {
         t.interrupt();
         gcPrintUsed();
         assertEquals(length, list.size());
-    }
-
-    static class MutableTypesImpl implements MutableTypes {
-        private boolean b;
-        private Boolean b2;
-        private byte b3;
-        private Byte b4;
-        private char ch;
-        private short s;
-        private int i;
-        private float f;
-        private long l;
-        private double d;
-        private ElementType elementType;
-        private String text;
-
-        @Override
-        public void setBoolean(boolean b) {
-            this.b = b;
-        }
-
-        @Override
-        public boolean getBoolean() {
-            return b;
-        }
-
-        @Override
-        public void setBoolean2(Boolean b) {
-            this.b2 = b;
-        }
-
-        @Override
-        public Boolean getBoolean2() {
-            return b2;
-        }
-
-        @Override
-        public void setByte(byte b) {
-            this.b3 = b;
-        }
-
-        @Override
-        public byte getByte() {
-            return b3;
-        }
-
-        @Override
-        public void setByte2(Byte b) {
-            this.b4 = b;
-        }
-
-        @Override
-        public Byte getByte2() {
-            return b4;
-        }
-
-        @Override
-        public void setChar(char ch) {
-            this.ch = ch;
-        }
-
-        @Override
-        public char getChar() {
-            return ch;
-        }
-
-        @Override
-        public void setShort(short s) {
-            this.s = s;
-        }
-
-        @Override
-        public short getShort() {
-            return s;
-        }
-
-        @Override
-        public void setInt(int i) {
-            this.i = i;
-        }
-
-        @Override
-        public int getInt() {
-            return i;
-        }
-
-        @Override
-        public void setFloat(float f) {
-            this.f = f;
-        }
-
-        @Override
-        public float getFloat() {
-            return f;
-        }
-
-        @Override
-        public void setLong(long l) {
-            this.l = l;
-        }
-
-        @Override
-        public long getLong() {
-            return l;
-        }
-
-        @Override
-        public void setDouble(double d) {
-            this.d = d;
-        }
-
-        @Override
-        public double getDouble() {
-            return d;
-        }
-
-        @Override
-        public void setElementType(ElementType elementType) {
-            this.elementType = elementType;
-        }
-
-        @Override
-        public ElementType getElementType() {
-            return elementType;
-        }
-
-        @Override
-        public void setString(String text) {
-            this.text = text;
-        }
-
-        @Override
-        public String getString() {
-            return text;
-        }
     }
 
     @Test
@@ -393,6 +364,47 @@ public class HugeArrayBuilderTest {
             }
             long randomTime = System.nanoTime() - randomStart;
             System.out.printf("Took %,d ns per object to access randomly%n", randomTime * 10 / list.size());
+            System.gc();
+        } while (System.currentTimeMillis() - start < 10 * 1000);
+        System.out.println("Finished");
+    }
+
+    private static void removeFromList(List<MutableTypes> list) {
+        gcPrintUsed();
+
+        long start = System.currentTimeMillis();
+        do {
+            System.out.println("Updating");
+            long startWrite = System.nanoTime();
+            populate(list);
+            int i;
+            long timeWrite = System.nanoTime() - startWrite;
+            System.out.printf("Took %,d ns per object write%n", timeWrite / list.size());
+
+            System.out.println("Removing");
+            long startRemove = System.nanoTime();
+            final int length = list.size();
+            while (length >= 3) {
+                // remove from the start.
+                final MutableTypes mt0 = list.remove(0);
+                // remove from the middle.
+                final MutableTypes mt1 = list.remove(list.size() / 2);
+                // remove from the end.
+                final MutableTypes mt2 = list.remove(list.size() - 1);
+                if (list instanceof HugeArrayList) {
+                    HugeArrayList hal = (HugeArrayList) list;
+                    hal.recycle(mt2);
+                    hal.recycle(mt1);
+                    hal.recycle(mt0);
+                }
+            }
+            while (!list.isEmpty())
+                // remove from the start.
+                list.remove(0);
+
+            long timeRemove = System.nanoTime() - startRemove;
+            System.out.printf("Took %,d ns per object remove%n", timeRemove / length);
+
             System.gc();
         } while (System.currentTimeMillis() - start < 10 * 1000);
         System.out.println("Finished");
@@ -483,20 +495,24 @@ public class HugeArrayBuilderTest {
     private static void populate(List<MutableTypes> list) {
         int i = 0;
         for (MutableTypes mb : list) {
-            mb.setBoolean(i % 2 == 0);
-            mb.setBoolean2(i % 3 == 0 ? null : i % 3 == 1);
-            mb.setByte((byte) i);
-            mb.setByte2(i % 31 == 0 ? null : (byte) i);
-            mb.setChar((char) i);
-            mb.setShort((short) i);
-            mb.setInt(i);
-            mb.setFloat(i);
-            mb.setLong(i);
-            mb.setDouble(i);
-            mb.setElementType(elementTypes[i % elementTypes.length]);
-            mb.setString(strings[i % strings.length]);
+            setFields(mb, i);
             i++;
         }
+    }
+
+    private static void setFields(MutableTypes mb, int i) {
+        mb.setBoolean(i % 2 == 0);
+        mb.setBoolean2(i % 3 == 0 ? null : i % 3 == 1);
+        mb.setByte((byte) i);
+        mb.setByte2(i % 31 == 0 ? null : (byte) i);
+        mb.setChar((char) i);
+        mb.setShort((short) i);
+        mb.setInt(i);
+        mb.setFloat(i);
+        mb.setLong(i);
+        mb.setDouble(i);
+        mb.setElementType(elementTypes[i % elementTypes.length]);
+        mb.setString(strings[i % strings.length]);
     }
 
     private void exerciseObjectList(List<ObjectTypes> list, long length) {

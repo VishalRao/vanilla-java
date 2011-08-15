@@ -112,5 +112,4 @@ public class ObjectFieldModel<T> extends AbstractFieldModel<T> {
     public static <T> int hashCode(T t) {
         return t == null ? 0 : t.hashCode();
     }
-
 }

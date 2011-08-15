@@ -23,18 +23,29 @@ import org.objectweb.asm.util.ASMifierClassVisitor;
 import vanilla.java.collections.hand.MutableTypesAllocation;
 import vanilla.java.collections.hand.MutableTypesArrayList;
 import vanilla.java.collections.hand.MutableTypesElement;
+import vanilla.java.collections.hand.MutableTypesImpl;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public class ClassNodeTest {
     @Test
     @Ignore
     public void test() throws IOException {
-        for (Class clazz : new Class[]{MutableTypesArrayList.class, MutableTypesAllocation.class, MutableTypesElement.class}) {
+        for (Class clazz : new Class[]{MutableTypesArrayList.class, MutableTypesAllocation.class, MutableTypesElement.class, MutableTypesImpl.class}) {
             ClassReader cr = new ClassReader(clazz.getName());
-            ASMifierClassVisitor cv = new ASMifierClassVisitor(new PrintWriter(System.out));
+            StringWriter sw = new StringWriter();
+            ASMifierClassVisitor cv = new ASMifierClassVisitor(new PrintWriter(sw));
             cr.accept(cv, 0);
+            String text = sw.toString();
+            System.out.println(text
+                    .replaceAll("\"vanilla/java/collections/hand/MutableTypes", "name + \"")
+                    .replaceAll("Lvanilla/java/collections/hand/MutableTypes", "L\" + name + \"")
+                    .replaceAll("\"vanilla/java/collections/MutableTypes\"", "name")
+                    .replaceAll("Lvanilla/java/collections/MutableTypes;", "L\" + name + \";")
+                    .replaceAll("\"vanilla/java/collections/", "collections + \"")
+                    .replaceAll("Lvanilla/java/collections/", "L\" + collections + \""));
         }
     }
 }

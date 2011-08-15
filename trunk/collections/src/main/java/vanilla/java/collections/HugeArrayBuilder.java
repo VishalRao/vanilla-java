@@ -33,6 +33,7 @@ public class HugeArrayBuilder<T> {
     protected int allocationSize = -1;
     protected boolean fixedSize;
     protected boolean entryBased;
+    protected boolean setRemoveReturnsNull;
     protected long capacity = -1;
     protected ClassLoader classLoader;
     private boolean disableCodeGeneration;
@@ -124,12 +125,13 @@ public class HugeArrayBuilder<T> {
             arrayListClass = classLoader().loadClass(typeModel.type().getName() + "ArrayList");
 
         } catch (ClassNotFoundException e) {
+            acquireImplClass();
             defineClass(GenerateHugeArrays.dumpElement(typeModel));
             defineClass(GenerateHugeArrays.dumpAllocation(typeModel));
             arrayListClass = defineClass(GenerateHugeArrays.dumpArrayList(typeModel));
         }
         try {
-            return (HugeArrayList<T>) arrayListClass.getConstructor(int.class).newInstance(allocationSize);
+            return (HugeArrayList<T>) arrayListClass.getConstructor(int.class, boolean.class).newInstance(allocationSize, setRemoveReturnsNull);
         } catch (NoSuchMethodException e) {
             throw new AssertionError(e);
         } catch (InstantiationException e) {
@@ -139,6 +141,28 @@ public class HugeArrayBuilder<T> {
         } catch (InvocationTargetException e) {
             throw new AssertionError(e.getCause());
         }
+    }
+
+    public T createBean() {
+        Class implClass = acquireImplClass();
+        try {
+            return (T) implClass.newInstance();
+        } catch (InstantiationException e) {
+            throw new AssertionError(e);
+        } catch (IllegalAccessException e) {
+            throw new AssertionError(e);
+        }
+    }
+
+    private Class acquireImplClass() {
+        Class implClass;
+        try {
+            implClass = classLoader().loadClass(typeModel.type().getName() + "Impl");
+
+        } catch (ClassNotFoundException e) {
+            implClass = defineClass(GenerateHugeArrays.dumpImpl(typeModel));
+        }
+        return implClass;
     }
 
     private Class defineClass(byte[] bytes) {

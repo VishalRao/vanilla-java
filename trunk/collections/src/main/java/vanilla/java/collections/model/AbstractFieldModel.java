@@ -114,6 +114,11 @@ public abstract class AbstractFieldModel<T> implements FieldModel<T> {
     }
 
     @Override
+    public boolean copySimpleValue() {
+        return true;
+    }
+
+    @Override
     public boolean isCallsNotEquals() {
         return false;
     }
@@ -121,5 +126,9 @@ public abstract class AbstractFieldModel<T> implements FieldModel<T> {
     @Override
     public boolean isCallsHashCode() {
         return isCallsNotEquals();
+    }
+
+    @Override
+    public void clear() {
     }
 }
