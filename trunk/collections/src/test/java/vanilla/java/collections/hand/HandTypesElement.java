@@ -24,7 +24,7 @@ import vanilla.java.collections.model.*;
 import java.lang.annotation.ElementType;
 
 public class HandTypesElement extends AbstractHugeElement<HandTypes, HandTypesAllocation> implements HandTypes {
-    HandTypesAllocation allocation = null;
+    HandTypesAllocation allocation;
 
     public HandTypesElement(AbstractHugeArrayList<HandTypes, HandTypesAllocation, HandTypesElement> list, long n) {
         super(list, n);

@@ -17,16 +17,15 @@ package vanilla.java.collections.model;
  */
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.CharBuffer;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Enumerated16FieldModel<T> extends AbstractFieldModel<T> {
     private final Class<T> type;
     private final Map<T, Character> map = new LinkedHashMap<T, Character>();
     private final List<T> list = new ArrayList<T>();
+    private int addPosition;
 
     public Enumerated16FieldModel(String fieldName, int fieldNumber, Class<T> type) {
         super(fieldName, fieldNumber);
@@ -45,7 +44,7 @@ public class Enumerated16FieldModel<T> extends AbstractFieldModel<T> {
     }
 
     public static CharBuffer newArrayOfField(int size) {
-        return ByteBuffer.allocateDirect(size * 2).asCharBuffer();
+        return ByteBuffer.allocateDirect(size * 2).order(ByteOrder.nativeOrder()).asCharBuffer();
     }
 
     @Override
@@ -55,7 +54,8 @@ public class Enumerated16FieldModel<T> extends AbstractFieldModel<T> {
     }
 
     public T get(CharBuffer array, int index) {
-        return list.get(array.get(index));
+        final char c = array.get(index);
+        return list.get(c);
     }
 
     @Override
@@ -68,13 +68,31 @@ public class Enumerated16FieldModel<T> extends AbstractFieldModel<T> {
         Character ordinal = map.get(value);
         if (ordinal == null) {
             final int size = map.size();
-            if (size >= Character.MAX_VALUE)
-                throw new IndexOutOfBoundsException("Too many value in Enumerated16 field");
-            ordinal = (char) size;
-            map.put(value, ordinal);
-            list.add(ordinal, value);
+            OUTER:
+            do {
+                for (; addPosition < map.size(); addPosition++) {
+                    if (list.get(addPosition) == null) {
+                        ordinal = addEnumValue(value, addPosition);
+                        break OUTER;
+                    }
+                }
+                ordinal = addEnumValue(value, size);
+            } while (false);
+            addPosition++;
         }
         array.put(index, ordinal);
+    }
+
+    private Character addEnumValue(T value, int position) {
+        char ordinal = (char) position;
+        if (ordinal != position)
+            throw new IndexOutOfBoundsException("Too many values in Enumerated16 field, try calling compact()");
+        map.put(value, ordinal);
+        if (ordinal == list.size())
+            list.add(ordinal, value);
+        else
+            list.set(ordinal, value);
+        return ordinal;
     }
 
     @Override
@@ -122,5 +140,49 @@ public class Enumerated16FieldModel<T> extends AbstractFieldModel<T> {
         list.clear();
         map.put(null, (char) 0);
         list.add(null);
+        addPosition = 1;
+    }
+
+    private final BitSet compactIndexUsed = new BitSet();
+
+
+    public void compactStart() {
+        compactIndexUsed.clear();
+    }
+
+    public void compactScan(CharBuffer charBuffer, long size) {
+        for (int i = 0; i < size; i++) {
+            final char ch = charBuffer.get(i);
+            compactIndexUsed.set(ch);
+        }
+    }
+
+    public void compactEnd() {
+        final int compactSize = compactIndexUsed.cardinality();
+        if (compactSize == map.size()) {
+            return;
+        }
+        for (int i = 1; i < list.size(); i++) {
+            if (compactIndexUsed.get(i)) continue;
+            // to be removed
+            T t = list.get(i);
+            list.set(i, null);
+            map.remove(t);
+            if (addPosition > i)
+                addPosition = i;
+        }
+    }
+
+    public Map<T, Character> map() {
+        return map;
+    }
+
+    public List<T> list() {
+        return list;
+    }
+
+    @Override
+    public boolean isCompacting() {
+        return true;
     }
 }

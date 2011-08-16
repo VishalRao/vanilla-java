@@ -136,4 +136,14 @@ public abstract class AbstractFieldModel<T> implements FieldModel<T> {
     @Override
     public void clear() {
     }
+
+    @Override
+    public boolean isBufferStore() {
+        return true;
+    }
+
+    @Override
+    public boolean isCompacting() {
+        return false;
+    }
 }

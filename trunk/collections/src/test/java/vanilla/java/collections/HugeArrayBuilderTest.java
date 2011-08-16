@@ -31,8 +31,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.*;
 
 public class HugeArrayBuilderTest {
     private static final ElementType[] elementTypes = ElementType.values();
@@ -83,6 +82,58 @@ public class HugeArrayBuilderTest {
                 System.out.println("get " + count);
         }
         t.interrupt();
+    }
+
+    interface MutableString {
+        public void setString(String text);
+
+        public String getString();
+    }
+
+    @Test
+    public void testEnum16() {
+        HugeArrayList<MutableString> list = new HugeArrayBuilder<MutableString>() {
+        }.create();
+        list.setSize(200 * 1000);
+        char ch = 0;
+        for (MutableString ms : list) {
+            try {
+                ms.setString(Character.toString(ch++));
+                if (ch >= 65535) ch = 0;
+            } catch (IndexOutOfBoundsException e) {
+                System.err.println("ch= " + (int) ch);
+                e.printStackTrace();
+            }
+        }
+        try {
+            list.get(0).setString("hello");
+            fail("");
+        } catch (IndexOutOfBoundsException expected) {
+            //
+        }
+        list.compact();
+
+        ch = 0;
+        for (MutableString ms : list) {
+            try {
+                ms.setString(Character.toString(ch += 2));
+                if (ch >= 65534) ch = 0;
+            } catch (IndexOutOfBoundsException e) {
+                System.err.println("ch= " + (int) ch);
+                throw e;
+            }
+        }
+        list.compact();
+        ch = 0;
+        for (MutableString ms : list) {
+            try {
+                ms.setString("a" + ++ch);
+                if (ch >= 32000) ch = 0;
+            } catch (IndexOutOfBoundsException e) {
+                System.err.println("ch= " + (int) ch);
+                throw e;
+            }
+        }
     }
 
     @Test

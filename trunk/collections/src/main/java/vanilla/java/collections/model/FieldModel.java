@@ -72,4 +72,8 @@ public interface FieldModel<T> {
     boolean isCallsHashCode();
 
     public void clear();
+
+    boolean isBufferStore();
+
+    boolean isCompacting();
 }

@@ -36,4 +36,6 @@ public interface HugeArrayList<T> extends List<T> {
     public void recycle(T t);
 
     public void ensureCapacity(long capacity);
+
+    void compact();
 }

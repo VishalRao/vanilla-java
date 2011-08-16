@@ -16,6 +16,7 @@ package vanilla.java.collections.hand;
  *    limitations under the License.
  */
 
+import vanilla.java.collections.api.HugeAllocation;
 import vanilla.java.collections.impl.AbstractHugeArrayList;
 import vanilla.java.collections.model.Enum8FieldModel;
 import vanilla.java.collections.model.Enumerated16FieldModel;
@@ -45,6 +46,22 @@ public class HandTypesArrayList extends AbstractHugeArrayList<HandTypes, HandTyp
     @Override
     protected HandTypes createImpl() {
         return new HandTypesImpl();
+    }
+
+    protected void compactStart() {
+        stringEnumerated16FieldModel.compactStart();
+    }
+
+    protected void compactOnAllocation0(HugeAllocation allocation, long thisSize) {
+        compactOnAllocation((HandTypesAllocation) allocation, thisSize);
+    }
+
+    protected void compactOnAllocation(HandTypesAllocation allocation, long thisSize) {
+        stringEnumerated16FieldModel.compactScan(allocation.m_string, thisSize);
+    }
+
+    protected void compactEnd() {
+        stringEnumerated16FieldModel.compactEnd();
     }
 
     @Override
