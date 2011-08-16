@@ -16,17 +16,17 @@ package vanilla.java.collections.hand;
  *    limitations under the License.
  */
 
-import vanilla.java.collections.MutableTypes;
+import vanilla.java.collections.ObjectTypes;
 import vanilla.java.collections.impl.AbstractHugeArrayList;
 import vanilla.java.collections.impl.AbstractHugeElement;
 import vanilla.java.collections.model.*;
 
 import java.lang.annotation.ElementType;
 
-public class MutableTypesElement extends AbstractHugeElement<MutableTypes, MutableTypesAllocation> implements MutableTypes {
-    MutableTypesAllocation allocation = null;
+public class HandTypesElement extends AbstractHugeElement<HandTypes, HandTypesAllocation> implements HandTypes {
+    HandTypesAllocation allocation = null;
 
-    public MutableTypesElement(AbstractHugeArrayList<MutableTypes, MutableTypesAllocation, MutableTypesElement> list, long n) {
+    public HandTypesElement(AbstractHugeArrayList<HandTypes, HandTypesAllocation, HandTypesElement> list, long n) {
         super(list, n);
     }
 
@@ -132,24 +132,34 @@ public class MutableTypesElement extends AbstractHugeElement<MutableTypes, Mutab
 
     @Override
     public void setElementType(ElementType elementType) {
-        ((MutableTypesArrayList) list).elementTypeFieldModel.set(allocation.m_elementType, offset, elementType);
+        ((HandTypesArrayList) list).elementTypeFieldModel.set(allocation.m_elementType, offset, elementType);
     }
 
     @Override
     public ElementType getElementType() {
-        return ((MutableTypesArrayList) list).elementTypeFieldModel.get(allocation.m_elementType, offset);
+        return ((HandTypesArrayList) list).elementTypeFieldModel.get(allocation.m_elementType, offset);
     }
 
     @Override
     public void setString(String text) {
-        ((MutableTypesArrayList) list).stringEnumerated16FieldModel.set(allocation.m_string, offset, text);
+        ((HandTypesArrayList) list).stringEnumerated16FieldModel.set(allocation.m_string, offset, text);
     }
 
     @Override
     public String getString() {
-        return ((MutableTypesArrayList) list).stringEnumerated16FieldModel.get(allocation.m_string, offset);
+        return ((HandTypesArrayList) list).stringEnumerated16FieldModel.get(allocation.m_string, offset);
     }
 
+
+    @Override
+    public void setA(ObjectTypes.A a) {
+        allocation.m_a[offset] = a;
+    }
+
+    @Override
+    public ObjectTypes.A getA() {
+        return allocation.m_a[offset];
+    }
 
     @Override
     protected void updateAllocation0(int allocationSize) {
@@ -159,7 +169,7 @@ public class MutableTypesElement extends AbstractHugeElement<MutableTypes, Mutab
 
     @Override
     public String toString() {
-        return "MutableTypesElement{" +
+        return "HandTypesElement{" +
                 "boolean=" + getBoolean() +
                 ", boolean2=" + getBoolean2() +
                 ", byte=" + getByte() +
@@ -180,7 +190,7 @@ public class MutableTypesElement extends AbstractHugeElement<MutableTypes, Mutab
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        MutableTypesElement that = (MutableTypesElement) o;
+        HandTypesElement that = (HandTypesElement) o;
 
         if (getBoolean() != that.getBoolean()) return false;
         if (Boolean2FieldModel.notEquals(getBoolean2(), that.getBoolean2())) return false;
@@ -200,7 +210,7 @@ public class MutableTypesElement extends AbstractHugeElement<MutableTypes, Mutab
 
     @Override
     public int hashCode() {
-        return (((((((((((
+        return ((((((((((((
                 getBoolean() ? 1 : 0) * 31 +
                 Boolean2FieldModel.hashCode(getBoolean2())) * 31 +
                 getByte()) * 31 +
@@ -211,19 +221,21 @@ public class MutableTypesElement extends AbstractHugeElement<MutableTypes, Mutab
                 FloatFieldModel.hashCode(getFloat())) * 31 +
                 LongFieldModel.hashCode(getLong())) * 31 +
                 DoubleFieldModel.hashCode(getDouble())) * 31 +
-                Enumerated16FieldModel.hashCode(getElementType())) * 31 +
-                ObjectFieldModel.hashCode(getString());
+                Enum8FieldModel.hashCode(getElementType())) * 31 +
+                Enumerated16FieldModel.hashCode(getString()) * 31 +
+                ObjectFieldModel.hashCode(getA()));
     }
 
     @Override
-    public void copyOf(MutableTypes t) {
+    public void copyOf(HandTypes t) {
         do {
             setBoolean(t.getBoolean());
             setBoolean2(t.getBoolean2());
             setByte2(t.getByte2());
+            setA(getA());
 
-            if (t instanceof MutableTypesElement) {
-                MutableTypesElement mte = (MutableTypesElement) t;
+            if (t instanceof HandTypesElement) {
+                HandTypesElement mte = (HandTypesElement) t;
                 if (mte.list == list) {
 
                     allocation.m_byte.put(offset, mte.allocation.m_byte.get(mte.offset));

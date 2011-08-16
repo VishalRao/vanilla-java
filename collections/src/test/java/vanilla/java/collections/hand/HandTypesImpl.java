@@ -16,13 +16,13 @@ package vanilla.java.collections.hand;
  *    limitations under the License.
  */
 
-import vanilla.java.collections.MutableTypes;
+import vanilla.java.collections.ObjectTypes;
 import vanilla.java.collections.api.HugeElement;
 import vanilla.java.collections.api.HugeElementType;
 
 import java.lang.annotation.ElementType;
 
-public class MutableTypesImpl implements MutableTypes, HugeElement<MutableTypes> {
+public class HandTypesImpl implements HandTypes, HugeElement<HandTypes> {
     private boolean m_boolean;
     private Boolean m_boolean2;
     private byte m_byte;
@@ -35,6 +35,7 @@ public class MutableTypesImpl implements MutableTypes, HugeElement<MutableTypes>
     private double m_double;
     private ElementType m_elementType;
     private String m_string;
+    private ObjectTypes.A m_a;
 
     @Override
     public void setBoolean(boolean b) {
@@ -156,6 +157,14 @@ public class MutableTypesImpl implements MutableTypes, HugeElement<MutableTypes>
         return m_string;
     }
 
+    public ObjectTypes.A getA() {
+        return m_a;
+    }
+
+    public void setA(ObjectTypes.A a) {
+        this.m_a = a;
+    }
+
     @Override
     public void index(long n) {
         throw new UnsupportedOperationException();
@@ -167,7 +176,7 @@ public class MutableTypesImpl implements MutableTypes, HugeElement<MutableTypes>
     }
 
     @Override
-    public void copyOf(MutableTypes t) {
+    public void copyOf(HandTypes t) {
         setBoolean(t.getBoolean());
         setBoolean2(t.getBoolean2());
         setByte(t.getByte());
@@ -180,6 +189,7 @@ public class MutableTypesImpl implements MutableTypes, HugeElement<MutableTypes>
         setLong(t.getLong());
         setShort(t.getShort());
         setString(t.getString());
+        setA(t.getA());
     }
 
     @Override

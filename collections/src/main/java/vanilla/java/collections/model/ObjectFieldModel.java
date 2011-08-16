@@ -64,6 +64,11 @@ public class ObjectFieldModel<T> extends AbstractFieldModel<T> {
     }
 
     @Override
+    public boolean copySimpleValue() {
+        return false;
+    }
+
+    @Override
     public String bcStoreType() {
         throw new UnsupportedOperationException();
     }

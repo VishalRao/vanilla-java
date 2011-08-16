@@ -20,8 +20,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 import vanilla.java.collections.api.HugeArrayList;
 import vanilla.java.collections.api.HugeElement;
-import vanilla.java.collections.hand.MutableTypesArrayList;
-import vanilla.java.collections.hand.MutableTypesImpl;
+import vanilla.java.collections.hand.HandTypes;
+import vanilla.java.collections.hand.HandTypesArrayList;
+import vanilla.java.collections.hand.HandTypesImpl;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
@@ -153,7 +154,7 @@ public class HugeArrayBuilderTest {
 
         final HugeArrayBuilder<MutableTypes> builder = new HugeArrayBuilder<MutableTypes>() {{
             capacity = length;
-            setRemoveReturnsNull = true;
+            setRemoveReturnsNull = false;
         }};
         final MutableTypes bean = builder.createBean();
         HugeArrayList<MutableTypes> hugeList = builder.create();
@@ -173,7 +174,7 @@ public class HugeArrayBuilderTest {
             integers.add(mt.getInt());
             hugeList.recycle(mt);
         }
-        assertEquals(elements, list.size());
+        assertEquals(0, list.size());
     }
 
     @Test
@@ -206,8 +207,8 @@ public class HugeArrayBuilderTest {
     public void testCreateTypes2() throws Exception {
         gcPrintUsed();
 
-        HugeArrayList<MutableTypes> hugeList = new MutableTypesArrayList(1024 * 1024, false);
-        List<MutableTypes> list = hugeList;
+        HugeArrayList<HandTypes> hugeList = new HandTypesArrayList(1024 * 1024, false);
+        List<HandTypes> list = hugeList;
         assertEquals(0, list.size());
 
         hugeList.setSize(length);
@@ -217,7 +218,7 @@ public class HugeArrayBuilderTest {
         assertEquals(length, list.size());
         assertEquals(length, hugeList.longSize());
 
-        exerciseList(list, length, new HAListSetSize(hugeList));
+        exerciseList((HugeArrayList) list, length, new HAListSetSize(hugeList));
 
         t.interrupt();
         gcPrintUsed();
@@ -684,14 +685,14 @@ public class HugeArrayBuilderTest {
         @Override
         public void run() {
             for (int i = 0; i < length; i++)
-                list.add(new MutableTypesImpl());
+                list.add(new HandTypesImpl());
         }
     }
 
     private static class HAListSetSize implements Runnable {
-        private final HugeArrayList<MutableTypes> hugeList;
+        private final HugeArrayList<? extends MutableTypes> hugeList;
 
-        public HAListSetSize(HugeArrayList<MutableTypes> hugeList) {
+        public HAListSetSize(HugeArrayList<? extends MutableTypes> hugeList) {
             this.hugeList = hugeList;
         }
 
