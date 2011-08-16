@@ -69,6 +69,11 @@ public class Enum8FieldModel<E extends Enum<E>> extends AbstractFieldModel<E> {
     }
 
     @Override
+    public String bcLStoredType() {
+        return "B";
+    }
+
+    @Override
     public Class<E> type() {
         return type;
     }
