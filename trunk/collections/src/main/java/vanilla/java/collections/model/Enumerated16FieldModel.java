@@ -67,7 +67,10 @@ public class Enumerated16FieldModel<T> extends AbstractFieldModel<T> {
     public void set(CharBuffer array, int index, T value) {
         Character ordinal = map.get(value);
         if (ordinal == null) {
-            ordinal = (char) map.size();
+            final int size = map.size();
+            if (size >= Character.MAX_VALUE)
+                throw new IndexOutOfBoundsException("Too many value in Enumerated16 field");
+            ordinal = (char) size;
             map.put(value, ordinal);
             list.add(ordinal, value);
         }
