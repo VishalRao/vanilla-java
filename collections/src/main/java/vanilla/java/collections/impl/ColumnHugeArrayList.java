@@ -34,7 +34,7 @@ import java.util.ListIterator;
 public class ColumnHugeArrayList<T> extends AbstractList<T> implements HugeArrayList<T> {
     private final TypeModel<T> type;
     private final int allocationSize;
-    private final List<Object[]> data = new ArrayList();
+    private final List<Object[]> allocations = new ArrayList();
     private final List<T> proxies = new ArrayList();
     private long longSize = 0;
 
@@ -47,11 +47,11 @@ public class ColumnHugeArrayList<T> extends AbstractList<T> implements HugeArray
     public void ensureCapacity(long size) {
         long blocks = (size + allocationSize - 1) / allocationSize;
         int fieldCount = type.fields().length;
-        while (blocks > data.size()) {
+        while (blocks > allocations.size()) {
             Object[] allocation = new Object[fieldCount];
             for (int i = 0; i < fieldCount; i++)
                 allocation[i] = type.arrayOfField(i, allocationSize);
-            data.add(allocation);
+            allocations.add(allocation);
         }
     }
 
@@ -158,13 +158,13 @@ public class ColumnHugeArrayList<T> extends AbstractList<T> implements HugeArray
     Object get(long index, FieldModel fieldModel) {
         int block = (int) (index / allocationSize);
         int portion = (int) (index % allocationSize);
-        return fieldModel.getAllocation(data.get(block), portion);
+        return fieldModel.getAllocation(allocations.get(block), portion);
     }
 
     void set(long index, FieldModel fieldModel, Object value) {
         int block = (int) (index / allocationSize);
         int portion = (int) (index % allocationSize);
-        fieldModel.setAllocation(data.get(block), portion, value);
+        fieldModel.setAllocation(allocations.get(block), portion, value);
     }
 
     class MyHugeIterator implements HugeIterator<T> {
@@ -264,6 +264,14 @@ public class ColumnHugeArrayList<T> extends AbstractList<T> implements HugeArray
             ensureCapacity(++longSize);
             set(t);
             handler.n++;
+        }
+    }
+
+    @Override
+    public void compact() {
+        int allocationsNeeded = (int) (longSize() / allocationSize + 1);
+        while (allocations.size() > allocationsNeeded) {
+            allocations.remove(allocations.size() - 1);
         }
     }
 }

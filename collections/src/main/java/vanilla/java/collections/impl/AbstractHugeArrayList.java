@@ -204,4 +204,23 @@ public abstract class AbstractHugeArrayList<T, TA extends HugeAllocation, TE ext
     }
 
     protected abstract T createImpl();
+
+    public void compact() {
+        int allocationsNeeded = (int) (longSize() / allocationSize + 1);
+        while (allocations.size() > allocationsNeeded) {
+            allocations.remove(allocations.size() - 1).destroy();
+        }
+        compactStart();
+        for (int i = 0, allocationsSize = allocations.size(); i < allocationsSize; i++) {
+            compactOnAllocation(allocations.get(i), Math.min(longSize - i * allocationsSize, allocationSize));
+        }
+        compactEnd();
+    }
+
+    protected abstract void compactStart();
+
+    protected abstract void compactOnAllocation(TA ta, long i);
+
+    protected abstract void compactEnd();
+
 }

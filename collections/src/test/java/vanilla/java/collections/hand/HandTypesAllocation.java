@@ -23,6 +23,8 @@ import vanilla.java.collections.model.*;
 import java.nio.*;
 import java.util.Arrays;
 
+import static vanilla.java.collections.impl.GenerateHugeArrays.clean;
+
 public class HandTypesAllocation implements HugeAllocation {
     IntBuffer m_boolean;
     IntBuffer m_boolean2;
@@ -56,4 +58,22 @@ public class HandTypesAllocation implements HugeAllocation {
     public void clear() {
         Arrays.fill(m_a, null);
     }
+
+    @Override
+    public void destroy() {
+        clean((Buffer) m_boolean);
+        clean((Buffer) m_boolean2);
+        final Object m = m_byte;
+        clean((Buffer) m);
+        // etc
+
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        destroy();
+    }
+
+
 }
