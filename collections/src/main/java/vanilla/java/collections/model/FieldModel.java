@@ -57,6 +57,8 @@ public interface FieldModel<T> {
 
     String bcLSetType();
 
+    String bcLStoredType();
+
     int bcFieldSize();
 
     BCType bcType();

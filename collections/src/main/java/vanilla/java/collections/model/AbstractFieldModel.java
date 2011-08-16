@@ -89,6 +89,11 @@ public abstract class AbstractFieldModel<T> implements FieldModel<T> {
     }
 
     @Override
+    public String bcLStoredType() {
+        return bcLFieldType();
+    }
+
+    @Override
     public String bcLFieldType() {
         return "L" + bcFieldType() + ';';
     }

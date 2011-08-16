@@ -594,8 +594,8 @@ public enum GenerateHugeArrays {
             mv.visitLineNumber(220, l0);
             boolean copySimpleValues = false;
             for (FieldModel fm : tm.fields()) {
-//                if (!fm.copySimpleValue()) {
-                if (true) {
+                if (!fm.copySimpleValue()) {
+//                if (true) {
                     mv.visitVarInsn(ALOAD, 0);
                     mv.visitVarInsn(ALOAD, 1);
                     mv.visitMethodInsn(INVOKEINTERFACE, name, "get" + fm.titleFieldName(), "()" + fm.bcLFieldType());
@@ -638,12 +638,11 @@ public enum GenerateHugeArrays {
                         mv.visitFieldInsn(GETFIELD, name + "Allocation", "m_" + fm.fieldName(), fm.bcLStoreType());
                         mv.visitVarInsn(ALOAD, 2);
                         mv.visitFieldInsn(GETFIELD, name + "Element", "offset", "I");
-                        mv.visitMethodInsn(INVOKEVIRTUAL, "java/nio/ByteBuffer", "get", "(I)" + fm.bcLFieldType());
-                        mv.visitMethodInsn(INVOKEVIRTUAL, "java/nio/ByteBuffer", "put", "(I" + fm.bcLFieldType() + ")" + fm.bcLStoreType());
+                        mv.visitMethodInsn(INVOKEVIRTUAL, fm.bcStoreType(), "get", "(I)" + fm.bcLStoredType());
+                        mv.visitMethodInsn(INVOKEVIRTUAL, fm.bcStoreType(), "put", "(I" + fm.bcLStoredType() + ")" + fm.bcLStoreType());
                         mv.visitInsn(POP);
                     }
                 }
-
             }
             Label l16 = new Label();
             mv.visitLabel(l16);
@@ -660,7 +659,6 @@ public enum GenerateHugeArrays {
                     mv.visitMethodInsn(INVOKEVIRTUAL, name2, "set" + fm.titleFieldName(), "(" + fm.bcLFieldType() + ")V");
                 }
             }
-
             mv.visitLabel(l17);
             mv.visitLineNumber(251, l17);
             mv.visitInsn(RETURN);

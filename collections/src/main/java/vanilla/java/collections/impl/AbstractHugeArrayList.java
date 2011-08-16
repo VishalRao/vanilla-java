@@ -181,6 +181,7 @@ public abstract class AbstractHugeArrayList<T, TA extends HugeAllocation, TE ext
                 recycle(t2);
             }
             recycle(t);
+            longSize--;
             return null;
         }
         T impl = acquireImpl();
@@ -192,6 +193,7 @@ public abstract class AbstractHugeArrayList<T, TA extends HugeAllocation, TE ext
             recycle(t2);
         }
         recycle(t);
+        longSize--;
         return impl;
     }
 

@@ -89,6 +89,11 @@ public class Enumerated16FieldModel<T> extends AbstractFieldModel<T> {
     }
 
     @Override
+    public String bcLStoredType() {
+        return "C";
+    }
+
+    @Override
     public boolean virtualGetSet() {
         return true;
     }

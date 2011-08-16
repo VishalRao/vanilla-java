@@ -35,7 +35,7 @@ import static junit.framework.Assert.assertFalse;
 
 public class HugeArrayBuilderTest {
     private static final ElementType[] elementTypes = ElementType.values();
-    private static final long length = 1000 * 1000L;
+    private static final long length = 10 * 1000 * 1000L;
 
     interface MutableBoolean {
         public void setFlag(boolean b);
@@ -106,7 +106,7 @@ public class HugeArrayBuilderTest {
         assertEquals(length, list.size());
         assertEquals(length, hugeList.longSize());
 
-        exerciseList(list, length);
+        exerciseList(list, length, new HAListSetSize(hugeList));
 
         t.interrupt();
         gcPrintUsed();
@@ -217,7 +217,7 @@ public class HugeArrayBuilderTest {
         assertEquals(length, list.size());
         assertEquals(length, hugeList.longSize());
 
-        exerciseList(list, length);
+        exerciseList(list, length, new HAListSetSize(hugeList));
 
         t.interrupt();
         gcPrintUsed();
@@ -243,25 +243,23 @@ public class HugeArrayBuilderTest {
         assertEquals(length, list.size());
     }
 
-    @Ignore
     @Test
     public void testRemoveAll() throws Exception {
         gcPrintUsed();
 
-        HugeArrayList<MutableTypes> hugeList = new HugeArrayBuilder<MutableTypes>() {{
+        final HugeArrayList<MutableTypes> hugeList = new HugeArrayBuilder<MutableTypes>() {{
             capacity = length;
             setRemoveReturnsNull = true;
         }}.create();
         List<MutableTypes> list = hugeList;
         assertEquals(0, list.size());
-        hugeList.setSize(length);
 
         Thread t = monitorThread();
 
-        removeFromList(list);
+        removeFromList(list, new HAListSetSize(hugeList));
         t.interrupt();
         gcPrintUsed();
-        assertEquals(length, list.size());
+        assertEquals(0, list.size());
     }
 
     @Ignore
@@ -269,15 +267,12 @@ public class HugeArrayBuilderTest {
     public void testRemoveAllJavaBean() throws Exception {
         gcPrintUsed();
 
-        List<MutableTypes> list = new ArrayList<MutableTypes>();
+        final List<MutableTypes> list = new ArrayList<MutableTypes>();
         assertEquals(0, list.size());
 
         Thread t = monitorThread();
 
-        for (int i = 0; i < length; i++)
-            list.add(new MutableTypesImpl());
-
-        removeFromList(list);
+        removeFromList(list, new ArrayListSetSize(list));
         t.interrupt();
         gcPrintUsed();
         assertEquals(length, list.size());
@@ -293,10 +288,7 @@ public class HugeArrayBuilderTest {
 
         Thread t = monitorThread();
 
-        for (int i = 0; i < length; i++)
-            list.add(new MutableTypesImpl());
-
-        exerciseList(list, length);
+        exerciseList(list, length, new ArrayListSetSize(list));
         t.interrupt();
         gcPrintUsed();
         assertEquals(length, list.size());
@@ -320,7 +312,7 @@ public class HugeArrayBuilderTest {
         assertEquals(size, hashCodes.size());
     }
 
-    private static void exerciseList(List<MutableTypes> list, long length) {
+    private static void exerciseList(List<MutableTypes> list, long length, Runnable setSize) {
         assertEquals(length, list.size());
         gcPrintUsed();
 
@@ -328,6 +320,7 @@ public class HugeArrayBuilderTest {
         do {
             System.out.println("Updating");
             long startWrite = System.nanoTime();
+            setSize.run();
             populate(list);
             int i;
             long timeWrite = System.nanoTime() - startWrite;
@@ -369,13 +362,14 @@ public class HugeArrayBuilderTest {
         System.out.println("Finished");
     }
 
-    private static void removeFromList(List<MutableTypes> list) {
+    private static void removeFromList(List<MutableTypes> list, Runnable setSize) {
         gcPrintUsed();
 
         long start = System.currentTimeMillis();
         do {
             System.out.println("Updating");
             long startWrite = System.nanoTime();
+            setSize.run();
             populate(list);
             int i;
             long timeWrite = System.nanoTime() - startWrite;
@@ -383,20 +377,24 @@ public class HugeArrayBuilderTest {
 
             System.out.println("Removing");
             long startRemove = System.nanoTime();
-            final int length = list.size();
-            while (length >= 3) {
+            while (list.size() >= 3) {
+                int size = list.size();
                 // remove from the start.
                 final MutableTypes mt0 = list.remove(0);
+                assertEquals(size - 1, list.size());
                 // remove from the middle.
                 final MutableTypes mt1 = list.remove(list.size() / 2);
+                assertEquals(size - 2, list.size());
                 // remove from the end.
                 final MutableTypes mt2 = list.remove(list.size() - 1);
+                assertEquals(size - 3, list.size());
                 if (list instanceof HugeArrayList) {
                     HugeArrayList hal = (HugeArrayList) list;
                     hal.recycle(mt2);
                     hal.recycle(mt1);
                     hal.recycle(mt0);
                 }
+//                System.out.println(list.size());
             }
             while (!list.isEmpty())
                 // remove from the start.
@@ -673,6 +671,33 @@ public class HugeArrayBuilderTest {
             throw new AssertionError(e);
         } catch (ClassNotFoundException e) {
             throw new AssertionError(e);
+        }
+    }
+
+    private static class ArrayListSetSize implements Runnable {
+        private final List<MutableTypes> list;
+
+        public ArrayListSetSize(List<MutableTypes> list) {
+            this.list = list;
+        }
+
+        @Override
+        public void run() {
+            for (int i = 0; i < length; i++)
+                list.add(new MutableTypesImpl());
+        }
+    }
+
+    private static class HAListSetSize implements Runnable {
+        private final HugeArrayList<MutableTypes> hugeList;
+
+        public HAListSetSize(HugeArrayList<MutableTypes> hugeList) {
+            this.hugeList = hugeList;
+        }
+
+        @Override
+        public void run() {
+            hugeList.setSize(length);
         }
     }
 }
