@@ -437,16 +437,16 @@ public enum GenerateHugeArrays {
             mv.visitMaxs(4, 2);
             mv.visitEnd();
         }
-        appendToStringHashCodeEqualsCopyOf(tm, cw, name + "Element");
+        appendToStringHashCodeEqualsCopyOf(tm, cw, name + "Element", true);
         cw.visitEnd();
 
         final byte[] bytes = cw.toByteArray();
-        ClassReader cr = new ClassReader(bytes);
-        cr.accept(new ASMifierClassVisitor(new PrintWriter(System.out)), 0);
+//        ClassReader cr = new ClassReader(bytes);
+//        cr.accept(new ASMifierClassVisitor(new PrintWriter(System.out)), 0);
         return bytes;
     }
 
-    private static void appendToStringHashCodeEqualsCopyOf(TypeModel tm, ClassWriter cw, String name2) {
+    private static void appendToStringHashCodeEqualsCopyOf(TypeModel tm, ClassWriter cw, String name2, boolean hasListField) {
         String name = tm.bcType();
         MethodVisitor mv;
         {
@@ -592,9 +592,10 @@ public enum GenerateHugeArrays {
             Label l0 = new Label();
             mv.visitLabel(l0);
             mv.visitLineNumber(220, l0);
+
             boolean copySimpleValues = false;
             for (FieldModel fm : tm.fields()) {
-                if (!fm.copySimpleValue()) {
+                if (!fm.copySimpleValue() || !hasListField) {
 //                if (true) {
                     mv.visitVarInsn(ALOAD, 0);
                     mv.visitVarInsn(ALOAD, 1);
@@ -611,33 +612,33 @@ public enum GenerateHugeArrays {
                 mv.visitLabel(l3);
                 mv.visitLineNumber(225, l3);
                 mv.visitVarInsn(ALOAD, 1);
-                mv.visitTypeInsn(INSTANCEOF, name + "Element");
+                mv.visitTypeInsn(INSTANCEOF, name2);
                 mv.visitJumpInsn(IFEQ, l4);
                 Label l5 = new Label();
                 mv.visitLabel(l5);
                 mv.visitLineNumber(226, l5);
                 mv.visitVarInsn(ALOAD, 1);
-                mv.visitTypeInsn(CHECKCAST, name + "Element");
+                mv.visitTypeInsn(CHECKCAST, name2);
                 mv.visitVarInsn(ASTORE, 2);
                 mv.visitLabel(l6);
                 mv.visitLineNumber(227, l6);
                 mv.visitVarInsn(ALOAD, 2);
-                mv.visitFieldInsn(GETFIELD, name + "Element", "list", "L" + collections + "impl/AbstractHugeArrayList;");
+                mv.visitFieldInsn(GETFIELD, name2, "list", "L" + collections + "impl/AbstractHugeArrayList;");
                 mv.visitVarInsn(ALOAD, 0);
-                mv.visitFieldInsn(GETFIELD, name + "Element", "list", "L" + collections + "impl/AbstractHugeArrayList;");
+                mv.visitFieldInsn(GETFIELD, name2, "list", "L" + collections + "impl/AbstractHugeArrayList;");
                 mv.visitJumpInsn(IF_ACMPNE, l4);
                 for (FieldModel fm : tm.fields()) {
                     if (fm.copySimpleValue()) {
                         mv.visitVarInsn(ALOAD, 0);
-                        mv.visitFieldInsn(GETFIELD, name + "Element", "allocation", "L" + name + "Allocation;");
+                        mv.visitFieldInsn(GETFIELD, name2, "allocation", "L" + name + "Allocation;");
                         mv.visitFieldInsn(GETFIELD, name + "Allocation", "m_" + fm.fieldName(), fm.bcLStoreType());
                         mv.visitVarInsn(ALOAD, 0);
-                        mv.visitFieldInsn(GETFIELD, name + "Element", "offset", "I");
+                        mv.visitFieldInsn(GETFIELD, name2, "offset", "I");
                         mv.visitVarInsn(ALOAD, 2);
-                        mv.visitFieldInsn(GETFIELD, name + "Element", "allocation", "L" + name + "Allocation;");
+                        mv.visitFieldInsn(GETFIELD, name2, "allocation", "L" + name + "Allocation;");
                         mv.visitFieldInsn(GETFIELD, name + "Allocation", "m_" + fm.fieldName(), fm.bcLStoreType());
                         mv.visitVarInsn(ALOAD, 2);
-                        mv.visitFieldInsn(GETFIELD, name + "Element", "offset", "I");
+                        mv.visitFieldInsn(GETFIELD, name2, "offset", "I");
                         mv.visitMethodInsn(INVOKEVIRTUAL, fm.bcStoreType(), "get", "(I)" + fm.bcLStoredType());
                         mv.visitMethodInsn(INVOKEVIRTUAL, fm.bcStoreType(), "put", "(I" + fm.bcLStoredType() + ")" + fm.bcLStoreType());
                         mv.visitInsn(POP);
@@ -700,7 +701,7 @@ public enum GenerateHugeArrays {
 
         String name = tm.bcType();
 
-        cw.visit(V1_6, ACC_PUBLIC + ACC_SUPER, name + "Impl", "Ljava/lang/Object;L" + name + ";L" + collections + "api/HugeElement<L" + name + ";>;", "java/lang/Object", new String[]{name, collections + "api/HugeElement"});
+        cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, name + "Impl", "Ljava/lang/Object;L" + name + ";L" + collections + "api/HugeElement<L" + name + ";>;", "java/lang/Object", new String[]{name, collections + "api/HugeElement"});
 
         cw.visitSource(tm.getClass().getSimpleName() + "Impl.java", null);
 
@@ -788,7 +789,7 @@ public enum GenerateHugeArrays {
             mv.visitMaxs(2, 1);
             mv.visitEnd();
         }
-        appendToStringHashCodeEqualsCopyOf(tm, cw, name + "Impl");
+        appendToStringHashCodeEqualsCopyOf(tm, cw, name + "Impl", false);
 
         {
             mv = cw.visitMethod(ACC_PUBLIC, "hugeElementType", "()L" + collections + "api/HugeElementType;", null, null);
@@ -807,8 +808,8 @@ public enum GenerateHugeArrays {
         cw.visitEnd();
 
         final byte[] bytes = cw.toByteArray();
-//        ClassReader cr = new ClassReader(bytes);
-//        cr.accept(new ASMifierClassVisitor(new PrintWriter(System.out)), 0);
+        ClassReader cr = new ClassReader(bytes);
+        cr.accept(new ASMifierClassVisitor(new PrintWriter(System.out)), 0);
 
         return bytes;
     }

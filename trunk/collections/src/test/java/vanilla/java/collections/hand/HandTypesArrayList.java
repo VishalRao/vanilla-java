@@ -16,36 +16,35 @@ package vanilla.java.collections.hand;
  *    limitations under the License.
  */
 
-import vanilla.java.collections.MutableTypes;
 import vanilla.java.collections.impl.AbstractHugeArrayList;
 import vanilla.java.collections.model.Enum8FieldModel;
 import vanilla.java.collections.model.Enumerated16FieldModel;
 
 import java.lang.annotation.ElementType;
 
-public class MutableTypesArrayList extends AbstractHugeArrayList<MutableTypes, MutableTypesAllocation, MutableTypesElement> {
+public class HandTypesArrayList extends AbstractHugeArrayList<HandTypes, HandTypesAllocation, HandTypesElement> {
     final Enum8FieldModel<ElementType> elementTypeFieldModel
             = new Enum8FieldModel<ElementType>("elementType", 10, ElementType.class, ElementType.values());
     final Enumerated16FieldModel<String> stringEnumerated16FieldModel
             = new Enumerated16FieldModel<String>("text", 11, String.class);
 
-    public MutableTypesArrayList(int allocationSize, boolean setRemoveReturnsNull) {
+    public HandTypesArrayList(int allocationSize, boolean setRemoveReturnsNull) {
         super(allocationSize, setRemoveReturnsNull);
     }
 
     @Override
-    protected MutableTypesAllocation createAllocation() {
-        return new MutableTypesAllocation(allocationSize);
+    protected HandTypesAllocation createAllocation() {
+        return new HandTypesAllocation(allocationSize);
     }
 
     @Override
-    protected MutableTypesElement createElement(long n) {
-        return new MutableTypesElement(this, n);
+    protected HandTypesElement createElement(long n) {
+        return new HandTypesElement(this, n);
     }
 
     @Override
-    protected MutableTypes createImpl() {
-        return new MutableTypesImpl();
+    protected HandTypes createImpl() {
+        return new HandTypesImpl();
     }
 
     @Override

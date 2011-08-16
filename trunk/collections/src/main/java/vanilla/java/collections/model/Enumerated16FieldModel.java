@@ -31,6 +31,7 @@ public class Enumerated16FieldModel<T> extends AbstractFieldModel<T> {
     public Enumerated16FieldModel(String fieldName, int fieldNumber, Class<T> type) {
         super(fieldName, fieldNumber);
         this.type = type;
+        clear();
     }
 
     @Override
@@ -116,5 +117,7 @@ public class Enumerated16FieldModel<T> extends AbstractFieldModel<T> {
     public void clear() {
         map.clear();
         list.clear();
+        map.put(null, (char) 0);
+        list.add(null);
     }
 }
