@@ -39,7 +39,6 @@ public class ShortFieldModel extends AbstractFieldModel<Short> {
         return ByteBuffer.allocateDirect(size * 2).order(ByteOrder.nativeOrder()).asShortBuffer();
     }
 
-
     @Override
     public Short getAllocation(Object[] arrays, int index) {
         ShortBuffer array = (ShortBuffer) arrays[fieldNumber];
@@ -69,4 +68,10 @@ public class ShortFieldModel extends AbstractFieldModel<Short> {
     public String bcLFieldType() {
         return "S";
     }
+
+    @Override
+    public short equalsPreference() {
+        return 16;
+    }
+
 }

@@ -88,4 +88,9 @@ public class FloatFieldModel extends AbstractFieldModel<Float> {
     public static int hashCode(float f) {
         return Float.floatToIntBits(f);
     }
+
+    @Override
+    public short equalsPreference() {
+        return 31;
+    }
 }

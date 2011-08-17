@@ -105,4 +105,8 @@ public class Boolean2FieldModel extends AbstractFieldModel<Boolean> {
         return false;
     }
 
+    @Override
+    public short equalsPreference() {
+        return 0;
+    }
 }

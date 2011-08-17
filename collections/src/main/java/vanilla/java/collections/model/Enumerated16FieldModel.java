@@ -185,4 +185,9 @@ public class Enumerated16FieldModel<T> extends AbstractFieldModel<T> {
     public boolean isCompacting() {
         return true;
     }
+
+    @Override
+    public short equalsPreference() {
+        return 15;
+    }
 }

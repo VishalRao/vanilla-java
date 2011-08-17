@@ -103,4 +103,9 @@ public class Enum8FieldModel<E extends Enum<E>> extends AbstractFieldModel<E> {
     public static int hashCode(Enum elementType) {
         return elementType == null ? Integer.MIN_VALUE : elementType.ordinal();
     }
+
+    @Override
+    public short equalsPreference() {
+        return 7;
+    }
 }

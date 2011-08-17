@@ -93,4 +93,9 @@ public class DoubleFieldModel extends AbstractFieldModel<Double> {
     public static int hashCode(double d) {
         return LongFieldModel.hashCode(Double.doubleToLongBits(d));
     }
+
+    @Override
+    public short equalsPreference() {
+        return 29; // 63, lower due to the increase memory requirement.
+    }
 }

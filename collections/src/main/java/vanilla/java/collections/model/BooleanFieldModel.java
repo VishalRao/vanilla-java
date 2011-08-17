@@ -87,4 +87,9 @@ public class BooleanFieldModel extends AbstractFieldModel<Boolean> {
     public boolean copySimpleValue() {
         return false;
     }
+
+    @Override
+    public short equalsPreference() {
+        return 1;
+    }
 }
