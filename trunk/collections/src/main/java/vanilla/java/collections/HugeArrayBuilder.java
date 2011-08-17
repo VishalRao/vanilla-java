@@ -111,6 +111,8 @@ public class HugeArrayBuilder<T> {
         return disableCodeGeneration;
     }
 
+    private Class arrayListClass = null;
+
     public HugeArrayList<T> create() {
         if (capacity < 1) capacity = 1;
         if (allocationSize < MIN_ALLOCATION_SIZE) {
@@ -120,9 +122,10 @@ public class HugeArrayBuilder<T> {
         }
         if (disableCodeGeneration)
             return new ColumnHugeArrayList<T>(typeModel, allocationSize, capacity);
-        Class arrayListClass;
+
         try {
-            arrayListClass = classLoader().loadClass(typeModel.type().getName() + "ArrayList");
+            if (arrayListClass == null)
+                arrayListClass = classLoader().loadClass(typeModel.type().getName() + "ArrayList");
 
         } catch (ClassNotFoundException e) {
             acquireImplClass();
@@ -154,10 +157,12 @@ public class HugeArrayBuilder<T> {
         }
     }
 
+    Class implClass = null;
+
     private Class acquireImplClass() {
-        Class implClass;
         try {
-            implClass = classLoader().loadClass(typeModel.type().getName() + "Impl");
+            if (implClass == null)
+                implClass = classLoader().loadClass(typeModel.type().getName() + "Impl");
 
         } catch (ClassNotFoundException e) {
             implClass = defineClass(GenerateHugeArrays.dumpImpl(typeModel));
