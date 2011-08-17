@@ -854,7 +854,7 @@ public enum GenerateHugeArrays {
 
         String name = tm.bcType();
 
-        cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, name + "Impl", "Ljava/lang/Object;L" + name + ";L" + collections + "api/HugeElement<L" + name + ";>;", "java/lang/Object", new String[]{name, collections + "api/HugeElement"});
+        cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, name + "Impl", "Ljava/lang/Object;L" + name + ";L" + collections + "api/HugeElement<L" + name + ";>;Ljava/io/Serializable;", "java/lang/Object", new String[]{name, collections + "api/HugeElement", "java/io/Serializable"});
 
         cw.visitSource(tm.getClass().getSimpleName() + "Impl.java", null);
 

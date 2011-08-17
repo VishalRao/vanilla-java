@@ -20,9 +20,10 @@ import vanilla.java.collections.ObjectTypes;
 import vanilla.java.collections.api.HugeElement;
 import vanilla.java.collections.api.HugeElementType;
 
+import java.io.Serializable;
 import java.lang.annotation.ElementType;
 
-public class HandTypesImpl implements HandTypes, HugeElement<HandTypes> {
+public class HandTypesImpl implements HandTypes, HugeElement<HandTypes>, Serializable {
     private boolean m_boolean;
     private Boolean m_boolean2;
     private byte m_byte;
