@@ -16,6 +16,9 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
@@ -74,4 +77,11 @@ public class ShortFieldModel extends AbstractFieldModel<Short> {
         return 16;
     }
 
+    public static void write(ObjectOutput out, short s) throws IOException {
+        out.writeShort(s);
+    }
+
+    public static short read(ObjectInput in) throws IOException {
+        return in.readShort();
+    }
 }

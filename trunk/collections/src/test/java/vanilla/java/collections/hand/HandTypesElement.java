@@ -21,9 +21,13 @@ import vanilla.java.collections.impl.AbstractHugeArrayList;
 import vanilla.java.collections.impl.AbstractHugeElement;
 import vanilla.java.collections.model.*;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.lang.annotation.ElementType;
 
-public class HandTypesElement extends AbstractHugeElement<HandTypes, HandTypesAllocation> implements HandTypes {
+public class HandTypesElement extends AbstractHugeElement<HandTypes, HandTypesAllocation> implements HandTypes, Externalizable {
     HandTypesAllocation allocation;
 
     public HandTypesElement(AbstractHugeArrayList<HandTypes, HandTypesAllocation, HandTypesElement> list, long n) {
@@ -228,37 +232,70 @@ public class HandTypesElement extends AbstractHugeElement<HandTypes, HandTypesAl
 
     @Override
     public void copyOf(HandTypes t) {
-        do {
-            setBoolean(t.getBoolean());
-            setBoolean2(t.getBoolean2());
-            setByte2(t.getByte2());
-            setA(getA());
+        setBoolean(t.getBoolean());
+        setBoolean2(t.getBoolean2());
+        setByte2(t.getByte2());
+        setA(getA());
 
-            if (t instanceof HandTypesElement) {
-                HandTypesElement mte = (HandTypesElement) t;
-                if (mte.list == list) {
+        if (t instanceof HandTypesElement) {
+            HandTypesElement mte = (HandTypesElement) t;
+            if (mte.list == list) {
 
-                    allocation.m_byte.put(offset, mte.allocation.m_byte.get(mte.offset));
-                    allocation.m_char.put(offset, mte.allocation.m_char.get(mte.offset));
-                    allocation.m_double.put(offset, mte.allocation.m_double.get(mte.offset));
-                    allocation.m_elementType.put(offset, mte.allocation.m_elementType.get(mte.offset));
-                    allocation.m_float.put(offset, mte.allocation.m_float.get(mte.offset));
-                    allocation.m_int.put(offset, mte.allocation.m_int.get(mte.offset));
-                    allocation.m_long.put(offset, mte.allocation.m_long.get(mte.offset));
-                    allocation.m_short.put(offset, mte.allocation.m_short.get(mte.offset));
-                    allocation.m_string.put(offset, mte.allocation.m_string.get(mte.offset));
-                    break;
-                }
+                allocation.m_byte.put(offset, mte.allocation.m_byte.get(mte.offset));
+                allocation.m_char.put(offset, mte.allocation.m_char.get(mte.offset));
+                allocation.m_double.put(offset, mte.allocation.m_double.get(mte.offset));
+                allocation.m_elementType.put(offset, mte.allocation.m_elementType.get(mte.offset));
+                allocation.m_float.put(offset, mte.allocation.m_float.get(mte.offset));
+                allocation.m_int.put(offset, mte.allocation.m_int.get(mte.offset));
+                allocation.m_long.put(offset, mte.allocation.m_long.get(mte.offset));
+                allocation.m_short.put(offset, mte.allocation.m_short.get(mte.offset));
+                allocation.m_string.put(offset, mte.allocation.m_string.get(mte.offset));
+                return;
             }
-            setByte(t.getByte());
-            setChar(t.getChar());
-            setDouble(t.getDouble());
-            setElementType(t.getElementType());
-            setFloat(t.getFloat());
-            setInt(t.getInt());
-            setLong(t.getLong());
-            setShort(t.getShort());
-            setString(t.getString());
-        } while (false);
+        }
+        setByte(t.getByte());
+        setChar(t.getChar());
+        setDouble(t.getDouble());
+        setElementType(t.getElementType());
+        setFloat(t.getFloat());
+        setInt(t.getInt());
+        setLong(t.getLong());
+        setShort(t.getShort());
+        setString(t.getString());
+
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        BooleanFieldModel.write(out, getBoolean());
+        Boolean2FieldModel.write(out, getBoolean2());
+        ByteFieldModel.write(out, getByte());
+        Byte2FieldModel.write(out, getByte2());
+        CharFieldModel.write(out, getChar());
+        DoubleFieldModel.write(out, getDouble());
+        Enum8FieldModel.write(out, ElementType.class, getElementType());
+        Enumerated16FieldModel.write(out, String.class, getString());
+        FloatFieldModel.write(out, getFloat());
+        IntFieldModel.write(out, getInt());
+        LongFieldModel.write(out, getLong());
+        ShortFieldModel.write(out, getShort());
+        ObjectFieldModel.write(out, ObjectTypes.A.class, getA());
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        setBoolean(BooleanFieldModel.read(in));
+        setBoolean2(Boolean2FieldModel.read(in));
+        setByte(ByteFieldModel.read(in));
+        setByte2(Byte2FieldModel.read(in));
+        setChar(CharFieldModel.read(in));
+        setDouble(DoubleFieldModel.read(in));
+        setElementType(Enum8FieldModel.read(in, ElementType.class));
+        setString(Enumerated16FieldModel.read(in, String.class));
+        setFloat(FloatFieldModel.read(in));
+        setInt(IntFieldModel.read(in));
+        setLong(LongFieldModel.read(in));
+        setShort(ShortFieldModel.read(in));
+        setA(ObjectFieldModel.read(in, ObjectTypes.A.class));
     }
 }

@@ -42,7 +42,7 @@ public class HugeArrayVsSerializationTest {
 
     @Test
     public void testSearchAndUpdateCollectionSerialization() throws IOException, ClassNotFoundException {
-        int length = 200 * 1000;
+        int length = 250 * 1000;
         List<byte[]> mts = new ArrayList<byte[]>();
         HugeArrayBuilder<MutableTypes> mtb = new HugeArrayBuilder<MutableTypes>() {
         };

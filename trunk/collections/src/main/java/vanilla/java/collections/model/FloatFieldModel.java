@@ -16,6 +16,9 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -92,5 +95,13 @@ public class FloatFieldModel extends AbstractFieldModel<Float> {
     @Override
     public short equalsPreference() {
         return 31;
+    }
+
+    public static void write(ObjectOutput out, float f) throws IOException {
+        out.writeFloat(f);
+    }
+
+    public static float read(ObjectInput in) throws IOException {
+        return in.readFloat();
     }
 }

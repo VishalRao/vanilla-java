@@ -16,6 +16,8 @@ package vanilla.java.collections;
  *    limitations under the License.
  */
 
+import java.io.Serializable;
+
 public interface ObjectTypes {
     public void setA(A a);
 
@@ -33,7 +35,7 @@ public interface ObjectTypes {
 
     public D getD();
 
-    public class A {
+    public class A implements Serializable {
     }
 
     public class B {

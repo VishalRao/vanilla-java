@@ -16,6 +16,9 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.CharBuffer;
@@ -74,4 +77,11 @@ public class CharFieldModel extends AbstractFieldModel<Character> {
         return 16;
     }
 
+    public static void write(ObjectOutput out, char ch) throws IOException {
+        out.writeChar(ch);
+    }
+
+    public static char read(ObjectInput in) throws IOException {
+        return in.readChar();
+    }
 }
