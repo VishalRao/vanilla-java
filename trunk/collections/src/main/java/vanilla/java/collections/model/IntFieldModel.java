@@ -69,4 +69,9 @@ public class IntFieldModel extends AbstractFieldModel<Integer> {
         return "I";
     }
 
+    @Override
+    public short equalsPreference() {
+        return 32;
+    }
+
 }

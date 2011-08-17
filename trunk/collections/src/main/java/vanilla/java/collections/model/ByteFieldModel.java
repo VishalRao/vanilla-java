@@ -69,4 +69,9 @@ public class ByteFieldModel extends AbstractFieldModel<Byte> {
         return "B";
     }
 
+    @Override
+    public short equalsPreference() {
+        return 8;
+    }
+
 }

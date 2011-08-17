@@ -91,4 +91,9 @@ public class LongFieldModel extends AbstractFieldModel<Long> {
     public static int hashCode(long l) {
         return (int) (l >>> 32 ^ l);
     }
+
+    @Override
+    public short equalsPreference() {
+        return 30; // 64; lower due to the increased memory requirement
+    }
 }

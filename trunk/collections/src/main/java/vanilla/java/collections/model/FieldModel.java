@@ -76,4 +76,6 @@ public interface FieldModel<T> {
     boolean isBufferStore();
 
     boolean isCompacting();
+
+    short equalsPreference();
 }

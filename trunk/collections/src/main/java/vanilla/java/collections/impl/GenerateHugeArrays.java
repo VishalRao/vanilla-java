@@ -23,6 +23,8 @@ import vanilla.java.collections.model.*;
 
 import java.nio.Buffer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.objectweb.asm.Opcodes.*;
@@ -671,7 +673,15 @@ public enum GenerateHugeArrays {
             Label l4 = new Label();
             mv.visitLabel(l4);
             mv.visitLineNumber(195, l4);
-            for (FieldModel fm : tm.fields()) {
+            final FieldModel[] fieldModels = tm.fields().clone();
+            Arrays.sort(fieldModels, new Comparator<FieldModel>() {
+                // reverse sort the preferences to optimise the
+                @Override
+                public int compare(FieldModel o1, FieldModel o2) {
+                    return o2.equalsPreference() - o1.equalsPreference();
+                }
+            });
+            for (FieldModel fm : fieldModels) {
 //                System.out.println(fm.fieldName());
                 mv.visitVarInsn(ALOAD, 0);
                 mv.visitMethodInsn(INVOKEVIRTUAL, name2, "get" + fm.titleFieldName(), "()" + fm.bcLFieldType());

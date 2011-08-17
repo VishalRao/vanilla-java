@@ -69,4 +69,9 @@ public class CharFieldModel extends AbstractFieldModel<Character> {
         return "C";
     }
 
+    @Override
+    public short equalsPreference() {
+        return 16;
+    }
+
 }

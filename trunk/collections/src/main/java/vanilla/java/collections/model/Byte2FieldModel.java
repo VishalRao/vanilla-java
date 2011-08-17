@@ -97,4 +97,10 @@ public class Byte2FieldModel extends AbstractFieldModel<Byte> {
     public boolean copySimpleValue() {
         return false;
     }
+
+    @Override
+    public short equalsPreference() {
+        return 7;
+    }
+
 }

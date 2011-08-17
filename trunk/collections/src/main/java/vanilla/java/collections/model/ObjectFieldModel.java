@@ -122,4 +122,10 @@ public class ObjectFieldModel<T> extends AbstractFieldModel<T> {
     public boolean isBufferStore() {
         return true;
     }
+
+    @Override
+    public short equalsPreference() {
+        return 0;
+    }
+
 }
