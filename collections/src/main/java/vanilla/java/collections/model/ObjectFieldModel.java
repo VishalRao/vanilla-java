@@ -16,6 +16,9 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.lang.reflect.Array;
 
 public class ObjectFieldModel<T> extends AbstractFieldModel<T> {
@@ -128,4 +131,14 @@ public class ObjectFieldModel<T> extends AbstractFieldModel<T> {
         return 0;
     }
 
+    public static <T> void write(ObjectOutput out, Class<T> clazz, T t) throws IOException {
+        if (clazz == String.class)
+            out.writeUTF((String) t);
+        else
+            out.writeObject(t);
+    }
+
+    public static <T> T read(ObjectInput in, Class<T> aClass) throws IOException, ClassNotFoundException {
+        return (T) (aClass == String.class ? in.readUTF() : in.readObject());
+    }
 }

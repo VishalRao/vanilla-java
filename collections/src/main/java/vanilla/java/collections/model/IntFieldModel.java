@@ -16,6 +16,9 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
@@ -74,4 +77,11 @@ public class IntFieldModel extends AbstractFieldModel<Integer> {
         return 32;
     }
 
+    public static void write(ObjectOutput out, int i) throws IOException {
+        out.writeInt(i);
+    }
+
+    public static int read(ObjectInput in) throws IOException {
+        return in.readInt();
+    }
 }

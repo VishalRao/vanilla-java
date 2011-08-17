@@ -16,6 +16,9 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.DoubleBuffer;
@@ -97,5 +100,13 @@ public class DoubleFieldModel extends AbstractFieldModel<Double> {
     @Override
     public short equalsPreference() {
         return 29; // 63, lower due to the increase memory requirement.
+    }
+
+    public static void write(ObjectOutput out, double d) throws IOException {
+        out.writeDouble(d);
+    }
+
+    public static double read(ObjectInput in) throws IOException {
+        return in.readDouble();
     }
 }

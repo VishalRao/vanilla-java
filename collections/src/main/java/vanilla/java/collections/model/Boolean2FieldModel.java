@@ -16,6 +16,9 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
@@ -73,6 +76,15 @@ public class Boolean2FieldModel extends AbstractFieldModel<Boolean> {
         int mask = ~(3 << index2);
         int value3 = (array.get(byteIndex) & mask) | (value2 << index2);
         array.put(byteIndex, value3);
+    }
+
+    public static void write(ObjectOutput oo, Boolean b) throws IOException {
+        oo.writeByte(b == null ? Byte.MIN_VALUE : b ? 1 : 0);
+    }
+
+    public static Boolean read(ObjectInput oi) throws IOException {
+        byte b = oi.readByte();
+        return b < 0 ? null : (Boolean) (b > 0);
     }
 
     @Override

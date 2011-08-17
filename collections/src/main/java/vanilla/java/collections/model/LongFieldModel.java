@@ -16,6 +16,9 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.LongBuffer;
@@ -95,5 +98,13 @@ public class LongFieldModel extends AbstractFieldModel<Long> {
     @Override
     public short equalsPreference() {
         return 30; // 64; lower due to the increased memory requirement
+    }
+
+    public static void write(ObjectOutput out, long l) throws IOException {
+        out.writeLong(l);
+    }
+
+    public static long read(ObjectInput in) throws IOException {
+        return in.readLong();
     }
 }

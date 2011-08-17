@@ -458,7 +458,7 @@ public enum GenerateHugeArrays {
 
         String name = tm.bcType();
 
-        cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, name + "Element", "L" + collections + "impl/AbstractHugeElement<L" + name + "Allocation;>;L" + name + ";", collections + "impl/AbstractHugeElement", new String[]{name});
+        cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, name + "Element", "L" + collections + "impl/AbstractHugeElement<L" + name + "Allocation;>;L" + name + ";Ljava/io/Externalizable;", collections + "impl/AbstractHugeElement", new String[]{name, "java/io/Externalizable"});
 
         cw.visitSource(tm.type().getSimpleName() + "Element.java", null);
 
@@ -844,6 +844,65 @@ public enum GenerateHugeArrays {
             mv.visitMaxs(2, 2);
             mv.visitEnd();
         }
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "writeExternal", "(Ljava/io/ObjectOutput;)V", null, new String[]{"java/io/IOException"});
+            mv.visitCode();
+            Label l0 = new Label();
+            mv.visitLabel(l0);
+            mv.visitLineNumber(185, l0);
+            for (FieldModel fm : tm.fields()) {
+                mv.visitVarInsn(ALOAD, 1);
+                if (fm.bcLSetType().equals(fm.bcLFieldType())) {
+                    mv.visitVarInsn(ALOAD, 0);
+                    mv.visitMethodInsn(INVOKEVIRTUAL, name2, "get" + fm.titleFieldName(), "()" + fm.bcLFieldType());
+                    mv.visitMethodInsn(INVOKESTATIC, fm.bcModelType(), "write", "(Ljava/io/ObjectOutput;" + fm.bcLSetType() + ")V");
+                } else {
+                    mv.visitLdcInsn(Type.getType(fm.bcLFieldType()));
+                    mv.visitVarInsn(ALOAD, 0);
+                    mv.visitMethodInsn(INVOKEVIRTUAL, name2, "get" + fm.titleFieldName(), "()" + fm.bcLFieldType());
+                    mv.visitMethodInsn(INVOKESTATIC, fm.bcModelType(), "write", "(Ljava/io/ObjectOutput;Ljava/lang/Class;" + fm.bcLSetType() + ")V");
+                }
+            }
+            Label l13 = new Label();
+            mv.visitLabel(l13);
+            mv.visitLineNumber(198, l13);
+            mv.visitInsn(RETURN);
+            Label l14 = new Label();
+            mv.visitLabel(l14);
+            mv.visitLocalVariable("this", "L" + name2 + ';', null, l0, l14, 0);
+            mv.visitLocalVariable("out", "Ljava/io/ObjectOutput;", null, l0, l14, 1);
+            mv.visitMaxs(4, 2);
+            mv.visitEnd();
+        }
+        {
+            mv = cw.visitMethod(ACC_PUBLIC, "readExternal", "(Ljava/io/ObjectInput;)V", null, new String[]{"java/io/IOException", "java/lang/ClassNotFoundException"});
+            mv.visitCode();
+            Label l0 = new Label();
+            mv.visitLabel(l0);
+            mv.visitLineNumber(202, l0);
+            for (FieldModel fm : tm.fields()) {
+                mv.visitVarInsn(ALOAD, 0);
+                mv.visitVarInsn(ALOAD, 1);
+                if (fm.bcLSetType().equals(fm.bcLFieldType())) {
+                    mv.visitMethodInsn(INVOKESTATIC, fm.bcModelType(), "read", "(Ljava/io/ObjectInput;)" + fm.bcLSetType());
+                } else {
+                    mv.visitLdcInsn(Type.getType(fm.bcLFieldType()));
+                    mv.visitMethodInsn(INVOKESTATIC, fm.bcModelType(), "read", "(Ljava/io/ObjectInput;Ljava/lang/Class;)" + fm.bcLSetType());
+                    mv.visitTypeInsn(CHECKCAST, fm.bcFieldType());
+                }
+                mv.visitMethodInsn(INVOKEVIRTUAL, name2, "set" + fm.titleFieldName(), "(" + fm.bcLFieldType() + ")V");
+            }
+            Label l13 = new Label();
+            mv.visitLabel(l13);
+            mv.visitLineNumber(215, l13);
+            mv.visitInsn(RETURN);
+            Label l14 = new Label();
+            mv.visitLabel(l14);
+            mv.visitLocalVariable("this", "L" + name2 + ";", null, l0, l14, 0);
+            mv.visitLocalVariable("in", "Ljava/io/ObjectInput;", null, l0, l14, 1);
+            mv.visitMaxs(3, 2);
+            mv.visitEnd();
+        }
     }
 
     public static byte[] dumpImpl(TypeModel tm) {
@@ -854,7 +913,7 @@ public enum GenerateHugeArrays {
 
         String name = tm.bcType();
 
-        cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, name + "Impl", "Ljava/lang/Object;L" + name + ";L" + collections + "api/HugeElement<L" + name + ";>;Ljava/io/Serializable;", "java/lang/Object", new String[]{name, collections + "api/HugeElement", "java/io/Serializable"});
+        cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, name + "Impl", "Ljava/lang/Object;L" + name + ";L" + collections + "api/HugeElement<L" + name + ";>;Ljava/io/Externalizable;", "java/lang/Object", new String[]{name, collections + "api/HugeElement", "java/io/Externalizable"});
 
         cw.visitSource(tm.getClass().getSimpleName() + "Impl.java", null);
 

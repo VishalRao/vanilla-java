@@ -16,12 +16,16 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 import java.util.*;
 
 public class Enumerated16FieldModel<T> extends AbstractFieldModel<T> {
+    private static final String NULL_STRING = "\0\0";
     private final Class<T> type;
     private final Map<T, Character> map = new LinkedHashMap<T, Character>();
     private final List<T> list = new ArrayList<T>();
@@ -189,5 +193,23 @@ public class Enumerated16FieldModel<T> extends AbstractFieldModel<T> {
     @Override
     public short equalsPreference() {
         return 15;
+    }
+
+    public static <T> void write(ObjectOutput out, Class<T> clazz, T t) throws IOException {
+        if (clazz == String.class) {
+            String s = (String) t;
+            if (s == null) s = "\0";
+            out.writeUTF(s);
+        } else
+            out.writeObject(t);
+    }
+
+    public static <T> T read(ObjectInput in, Class<T> clazz) throws IOException, ClassNotFoundException {
+        if (clazz == String.class) {
+            final String s = in.readUTF();
+            if (s.equals(NULL_STRING)) return null;
+            return (T) s;
+        } else
+            return (T) in.readObject();
     }
 }

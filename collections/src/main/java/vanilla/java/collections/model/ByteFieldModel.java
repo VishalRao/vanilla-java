@@ -16,6 +16,9 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
 
 public class ByteFieldModel extends AbstractFieldModel<Byte> {
@@ -74,4 +77,11 @@ public class ByteFieldModel extends AbstractFieldModel<Byte> {
         return 8;
     }
 
+    public static void write(ObjectOutput out, byte b) throws IOException {
+        out.writeByte(b);
+    }
+
+    public static byte read(ObjectInput in) throws IOException {
+        return in.readByte();
+    }
 }

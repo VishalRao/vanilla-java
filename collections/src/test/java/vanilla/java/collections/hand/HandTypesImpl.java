@@ -19,11 +19,15 @@ package vanilla.java.collections.hand;
 import vanilla.java.collections.ObjectTypes;
 import vanilla.java.collections.api.HugeElement;
 import vanilla.java.collections.api.HugeElementType;
+import vanilla.java.collections.model.*;
 
-import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.lang.annotation.ElementType;
 
-public class HandTypesImpl implements HandTypes, HugeElement<HandTypes>, Serializable {
+public class HandTypesImpl implements HandTypes, HugeElement<HandTypes>, Externalizable {
     private boolean m_boolean;
     private Boolean m_boolean2;
     private byte m_byte;
@@ -174,6 +178,40 @@ public class HandTypesImpl implements HandTypes, HugeElement<HandTypes>, Seriali
     @Override
     public long index() {
         return 0;
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        BooleanFieldModel.write(out, getBoolean());
+        Boolean2FieldModel.write(out, getBoolean2());
+        ByteFieldModel.write(out, getByte());
+        Byte2FieldModel.write(out, getByte2());
+        CharFieldModel.write(out, getChar());
+        DoubleFieldModel.write(out, getDouble());
+        Enum8FieldModel.write(out, ElementType.class, getElementType());
+        Enumerated16FieldModel.write(out, String.class, getString());
+        FloatFieldModel.write(out, getFloat());
+        IntFieldModel.write(out, getInt());
+        LongFieldModel.write(out, getLong());
+        ShortFieldModel.write(out, getShort());
+        ObjectFieldModel.write(out, ObjectTypes.A.class, getA());
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        setBoolean(BooleanFieldModel.read(in));
+        setBoolean2(Boolean2FieldModel.read(in));
+        setByte(ByteFieldModel.read(in));
+        setByte2(Byte2FieldModel.read(in));
+        setChar(CharFieldModel.read(in));
+        setDouble(DoubleFieldModel.read(in));
+        setElementType(Enum8FieldModel.read(in, ElementType.class));
+        setString(Enumerated16FieldModel.read(in, String.class));
+        setFloat(FloatFieldModel.read(in));
+        setInt(IntFieldModel.read(in));
+        setLong(LongFieldModel.read(in));
+        setShort(ShortFieldModel.read(in));
+        setA(ObjectFieldModel.read(in, ObjectTypes.A.class));
     }
 
     @Override

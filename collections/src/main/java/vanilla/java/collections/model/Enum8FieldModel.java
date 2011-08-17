@@ -16,6 +16,9 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
 
 public class Enum8FieldModel<E extends Enum<E>> extends AbstractFieldModel<E> {
@@ -107,5 +110,13 @@ public class Enum8FieldModel<E extends Enum<E>> extends AbstractFieldModel<E> {
     @Override
     public short equalsPreference() {
         return 7;
+    }
+
+    public static <E extends Enum<E>> E read(ObjectInput in, Class<E> eClass) throws IOException, ClassNotFoundException {
+        return (E) in.readObject();
+    }
+
+    public static <E extends Enum<E>> void write(ObjectOutput out, Class<E> eClass, E e) throws IOException {
+        out.writeObject(e);
     }
 }

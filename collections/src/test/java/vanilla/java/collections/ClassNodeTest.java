@@ -20,9 +20,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.util.ASMifierClassVisitor;
-import vanilla.java.collections.hand.HandTypesAllocation;
-import vanilla.java.collections.hand.HandTypesArrayList;
-import vanilla.java.collections.hand.HandTypesElement;
 import vanilla.java.collections.hand.HandTypesImpl;
 
 import java.io.IOException;
@@ -33,7 +30,8 @@ public class ClassNodeTest {
     @Test
     @Ignore
     public void test() throws IOException {
-        for (Class clazz : new Class[]{HandTypesArrayList.class, HandTypesAllocation.class, HandTypesElement.class, HandTypesImpl.class}) {
+//        for (Class clazz : new Class[]{HandTypesArrayList.class, HandTypesAllocation.class, HandTypesElement.class, HandTypesImpl.class}) {
+        for (Class clazz : new Class[]{HandTypesImpl.class}) {
             ClassReader cr = new ClassReader(clazz.getName());
             StringWriter sw = new StringWriter();
             ASMifierClassVisitor cv = new ASMifierClassVisitor(new PrintWriter(sw));
