@@ -41,6 +41,10 @@ public class HugeArrayVsSerializationTest {
         };
         HugeArrayList<MutableTypes> mts = mtb.create();
         mts.setSize(length);
+        for (MutableTypes mt : mts) {
+            mt.setBoolean2(true);
+            mt.setByte2((byte) 1);
+        }
         gcPrintUsed();
 
         long start = System.nanoTime();
@@ -62,8 +66,12 @@ public class HugeArrayVsSerializationTest {
         HugeArrayBuilder<MutableTypes> mtb = new HugeArrayBuilder<MutableTypes>() {
         };
         final List<MutableTypes> mts = new ArrayList<MutableTypes>();
-        for (int i = 0; i < length; i++)
-            mts.add(mtb.createBean());
+        for (int i = 0; i < length; i++) {
+            final MutableTypes bean = mtb.createBean();
+            bean.setBoolean2(true);
+            bean.setByte2((byte) 1);
+            mts.add(bean);
+        }
 
         gcPrintUsed();
 
@@ -86,6 +94,8 @@ public class HugeArrayVsSerializationTest {
         HugeArrayBuilder<MutableTypes> mtb = new HugeArrayBuilder<MutableTypes>() {
         };
         final MutableTypes bean = mtb.createBean();
+        bean.setBoolean2(true);
+        bean.setByte2((byte) 1);
         byte[] bytes = toBytes(bean);
         for (int i = 0; i < length; i++)
             mts.add(bytes.clone());
@@ -108,7 +118,10 @@ public class HugeArrayVsSerializationTest {
         gcPrintUsed();
         int length = 1000 * 1000; // about 8 seconds
         List<byte[]> mts = new ArrayList<byte[]>();
-        byte[] bytes = toBytes(new PlainMutableTypes());
+        final PlainMutableTypes bean = new PlainMutableTypes();
+        bean.setBoolean2(true);
+        bean.setByte2((byte) 1);
+        byte[] bytes = toBytes(bean);
         for (int i = 0; i < length; i++)
             mts.add(bytes.clone());
         System.out.println("Per object size is " + (4 + (bytes.length + 7 + 12) / 8 * 8));

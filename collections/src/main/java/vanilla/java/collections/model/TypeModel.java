@@ -17,10 +17,18 @@ package vanilla.java.collections.model;
  */
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TypeModel<T> {
+    public static final Comparator<FieldModel> FIELD_MODEL_COMPARATOR = new Comparator<FieldModel>() {
+        @Override
+        public int compare(FieldModel o1, FieldModel o2) {
+            return o1.fieldName().compareTo(o2.fieldName());
+        }
+    };
     private final Class<T> type;
     private final Map<Method, MethodModel> methodMap = new LinkedHashMap();
     private final FieldModel[] fields;
@@ -34,6 +42,7 @@ public class TypeModel<T> {
             methodMap.put(method, new MethodModel(method, fieldMap));
         }
         fields = fieldMap.values().toArray(new FieldModel[fieldMap.size()]);
+        Arrays.sort(fields, FIELD_MODEL_COMPARATOR);
     }
 
     public Class<T> type() {
