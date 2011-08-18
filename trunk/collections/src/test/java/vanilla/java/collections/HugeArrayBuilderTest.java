@@ -692,14 +692,14 @@ public class HugeArrayBuilderTest {
         return t;
     }
 
-    private static void gcPrintUsed() {
+    public static void gcPrintUsed() {
         System.gc();
         Thread.yield();
 
         printUsed();
     }
 
-    private static void printUsed() {
+    public static void printUsed() {
         double directUsed;
         try {
             directUsed = (Long) (reservedMemory.get(null));
@@ -707,7 +707,7 @@ public class HugeArrayBuilderTest {
             throw new AssertionError(e);
         }
         System.out.printf((System.currentTimeMillis() - start) / 1000
-                + " sec - used %6.1f MB heap, %6.1f MB direct.%n",
+                + " sec - used %7.2f MB heap, %6.1f MB direct.%n",
                 (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1e6,
                 directUsed / 1e6
         );

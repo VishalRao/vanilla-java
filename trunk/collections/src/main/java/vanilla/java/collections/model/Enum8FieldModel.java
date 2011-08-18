@@ -52,7 +52,8 @@ public class Enum8FieldModel<E extends Enum<E>> extends AbstractFieldModel<E> {
     }
 
     public E get(ByteBuffer array, int index) {
-        return values[array.get(index)];
+        final byte b = array.get(index);
+        return b == -1 ? null : values[b & 0xFF];
     }
 
     @Override
@@ -63,7 +64,7 @@ public class Enum8FieldModel<E extends Enum<E>> extends AbstractFieldModel<E> {
 
     // mv.visitMethodInsn(INVOKEVIRTUAL, collections + "model/Enum8FieldModel", "set", "(Ljava/nio/ByteBuffer;ILjava/lang/Enum;)V");
     public void set(ByteBuffer array, int index, E value) {
-        array.put(index, (byte) value.ordinal());
+        array.put(index, value == null ? -1 : (byte) value.ordinal());
     }
 
     @Override
