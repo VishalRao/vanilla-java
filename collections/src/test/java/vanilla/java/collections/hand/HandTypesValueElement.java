@@ -17,8 +17,8 @@ package vanilla.java.collections.hand;
  */
 
 import vanilla.java.collections.ObjectTypes;
-import vanilla.java.collections.impl.AbstractHugeArrayList;
 import vanilla.java.collections.impl.AbstractHugeElement;
+import vanilla.java.collections.impl.AbstractHugeMap;
 import vanilla.java.collections.model.*;
 
 import java.io.Externalizable;
@@ -27,11 +27,11 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.lang.annotation.ElementType;
 
-public class HandTypesElement extends AbstractHugeElement<HandTypes, HandTypesAllocation> implements HandTypes, Externalizable {
+public class HandTypesValueElement extends AbstractHugeElement<HandTypes, HandTypesAllocation> implements HandTypes, Externalizable {
   HandTypesAllocation allocation;
 
-  public HandTypesElement(AbstractHugeArrayList<HandTypes, HandTypesAllocation, HandTypesElement> list, long n) {
-    super(list, n);
+  public HandTypesValueElement(AbstractHugeMap<HandTypesKey, HandTypesKeyElement, HandTypes, HandTypesValueElement, HandTypesAllocation> map, long n) {
+    super(map, n);
   }
 
   @Override
@@ -136,22 +136,22 @@ public class HandTypesElement extends AbstractHugeElement<HandTypes, HandTypesAl
 
   @Override
   public void setElementType(ElementType elementType) {
-    ((HandTypesArrayList) container).elementTypeFieldModel.set(allocation.m_elementType, offset, elementType);
+    ((HandTypesMap) container).elementTypeFieldModel.set(allocation.m_elementType, offset, elementType);
   }
 
   @Override
   public ElementType getElementType() {
-    return ((HandTypesArrayList) container).elementTypeFieldModel.get(allocation.m_elementType, offset);
+    return ((HandTypesMap) container).elementTypeFieldModel.get(allocation.m_elementType, offset);
   }
 
   @Override
   public void setString(String text) {
-    ((HandTypesArrayList) container).stringEnumerated16FieldModel.set(allocation.m_string, offset, text);
+    ((HandTypesMap) container).stringEnumerated16FieldModel.set(allocation.m_string, offset, text);
   }
 
   @Override
   public String getString() {
-    return ((HandTypesArrayList) container).stringEnumerated16FieldModel.get(allocation.m_string, offset);
+    return ((HandTypesMap) container).stringEnumerated16FieldModel.get(allocation.m_string, offset);
   }
 
 
@@ -194,7 +194,7 @@ public class HandTypesElement extends AbstractHugeElement<HandTypes, HandTypesAl
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    HandTypesElement that = (HandTypesElement) o;
+    HandTypesValueElement that = (HandTypesValueElement) o;
 
     if (getBoolean() != that.getBoolean()) return false;
     if (Boolean2FieldModel.notEquals(getBoolean2(), that.getBoolean2())) return false;
@@ -242,8 +242,8 @@ public class HandTypesElement extends AbstractHugeElement<HandTypes, HandTypesAl
     setByte2(t.getByte2());
     setA(getA());
 
-    if (t instanceof HandTypesElement) {
-      HandTypesElement mte = (HandTypesElement) t;
+    if (t instanceof HandTypesValueElement) {
+      HandTypesValueElement mte = (HandTypesValueElement) t;
       if (mte.container == container) {
 
         allocation.m_byte.put(offset, mte.allocation.m_byte.get(mte.offset));

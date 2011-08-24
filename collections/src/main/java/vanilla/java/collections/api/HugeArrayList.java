@@ -18,24 +18,14 @@ package vanilla.java.collections.api;
 
 import java.util.List;
 
-public interface HugeArrayList<T> extends List<T> {
-    public long longSize();
+public interface HugeArrayList<T> extends List<T>, HugeContainer {
+  public T get(long n) throws IndexOutOfBoundsException;
 
-    public void setSize(long length);
+  public T remove(long n) throws IndexOutOfBoundsException;
 
-    public T get(long n) throws IndexOutOfBoundsException;
+  public T set(long n, T t) throws IndexOutOfBoundsException;
 
-    public T remove(long n) throws IndexOutOfBoundsException;
+  public HugeIterator<T> iterator();
 
-    public T set(long n, T t) throws IndexOutOfBoundsException;
-
-    public HugeIterator<T> iterator();
-
-    public HugeIterator<T> listIterator();
-
-    public void recycle(T t);
-
-    public void ensureCapacity(long capacity);
-
-    void compact();
+  public HugeIterator<T> listIterator();
 }

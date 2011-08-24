@@ -16,14 +16,8 @@ package vanilla.java.collections.api;
  *    limitations under the License.
  */
 
-public interface HugeElement<T> {
-  HugeElementType hugeElementType();
+import java.util.Map;
 
-  void copyOf(T t);
+public interface HugeMap<K, V> extends Map<K, V>, HugeContainer {
 
-  void index(long n);
-
-  long index();
-
-  long longHashCode();
 }
