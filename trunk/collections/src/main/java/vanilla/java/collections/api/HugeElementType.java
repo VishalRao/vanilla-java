@@ -17,5 +17,5 @@ package vanilla.java.collections.api;
  */
 
 public enum HugeElementType {
-    Element, BeanImpl
+  Element, BeanImpl, KeyElement, KeyImpl
 }

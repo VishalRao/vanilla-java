@@ -26,54 +26,55 @@ import java.util.Arrays;
 import static vanilla.java.collections.impl.GenerateHugeArrays.clean;
 
 public class HandTypesAllocation implements HugeAllocation {
-    IntBuffer m_boolean;
-    IntBuffer m_boolean2;
-    ByteBuffer m_byte;
-    ByteBuffer m_byte2;
-    CharBuffer m_char;
-    ShortBuffer m_short;
-    IntBuffer m_int;
-    FloatBuffer m_float;
-    LongBuffer m_long;
-    DoubleBuffer m_double;
-    ByteBuffer m_elementType;
-    CharBuffer m_string;
-    ObjectTypes.A[] m_a;
+  IntBuffer m_boolean;
+  IntBuffer m_boolean2;
+  ByteBuffer m_byte;
+  ByteBuffer m_byte2;
+  CharBuffer m_char;
+  ShortBuffer m_short;
+  IntBuffer m_int;
+  FloatBuffer m_float;
+  LongBuffer m_long;
+  DoubleBuffer m_double;
+  ByteBuffer m_elementType;
+  CharBuffer m_string;
+  ObjectTypes.A[] m_a;
 
-    public HandTypesAllocation(int allocationSize) {
-        m_boolean = BooleanFieldModel.newArrayOfField(allocationSize);
-        m_boolean2 = Boolean2FieldModel.newArrayOfField(allocationSize);
-        m_byte = ByteFieldModel.newArrayOfField(allocationSize);
-        m_byte2 = Byte2FieldModel.newArrayOfField(allocationSize);
-        m_char = CharFieldModel.newArrayOfField(allocationSize);
-        m_short = ShortFieldModel.newArrayOfField(allocationSize);
-        m_int = IntFieldModel.newArrayOfField(allocationSize);
-        m_float = FloatFieldModel.newArrayOfField(allocationSize);
-        m_long = LongFieldModel.newArrayOfField(allocationSize);
-        m_double = DoubleFieldModel.newArrayOfField(allocationSize);
-        m_elementType = Enum8FieldModel.newArrayOfField(allocationSize);
-        m_string = Enumerated16FieldModel.newArrayOfField(allocationSize);
-    }
+  public HandTypesAllocation(int allocationSize) {
+    m_boolean = BooleanFieldModel.newArrayOfField(allocationSize);
+    m_boolean2 = Boolean2FieldModel.newArrayOfField(allocationSize);
+    m_byte = ByteFieldModel.newArrayOfField(allocationSize);
+    m_byte2 = Byte2FieldModel.newArrayOfField(allocationSize);
+    m_char = CharFieldModel.newArrayOfField(allocationSize);
+    m_short = ShortFieldModel.newArrayOfField(allocationSize);
+    m_int = IntFieldModel.newArrayOfField(allocationSize);
+    m_float = FloatFieldModel.newArrayOfField(allocationSize);
+    m_long = LongFieldModel.newArrayOfField(allocationSize);
+    m_double = DoubleFieldModel.newArrayOfField(allocationSize);
+    m_elementType = Enum8FieldModel.newArrayOfField(allocationSize);
+    m_string = Enumerated16FieldModel.newArrayOfField(allocationSize);
+    m_a = new ObjectTypes.A[allocationSize];
+  }
 
-    public void clear() {
-        Arrays.fill(m_a, null);
-    }
+  public void clear() {
+    Arrays.fill(m_a, null);
+  }
 
-    @Override
-    public void destroy() {
-        clean((Buffer) m_boolean);
-        clean((Buffer) m_boolean2);
-        final Object m = m_byte;
-        clean((Buffer) m);
-        // etc
+  @Override
+  public void destroy() {
+    clean((Buffer) m_boolean);
+    clean((Buffer) m_boolean2);
+    final Object m = m_byte;
+    clean((Buffer) m);
+    // etc
 
-    }
+  }
 
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        destroy();
-    }
+  @Override
+  protected void finalize() throws Throwable {
+    super.finalize();
+    destroy();
+  }
 
 
 }
