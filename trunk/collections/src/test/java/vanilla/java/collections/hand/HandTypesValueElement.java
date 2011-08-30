@@ -240,7 +240,7 @@ public class HandTypesValueElement extends AbstractHugeElement<HandTypes, HandTy
     setBoolean(t.getBoolean());
     setBoolean2(t.getBoolean2());
     setByte2(t.getByte2());
-    setA(getA());
+    setA(t.getA());
 
     if (t instanceof HandTypesValueElement) {
       HandTypesValueElement mte = (HandTypesValueElement) t;

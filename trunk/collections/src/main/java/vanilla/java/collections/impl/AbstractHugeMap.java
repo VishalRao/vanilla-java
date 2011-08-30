@@ -32,12 +32,12 @@ public abstract class AbstractHugeMap<K, KE extends HugeElement<K>, V, VE extend
   protected final List<VE> valueElements = new ArrayList<VE>();
   protected final List<K> keyImpls = new ArrayList<K>();
   protected final List<V> valueImpls = new ArrayList<V>();
-  protected final IntBuffer[] keysBuffers = new IntBuffer[32];
+  protected final IntBuffer[] keysBuffers = new IntBuffer[256];
 
   protected AbstractHugeMap(HugeMapBuilder<K, V> hmb) {
     super(hmb);
     for (int i = 0; i < keysBuffers.length; i++)
-      keysBuffers[i] = ByteBuffer.allocate(4 * 1024).order(ByteOrder.nativeOrder()).asIntBuffer();
+      keysBuffers[i] = ByteBuffer.allocate(512 * 1024).order(ByteOrder.nativeOrder()).asIntBuffer();
     ensureCapacity(1);
   }
 
@@ -134,7 +134,7 @@ public abstract class AbstractHugeMap<K, KE extends HugeElement<K>, V, VE extend
             // used field.
             keysBuffer.position(keysBuffer.position() - 1);
           }
-          return i1;
+          return i1 - 1;
         }
       }
       return -1;

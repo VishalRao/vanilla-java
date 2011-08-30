@@ -37,11 +37,14 @@ public abstract class AbstractHugeContainer<T, TA extends HugeAllocation> {
 
   public AbstractHugeContainer(HugeCollectionBuilder<T> hab) {
     this.allocationSize = hab.allocationSize();
-    this.allocationByteSize = hab.typeModel().recordSize(allocationSize);
     this.setRemoveReturnsNull = hab.setRemoveReturnsNull();
     this.baseDirectory = hab.baseDirectory();
-    if (baseDirectory != null)
+    if (baseDirectory != null) {
+      this.allocationByteSize = hab.typeModel().recordSize(allocationSize);
       new File(baseDirectory).mkdirs();
+    } else {
+      this.allocationByteSize = 0;
+    }
   }
 
 
