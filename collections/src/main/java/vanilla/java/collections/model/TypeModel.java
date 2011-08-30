@@ -23,49 +23,57 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TypeModel<T> {
-    public static final Comparator<FieldModel> FIELD_MODEL_COMPARATOR = new Comparator<FieldModel>() {
-        @Override
-        public int compare(FieldModel o1, FieldModel o2) {
-            return o1.fieldName().compareTo(o2.fieldName());
-        }
-    };
-    private final Class<T> type;
-    private final Map<Method, MethodModel> methodMap = new LinkedHashMap();
-    private final FieldModel[] fields;
-
-    public TypeModel(Class<T> type) {
-        this.type = type;
-        Map<String, FieldModel> fieldMap = new LinkedHashMap();
-        for (Method method : type.getMethods()) {
-            if (method.getDeclaringClass() == Object.class) continue;
-
-            methodMap.put(method, new MethodModel(method, fieldMap));
-        }
-        fields = fieldMap.values().toArray(new FieldModel[fieldMap.size()]);
-        Arrays.sort(fields, FIELD_MODEL_COMPARATOR);
+  public static final Comparator<FieldModel> FIELD_MODEL_COMPARATOR = new Comparator<FieldModel>() {
+    @Override
+    public int compare(FieldModel o1, FieldModel o2) {
+      return o1.fieldName().compareTo(o2.fieldName());
     }
+  };
+  private final Class<T> type;
+  private final Map<Method, MethodModel> methodMap = new LinkedHashMap();
+  private final FieldModel[] fields;
 
-    public Class<T> type() {
-        return type;
-    }
+  public TypeModel(Class<T> type) {
+    this.type = type;
+    Map<String, FieldModel> fieldMap = new LinkedHashMap();
+    for (Method method : type.getMethods()) {
+      if (method.getDeclaringClass() == Object.class) continue;
 
-    public ClassLoader classLoader() {
-        return type().getClassLoader();
+      methodMap.put(method, new MethodModel(method, fieldMap));
     }
+    fields = fieldMap.values().toArray(new FieldModel[fieldMap.size()]);
+    Arrays.sort(fields, FIELD_MODEL_COMPARATOR);
+  }
 
-    public FieldModel[] fields() {
-        return fields;
-    }
+  public Class<T> type() {
+    return type;
+  }
 
-    public Object arrayOfField(int fieldNumber, int size) {
-        return fields[fieldNumber].arrayOfField(size);
-    }
+  public ClassLoader classLoader() {
+    return type().getClassLoader();
+  }
 
-    public MethodModel method(Method method) {
-        return methodMap.get(method);
-    }
+  public FieldModel[] fields() {
+    return fields;
+  }
 
-    public String bcType() {
-        return type().getName().replace('.', '/');
+  public Object arrayOfField(int fieldNumber, int size) {
+    return fields[fieldNumber].arrayOfField(size);
+  }
+
+  public MethodModel method(Method method) {
+    return methodMap.get(method);
+  }
+
+  public String bcType() {
+    return type().getName().replace('.', '/');
+  }
+
+  public int recordSize(int elements) {
+    int recordSize = 0;
+    for (FieldModel field : fields) {
+      recordSize += field.sizeOf(elements);
     }
+    return recordSize;
+  }
 }

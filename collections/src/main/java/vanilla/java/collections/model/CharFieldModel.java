@@ -16,72 +16,81 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
+import vanilla.java.collections.impl.MappedFileChannel;
+
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 
 public class CharFieldModel extends AbstractFieldModel<Character> {
-    public CharFieldModel(String fieldName, int fieldNumber) {
-        super(fieldName, fieldNumber);
-    }
+  public CharFieldModel(String fieldName, int fieldNumber) {
+    super(fieldName, fieldNumber);
+  }
 
-    @Override
-    public Object arrayOfField(int size) {
-        return newArrayOfField(size);
-    }
+  @Override
+  public Object arrayOfField(int size) {
+    return newArrayOfField(size, null);
+  }
 
-    @Override
-    public Class storeType() {
-        return CharBuffer.class;
-    }
+  @Override
+  public int sizeOf(int elements) {
+    return sizeOf0(elements);
+  }
 
-    public static CharBuffer newArrayOfField(int size) {
-        return ByteBuffer.allocateDirect(size * 2).order(ByteOrder.nativeOrder()).asCharBuffer();
-    }
+  private static int sizeOf0(int elements) {
+    return elements * 2;
+  }
 
-    @Override
-    public Character getAllocation(Object[] arrays, int index) {
-        CharBuffer array = (CharBuffer) arrays[fieldNumber];
-        return get(array, index);
-    }
+  public static CharBuffer newArrayOfField(int size, MappedFileChannel mfc) {
+    return acquireByteBuffer(mfc, sizeOf0(size)).asCharBuffer();
+  }
 
-    public static char get(CharBuffer array, int index) {
-        return array.get(index);
-    }
+  @Override
+  public Class storeType() {
+    return CharBuffer.class;
+  }
 
-    @Override
-    public void setAllocation(Object[] arrays, int index, Character value) {
-        CharBuffer array = (CharBuffer) arrays[fieldNumber];
-        set(array, index, value);
-    }
+  @Override
+  public Character getAllocation(Object[] arrays, int index) {
+    CharBuffer array = (CharBuffer) arrays[fieldNumber];
+    return get(array, index);
+  }
 
-    public static void set(CharBuffer array, int index, char value) {
-        array.put(index, value);
-    }
+  public static char get(CharBuffer array, int index) {
+    return array.get(index);
+  }
 
-    @Override
-    public Class<Character> type() {
-        return (Class) char.class;
-    }
+  @Override
+  public void setAllocation(Object[] arrays, int index, Character value) {
+    CharBuffer array = (CharBuffer) arrays[fieldNumber];
+    set(array, index, value);
+  }
 
-    @Override
-    public String bcLFieldType() {
-        return "C";
-    }
+  public static void set(CharBuffer array, int index, char value) {
+    array.put(index, value);
+  }
 
-    @Override
-    public short equalsPreference() {
-        return 16;
-    }
+  @Override
+  public Class<Character> type() {
+    return (Class) char.class;
+  }
 
-    public static void write(ObjectOutput out, char ch) throws IOException {
-        out.writeChar(ch);
-    }
+  @Override
+  public String bcLFieldType() {
+    return "C";
+  }
 
-    public static char read(ObjectInput in) throws IOException {
-        return in.readChar();
-    }
+  @Override
+  public short equalsPreference() {
+    return 16;
+  }
+
+  public static void write(ObjectOutput out, char ch) throws IOException {
+    out.writeChar(ch);
+  }
+
+  public static char read(ObjectInput in) throws IOException {
+    return in.readChar();
+  }
 }

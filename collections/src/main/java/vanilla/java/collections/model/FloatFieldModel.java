@@ -16,92 +16,101 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
+import vanilla.java.collections.impl.MappedFileChannel;
+
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 public class FloatFieldModel extends AbstractFieldModel<Float> {
-    public FloatFieldModel(String fieldName, int fieldNumber) {
-        super(fieldName, fieldNumber);
-    }
+  public FloatFieldModel(String fieldName, int fieldNumber) {
+    super(fieldName, fieldNumber);
+  }
 
-    @Override
-    public Object arrayOfField(int size) {
-        return newArrayOfField(size);
-    }
+  @Override
+  public Object arrayOfField(int size) {
+    return newArrayOfField(size, null);
+  }
 
-    @Override
-    public Class storeType() {
-        return FloatBuffer.class;
-    }
+  @Override
+  public int sizeOf(int elements) {
+    return sizeOf0(elements);
+  }
 
-    public static FloatBuffer newArrayOfField(int size) {
-        return ByteBuffer.allocateDirect(size * 4).order(ByteOrder.nativeOrder()).asFloatBuffer();
-    }
+  private static int sizeOf0(int elements) {
+    return elements * 4;
+  }
 
-    @Override
-    public Float getAllocation(Object[] arrays, int index) {
-        FloatBuffer array = (FloatBuffer) arrays[fieldNumber];
-        return get(array, index);
-    }
+  public static FloatBuffer newArrayOfField(int size, MappedFileChannel mfc) {
+    return acquireByteBuffer(mfc, sizeOf0(size)).asFloatBuffer();
+  }
 
-    public static float get(FloatBuffer array, int index) {
-        return array.get(index);
-    }
+  @Override
+  public Class storeType() {
+    return FloatBuffer.class;
+  }
 
-    @Override
-    public void setAllocation(Object[] arrays, int index, Float value) {
-        FloatBuffer array = (FloatBuffer) arrays[fieldNumber];
-        set(array, index, value);
-    }
+  @Override
+  public Float getAllocation(Object[] arrays, int index) {
+    FloatBuffer array = (FloatBuffer) arrays[fieldNumber];
+    return get(array, index);
+  }
 
-    public static void set(FloatBuffer array, int index, float value) {
-        array.put(index, value);
-    }
+  public static float get(FloatBuffer array, int index) {
+    return array.get(index);
+  }
 
-    @Override
-    public Class<Float> type() {
-        return (Class) float.class;
-    }
+  @Override
+  public void setAllocation(Object[] arrays, int index, Float value) {
+    FloatBuffer array = (FloatBuffer) arrays[fieldNumber];
+    set(array, index, value);
+  }
 
-    @Override
-    public String bcLFieldType() {
-        return "F";
-    }
+  public static void set(FloatBuffer array, int index, float value) {
+    array.put(index, value);
+  }
 
-    @Override
-    public BCType bcType() {
-        return BCType.Float;
-    }
+  @Override
+  public Class<Float> type() {
+    return (Class) float.class;
+  }
 
-    @Override
-    public boolean isCallsNotEquals() {
-        return true;
-    }
+  @Override
+  public String bcLFieldType() {
+    return "F";
+  }
 
-    @UsedFromByteCode
-    public static boolean notEquals(float d1, float d2) {
-        return Float.floatToIntBits(d1) != Float.floatToIntBits(d2);
-    }
+  @Override
+  public BCType bcType() {
+    return BCType.Float;
+  }
 
-    @UsedFromByteCode
-    public static int hashCode(float f) {
-        return Float.floatToIntBits(f);
-    }
+  @Override
+  public boolean isCallsNotEquals() {
+    return true;
+  }
 
-    @Override
-    public short equalsPreference() {
-        return 31;
-    }
+  @UsedFromByteCode
+  public static boolean notEquals(float d1, float d2) {
+    return Float.floatToIntBits(d1) != Float.floatToIntBits(d2);
+  }
 
-    public static void write(ObjectOutput out, float f) throws IOException {
-        out.writeFloat(f);
-    }
+  @UsedFromByteCode
+  public static int hashCode(float f) {
+    return Float.floatToIntBits(f);
+  }
 
-    public static float read(ObjectInput in) throws IOException {
-        return in.readFloat();
-    }
+  @Override
+  public short equalsPreference() {
+    return 31;
+  }
+
+  public static void write(ObjectOutput out, float f) throws IOException {
+    out.writeFloat(f);
+  }
+
+  public static float read(ObjectInput in) throws IOException {
+    return in.readFloat();
+  }
 }

@@ -16,108 +16,119 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
+import vanilla.java.collections.impl.MappedFileChannel;
+
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
 
 public class Enum8FieldModel<E extends Enum<E>> extends AbstractFieldModel<E> {
-    private final Class<E> type;
-    private final E[] values;
+  private final Class<E> type;
+  private final E[] values;
 
-    public Enum8FieldModel(String fieldName, int fieldNumber, Class<E> type, E[] values) {
-        super(fieldName, fieldNumber);
-        this.type = type;
-        this.values = values;
-    }
+  public Enum8FieldModel(String fieldName, int fieldNumber, Class<E> type, E[] values) {
+    super(fieldName, fieldNumber);
+    this.type = type;
+    this.values = values;
+  }
 
-    @Override
-    public Object arrayOfField(int size) {
-        return newArrayOfField(size);
-    }
+  @Override
+  public Object arrayOfField(int size) {
+    return newArrayOfField(size, null);
+  }
 
-    public static ByteBuffer newArrayOfField(int size) {
-        return ByteBuffer.allocateDirect(size);
-    }
+  @Override
+  public int sizeOf(int elements) {
+    return sizeOf0(elements);
+  }
 
-    @Override
-    public Class storeType() {
-        return ByteBuffer.class;
-    }
+  private static int sizeOf0(int elements) {
+    return elements;
+  }
 
-    @Override
-    public E getAllocation(Object[] arrays, int index) {
-        ByteBuffer array = (ByteBuffer) arrays[fieldNumber];
-        return get(array, index);
-    }
+  public static ByteBuffer newArrayOfField(int size, MappedFileChannel mfc) {
+    return acquireByteBuffer(mfc, sizeOf0(size));
+  }
 
-    public E get(ByteBuffer array, int index) {
-        final byte b = array.get(index);
-        return b == -1 ? null : values[b & 0xFF];
-    }
+  @Override
+  public Class storeType() {
+    return ByteBuffer.class;
+  }
 
-    @Override
-    public void setAllocation(Object[] arrays, int index, E value) {
-        ByteBuffer array = (ByteBuffer) arrays[fieldNumber];
-        set(array, index, value);
-    }
+  @Override
+  public E getAllocation(Object[] arrays, int index) {
+    ByteBuffer array = (ByteBuffer) arrays[fieldNumber];
+    return get(array, index);
+  }
 
-    // mv.visitMethodInsn(INVOKEVIRTUAL, collections + "model/Enum8FieldModel", "set", "(Ljava/nio/ByteBuffer;ILjava/lang/Enum;)V");
-    public void set(ByteBuffer array, int index, E value) {
-        array.put(index, value == null ? -1 : (byte) value.ordinal());
-    }
+  public E get(ByteBuffer array, int index) {
+    final byte b = array.get(index);
+    return b == -1 ? null : values[b & 0xFF];
+  }
 
-    @Override
-    public String bcLSetType() {
-        return "Ljava/lang/Enum;";
-    }
+  @Override
+  public void setAllocation(Object[] arrays, int index, E value) {
+    ByteBuffer array = (ByteBuffer) arrays[fieldNumber];
+    set(array, index, value);
+  }
 
-    @Override
-    public String bcLStoredType() {
-        return "B";
-    }
+  // mv.visitMethodInsn(INVOKEVIRTUAL, collections + "model/Enum8FieldModel", "set", "(Ljava/nio/ByteBuffer;ILjava/lang/Enum;)V");
+  public void set(ByteBuffer array, int index, E value) {
+    array.put(index, value == null ? -1 : (byte) value.ordinal());
+  }
 
-    @Override
-    public Class<E> type() {
-        return type;
-    }
+  @Override
+  public String bcLSetType() {
+    return "Ljava/lang/Enum;";
+  }
 
-    @Override
-    public BCType bcType() {
-        return BCType.Reference;
-    }
+  @Override
+  public String bcLStoredType() {
+    return "B";
+  }
+
+  @Override
+  public Class<E> type() {
+    return type;
+  }
+
+  @Override
+  public BCType bcType() {
+    return BCType.Reference;
+  }
 
 
-    @Override
-    public boolean virtualGetSet() {
-        return true;
-    }
+  @Override
+  public boolean virtualGetSet() {
+    return true;
+  }
 
-    @Override
-    public boolean isCallsNotEquals() {
-        return true;
-    }
+  @Override
+  public boolean isCallsNotEquals() {
+    return true;
+  }
 
-    @UsedFromByteCode
-    public static <T extends Enum<T>> boolean notEquals(T t1, T t2) {
-        return t1 == null ? t2 != null : !t1.equals(t2);
-    }
+  @UsedFromByteCode
+  public static <T extends Enum<T>> boolean notEquals(T t1, T t2) {
+    return t1 == null ? t2 != null : !t1.equals(t2);
+  }
 
-    @UsedFromByteCode
-    public static int hashCode(Enum elementType) {
-        return elementType == null ? Integer.MIN_VALUE : elementType.ordinal();
-    }
+  @UsedFromByteCode
+  public static int hashCode(Enum elementType) {
+    return elementType == null ? Integer.MIN_VALUE : elementType.ordinal();
+  }
 
-    @Override
-    public short equalsPreference() {
-        return 7;
-    }
+  @Override
+  public short equalsPreference() {
+    return 7;
+  }
 
-    public static <E extends Enum<E>> E read(ObjectInput in, Class<E> eClass) throws IOException, ClassNotFoundException {
-        return (E) in.readObject();
-    }
+  public static <E extends Enum<E>> E read(ObjectInput in, Class<E> eClass) throws IOException, ClassNotFoundException {
+    return (E) in.readObject();
+  }
 
-    public static <E extends Enum<E>> void write(ObjectOutput out, Class<E> eClass, E e) throws IOException {
-        out.writeObject(e);
-    }
+  public static <E extends Enum<E>> void write(ObjectOutput out, Class<E> eClass, E e) throws IOException {
+    out.writeObject(e);
+  }
 }

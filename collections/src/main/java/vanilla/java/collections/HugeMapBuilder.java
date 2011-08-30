@@ -1,4 +1,4 @@
-package vanilla.java.collections.api;
+package vanilla.java.collections;
 
 /*
  * Copyright 2011 Peter Lawrey
@@ -16,21 +16,10 @@ package vanilla.java.collections.api;
  *    limitations under the License.
  */
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.List;
+import vanilla.java.collections.impl.HugeCollectionBuilder;
 
-public interface HugeArrayList<T> extends List<T>, Closeable, HugeContainer {
-  public T get(long n) throws IndexOutOfBoundsException;
-
-  public HugeIterator<T> iterator();
-
-  public HugeIterator<T> listIterator();
-
-  public T remove(long n) throws IndexOutOfBoundsException;
-
-  public T set(long n, T t) throws IndexOutOfBoundsException;
-
-  public void flush() throws IOException;
-
+public class HugeMapBuilder<K, V> extends HugeCollectionBuilder<V> {
+  public HugeMapBuilder() {
+    super(1);
+  }
 }

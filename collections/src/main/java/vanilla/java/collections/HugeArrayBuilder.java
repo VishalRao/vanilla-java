@@ -16,171 +16,83 @@ package vanilla.java.collections;
  *    limitations under the License.
  */
 
-import org.objectweb.asm.ClassWriter;
 import vanilla.java.collections.api.HugeArrayList;
-import vanilla.java.collections.impl.ColumnHugeArrayList;
 import vanilla.java.collections.impl.GenerateHugeArrays;
-import vanilla.java.collections.model.TypeModel;
+import vanilla.java.collections.impl.HugeCollectionBuilder;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 
-public class HugeArrayBuilder<T> {
-    public static final int MIN_ALLOCATION_SIZE = 32 * 1024;
-    private final Class<T> type;
-    private final TypeModel<T> typeModel;
-    protected int allocationSize = -1;
-    protected boolean fixedSize;
-    protected boolean entryBased;
-    protected boolean setRemoveReturnsNull;
-    protected long capacity = -1;
-    protected ClassLoader classLoader;
-    private boolean disableCodeGeneration;
+public class HugeArrayBuilder<T> extends HugeCollectionBuilder<T> {
+  private Class<?> arrayListClass;
 
-    protected HugeArrayBuilder() {
-        type = (Class) ((ParameterizedType) this.getClass().
-                getGenericSuperclass()).getActualTypeArguments()[0];
-        typeModel = new TypeModel<T>(type);
-        classLoader = getClass().getClassLoader();
-        try {
-            @SuppressWarnings({"UnusedDeclaration"})
-            Class classWriter = ClassWriter.class;
-            disableCodeGeneration = false;
-        } catch (NoClassDefFoundError ignored) {
-            disableCodeGeneration = true;
-        }
+
+  protected HugeArrayBuilder() {
+    super(0);
+  }
+
+
+  public HugeArrayList<T> create() {
+    normaliseArgs();
+
+    try {
+      if (arrayListClass == null)
+        arrayListClass = classLoader().loadClass(typeModel.type().getName() + "ArrayList");
+
+    } catch (ClassNotFoundException e) {
+      acquireImplClass();
+      defineClass(GenerateHugeArrays.dumpElement(typeModel));
+      defineClass(GenerateHugeArrays.dumpAllocation(typeModel));
+      arrayListClass = defineClass(GenerateHugeArrays.dumpArrayList(typeModel));
     }
-
-    public HugeArrayBuilder(Class<T> type) {
-        this.type = type;
-        typeModel = new TypeModel<T>(type);
+    try {
+      return (HugeArrayList<T>) arrayListClass.getConstructor(HugeArrayBuilder.class).newInstance(this);
+    } catch (NoSuchMethodException e) {
+      throw new AssertionError(e);
+    } catch (InstantiationException e) {
+      throw new AssertionError(e);
+    } catch (IllegalAccessException e) {
+      throw new AssertionError(e);
+    } catch (InvocationTargetException e) {
+      throw new AssertionError(e.getCause());
     }
+  }
 
-    public HugeArrayBuilder<T> allocationSize(int allocationSize) {
-        this.allocationSize = allocationSize;
-        return this;
+  public T createBean() {
+    Class implClass = acquireImplClass();
+    try {
+      return (T) implClass.newInstance();
+    } catch (InstantiationException e) {
+      throw new AssertionError(e);
+    } catch (IllegalAccessException e) {
+      throw new AssertionError(e);
     }
+  }
 
-    public int allocationSize() {
-        return allocationSize;
+  Class implClass = null;
+
+  private Class acquireImplClass() {
+    try {
+      if (implClass == null)
+        implClass = classLoader().loadClass(typeModel.type().getName() + "Impl");
+
+    } catch (ClassNotFoundException e) {
+      implClass = defineClass(GenerateHugeArrays.dumpImpl(typeModel));
     }
+    return implClass;
+  }
 
-    public HugeArrayBuilder<T> capacity(int capacity) {
-        this.capacity = capacity;
-        return this;
+  private Class defineClass(byte[] bytes) {
+    try {
+      Method defineClass = ClassLoader.class.getDeclaredMethod("defineClass", String.class /*name*/, byte[].class /*b*/, int.class /*off*/, int.class /*len*/);
+      defineClass.setAccessible(true);
+      return (Class) defineClass.invoke(classLoader, null, bytes, 0, bytes.length);
+    } catch (NoSuchMethodException e) {
+      throw new AssertionError(e);
+    } catch (IllegalAccessException e) {
+      throw new AssertionError(e);
+    } catch (InvocationTargetException e) {
+      throw new AssertionError(e.getCause());
     }
-
-    public long capacity() {
-        return Math.max(Math.max(allocationSize, capacity), MIN_ALLOCATION_SIZE);
-    }
-
-    public HugeArrayBuilder<T> fixedSize(boolean fixedSize) {
-        this.fixedSize = fixedSize;
-        return this;
-    }
-
-    public boolean fixedSize() {
-        return fixedSize;
-    }
-
-    public HugeArrayBuilder<T> entryBased(boolean entryBased) {
-        this.entryBased = entryBased;
-        return this;
-    }
-
-    public boolean entryBased() {
-        return entryBased;
-    }
-
-    public HugeArrayBuilder<T> classLoader(ClassLoader classLoader) {
-        this.classLoader = classLoader;
-        return this;
-    }
-
-    public ClassLoader classLoader() {
-        return classLoader;
-    }
-
-    public HugeArrayBuilder<T> disableCodeGeneration(boolean disableCodeGeneration) {
-        this.disableCodeGeneration = disableCodeGeneration;
-        return this;
-    }
-
-    public boolean disableCodeGeneration() {
-        return disableCodeGeneration;
-    }
-
-    private Class arrayListClass = null;
-
-    public HugeArrayList<T> create() {
-        if (capacity < 1) capacity = 1;
-        if (allocationSize < MIN_ALLOCATION_SIZE) {
-            allocationSize = MIN_ALLOCATION_SIZE;
-            while (128 * allocationSize < capacity && allocationSize < 64 * 1024 * 1024)
-                allocationSize <<= 1;
-        }
-        if (disableCodeGeneration)
-            return new ColumnHugeArrayList<T>(typeModel, allocationSize, capacity);
-
-        try {
-            if (arrayListClass == null)
-                arrayListClass = classLoader().loadClass(typeModel.type().getName() + "ArrayList");
-
-        } catch (ClassNotFoundException e) {
-            acquireImplClass();
-            defineClass(GenerateHugeArrays.dumpElement(typeModel));
-            defineClass(GenerateHugeArrays.dumpAllocation(typeModel));
-            arrayListClass = defineClass(GenerateHugeArrays.dumpArrayList(typeModel));
-        }
-        try {
-            return (HugeArrayList<T>) arrayListClass.getConstructor(int.class, boolean.class).newInstance(allocationSize, setRemoveReturnsNull);
-        } catch (NoSuchMethodException e) {
-            throw new AssertionError(e);
-        } catch (InstantiationException e) {
-            throw new AssertionError(e);
-        } catch (IllegalAccessException e) {
-            throw new AssertionError(e);
-        } catch (InvocationTargetException e) {
-            throw new AssertionError(e.getCause());
-        }
-    }
-
-    public T createBean() {
-        Class implClass = acquireImplClass();
-        try {
-            return (T) implClass.newInstance();
-        } catch (InstantiationException e) {
-            throw new AssertionError(e);
-        } catch (IllegalAccessException e) {
-            throw new AssertionError(e);
-        }
-    }
-
-    Class implClass = null;
-
-    private Class acquireImplClass() {
-        try {
-            if (implClass == null)
-                implClass = classLoader().loadClass(typeModel.type().getName() + "Impl");
-
-        } catch (ClassNotFoundException e) {
-            implClass = defineClass(GenerateHugeArrays.dumpImpl(typeModel));
-        }
-        return implClass;
-    }
-
-    private Class defineClass(byte[] bytes) {
-        try {
-            Method defineClass = ClassLoader.class.getDeclaredMethod("defineClass", String.class /*name*/, byte[].class /*b*/, int.class /*off*/, int.class /*len*/);
-            defineClass.setAccessible(true);
-            return (Class) defineClass.invoke(classLoader, null, bytes, 0, bytes.length);
-        } catch (NoSuchMethodException e) {
-            throw new AssertionError(e);
-        } catch (IllegalAccessException e) {
-            throw new AssertionError(e);
-        } catch (InvocationTargetException e) {
-            throw new AssertionError(e.getCause());
-        }
-    }
+  }
 }
