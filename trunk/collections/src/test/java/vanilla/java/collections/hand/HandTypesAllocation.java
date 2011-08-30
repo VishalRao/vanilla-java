@@ -18,6 +18,7 @@ package vanilla.java.collections.hand;
 
 import vanilla.java.collections.ObjectTypes;
 import vanilla.java.collections.api.HugeAllocation;
+import vanilla.java.collections.impl.MappedFileChannel;
 import vanilla.java.collections.model.*;
 
 import java.nio.*;
@@ -40,20 +41,19 @@ public class HandTypesAllocation implements HugeAllocation {
   CharBuffer m_string;
   ObjectTypes.A[] m_a;
 
-  public HandTypesAllocation(int allocationSize) {
-    m_boolean = BooleanFieldModel.newArrayOfField(allocationSize);
-    m_boolean2 = Boolean2FieldModel.newArrayOfField(allocationSize);
-    m_byte = ByteFieldModel.newArrayOfField(allocationSize);
-    m_byte2 = Byte2FieldModel.newArrayOfField(allocationSize);
-    m_char = CharFieldModel.newArrayOfField(allocationSize);
-    m_short = ShortFieldModel.newArrayOfField(allocationSize);
-    m_int = IntFieldModel.newArrayOfField(allocationSize);
-    m_float = FloatFieldModel.newArrayOfField(allocationSize);
-    m_long = LongFieldModel.newArrayOfField(allocationSize);
-    m_double = DoubleFieldModel.newArrayOfField(allocationSize);
-    m_elementType = Enum8FieldModel.newArrayOfField(allocationSize);
-    m_string = Enumerated16FieldModel.newArrayOfField(allocationSize);
-    m_a = new ObjectTypes.A[allocationSize];
+  public HandTypesAllocation(int allocationSize, MappedFileChannel mfc) {
+    m_boolean = BooleanFieldModel.newArrayOfField(allocationSize, mfc);
+    m_boolean2 = Boolean2FieldModel.newArrayOfField(allocationSize, mfc);
+    m_byte = ByteFieldModel.newArrayOfField(allocationSize, mfc);
+    m_byte2 = Byte2FieldModel.newArrayOfField(allocationSize, mfc);
+    m_char = CharFieldModel.newArrayOfField(allocationSize, mfc);
+    m_short = ShortFieldModel.newArrayOfField(allocationSize, mfc);
+    m_int = IntFieldModel.newArrayOfField(allocationSize, mfc);
+    m_float = FloatFieldModel.newArrayOfField(allocationSize, mfc);
+    m_long = LongFieldModel.newArrayOfField(allocationSize, mfc);
+    m_double = DoubleFieldModel.newArrayOfField(allocationSize, mfc);
+    m_elementType = Enum8FieldModel.newArrayOfField(allocationSize, mfc);
+    m_string = Enumerated16FieldModel.newArrayOfField(allocationSize, mfc);
   }
 
   public void clear() {

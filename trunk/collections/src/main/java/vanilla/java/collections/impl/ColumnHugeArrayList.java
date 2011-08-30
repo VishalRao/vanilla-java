@@ -269,6 +269,14 @@ public class ColumnHugeArrayList<T> extends AbstractList<T> implements HugeArray
   }
 
   @Override
+  public void flush() {
+  }
+
+  @Override
+  public void close() {
+  }
+
+  @Override
   public void compact() {
     int allocationsNeeded = (int) (longSize() / allocationSize + 1);
     while (allocations.size() > allocationsNeeded) {

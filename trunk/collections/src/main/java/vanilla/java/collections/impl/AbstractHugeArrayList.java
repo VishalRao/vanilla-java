@@ -16,18 +16,22 @@ package vanilla.java.collections.impl;
  *    limitations under the License.
  */
 
+import vanilla.java.collections.HugeArrayBuilder;
 import vanilla.java.collections.api.*;
+import vanilla.java.collections.model.FieldModel;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.*;
 
 public abstract class AbstractHugeArrayList<T, TA extends HugeAllocation, TE extends AbstractHugeElement<T, TA>> extends AbstractHugeContainer<T, TA> implements HugeArrayList<T> {
-  protected final boolean setRemoveReturnsNull;
   protected final List<TE> elements = new ArrayList<TE>();
   protected final List<T> impls = new ArrayList<T>();
+  protected long longSize;
 
-  public AbstractHugeArrayList(int allocationSize, boolean setRemoveReturnsNull) {
-    super(allocationSize);
-    this.setRemoveReturnsNull = setRemoveReturnsNull;
+  public AbstractHugeArrayList(HugeArrayBuilder hab) {
+    super(hab);
+
   }
 
   @Override
@@ -63,16 +67,16 @@ public abstract class AbstractHugeArrayList<T, TA extends HugeAllocation, TE ext
   }
 
   @Override
-  public void recycle(Object o) {
-    if (!(o instanceof HugeElement)) return;
-    switch (((HugeElement) o).hugeElementType()) {
+  public void recycle(Object t) {
+    if (!(t instanceof HugeElement)) return;
+    switch (((HugeElement) t).hugeElementType()) {
       case Element:
         if (elements.size() < allocationSize)
-          elements.add((TE) o);
+          elements.add((TE) t);
         break;
       case BeanImpl:
         if (impls.size() < allocationSize)
-          impls.add((T) o);
+          impls.add((T) t);
         break;
     }
   }
@@ -162,6 +166,34 @@ public abstract class AbstractHugeArrayList<T, TA extends HugeAllocation, TE ext
 
   protected abstract T createImpl();
 
+  public void flush() throws IOException {
+    for (MappedFileChannel mfc : mfChannels) {
+      try {
+        mfc.flush();
+      } catch (IOException ignored) {
+      }
+    }
+    for (Field f : getClass().getDeclaredFields()) {
+      if (!FieldModel.class.isAssignableFrom(f.getType())) continue;
+      f.setAccessible(true);
+      try {
+        FieldModel fm = (FieldModel) f.get(this);
+        fm.flush();
+      } catch (IllegalAccessException e) {
+        throw new AssertionError(e);
+      }
+    }
+  }
+
+  public void close() throws IOException {
+    flush();
+    for (MappedFileChannel mfc : mfChannels) {
+      try {
+        mfc.close();
+      } catch (IOException ignored) {
+      }
+    }
+  }
   // imported from AbstractList
 
   public List<T> subList(int fromIndex, int toIndex) {
@@ -285,7 +317,7 @@ public abstract class AbstractHugeArrayList<T, TA extends HugeAllocation, TE ext
         throw new IndexOutOfBoundsException("toIndex = " + toIndex);
       if (fromIndex > toIndex)
         throw new IllegalArgumentException("fromIndex(" + fromIndex +
-            ") > toIndex(" + toIndex + ")");
+                                               ") > toIndex(" + toIndex + ")");
       offset = fromIndex;
       size = toIndex - fromIndex;
     }
@@ -332,7 +364,7 @@ public abstract class AbstractHugeArrayList<T, TA extends HugeAllocation, TE ext
     public boolean addAll(int index, Collection<? extends T> c) {
       if (index < 0 || index > size)
         throw new IndexOutOfBoundsException(
-            "Index: " + index + ", Size: " + size);
+                                               "Index: " + index + ", Size: " + size);
       int cSize = c.size();
       if (cSize == 0)
         return false;
@@ -350,7 +382,7 @@ public abstract class AbstractHugeArrayList<T, TA extends HugeAllocation, TE ext
     public ListIterator<T> listIterator(final int index) {
       if (index < 0 || index > size)
         throw new IndexOutOfBoundsException(
-            "Index: " + index + ", Size: " + size);
+                                               "Index: " + index + ", Size: " + size);
 
       return new ListIterator<T>() {
         private ListIterator<T> i = AbstractHugeArrayList.this.listIterator(index + offset);
@@ -407,10 +439,10 @@ public abstract class AbstractHugeArrayList<T, TA extends HugeAllocation, TE ext
       return new SubList(fromIndex, toIndex);
     }
 
-    private void rangeCheck(int index) {
+    void rangeCheck(int index) {
       if (index < 0 || index >= size)
         throw new IndexOutOfBoundsException("Index: " + index +
-            ",Size: " + size);
+                                                ",Size: " + size);
     }
   }
 }

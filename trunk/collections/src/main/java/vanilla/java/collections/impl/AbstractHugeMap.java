@@ -1,5 +1,22 @@
 package vanilla.java.collections.impl;
 
+/*
+ * Copyright 2011 Peter Lawrey
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+import vanilla.java.collections.HugeMapBuilder;
 import vanilla.java.collections.api.HugeAllocation;
 import vanilla.java.collections.api.HugeElement;
 import vanilla.java.collections.api.HugeMap;
@@ -11,16 +28,14 @@ import java.util.*;
 
 public abstract class AbstractHugeMap<K, KE extends HugeElement<K>, V, VE extends HugeElement<V>, MA extends HugeAllocation> extends AbstractHugeContainer<V, MA> implements HugeMap<K, V> {
   public static final long HASH_MASK = 0xFFFFFFFFFL; // so divide by 32 is positive.
-  protected final boolean setRemoveReturnsNull;
   protected final List<KE> keyElements = new ArrayList<KE>();
   protected final List<VE> valueElements = new ArrayList<VE>();
   protected final List<K> keyImpls = new ArrayList<K>();
   protected final List<V> valueImpls = new ArrayList<V>();
   protected final IntBuffer[] keysBuffers = new IntBuffer[32];
 
-  public AbstractHugeMap(int allocationSize, boolean setRemoveReturnsNull) {
-    super(allocationSize);
-    this.setRemoveReturnsNull = setRemoveReturnsNull;
+  protected AbstractHugeMap(HugeMapBuilder<K, V> hmb) {
+    super(hmb);
     for (int i = 0; i < keysBuffers.length; i++)
       keysBuffers[i] = ByteBuffer.allocate(4 * 1024).order(ByteOrder.nativeOrder()).asIntBuffer();
     ensureCapacity(1);

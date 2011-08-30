@@ -18,27 +18,66 @@ package vanilla.java.collections.impl;
 
 import vanilla.java.collections.api.HugeAllocation;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractHugeContainer<T, TA extends HugeAllocation> {
   protected final int allocationSize;
+  protected final int allocationByteSize;
+  protected final boolean setRemoveReturnsNull;
+  protected final String baseDirectory;
+
   protected final List<TA> allocations = new ArrayList<TA>();
+  protected final List<MappedFileChannel> mfChannels = new ArrayList<MappedFileChannel>();
   protected long longSize;
 
-  public AbstractHugeContainer(int allocationSize) {
-    this.allocationSize = allocationSize;
+  public AbstractHugeContainer(HugeCollectionBuilder<T> hab) {
+    this.allocationSize = hab.allocationSize();
+    this.allocationByteSize = hab.typeModel().recordSize(allocationSize);
+    this.setRemoveReturnsNull = hab.setRemoveReturnsNull();
+    this.baseDirectory = hab.baseDirectory();
+    if (baseDirectory != null)
+      new File(baseDirectory).mkdirs();
   }
+
 
   public void ensureCapacity(long size) {
     long blocks = (size + allocationSize - 1) / allocationSize;
     while (blocks > allocations.size()) {
-      allocations.add(createAllocation());
+      MappedFileChannel mfc = null;
+      if (baseDirectory != null) {
+        final String name = baseDirectory + "/alloc-" + allocations.size();
+        File file = new File(name);
+        final int fileSize = allocationByteSize;
+        RandomAccessFile raf = null;
+        try {
+          raf = new RandomAccessFile(name, "rw");
+          ByteBuffer bb = null;
+          while (file.length() < fileSize) {
+            if (bb == null)
+              bb = ByteBuffer.allocateDirect(32 * 1024);
+            else
+              bb.clear();
+            raf.getChannel().write(bb);
+          }
+          mfChannels.add(mfc = new MappedFileChannel(raf));
+        } catch (IOException e) {
+          try {
+            raf.close();
+          } catch (IOException ignored) {
+          }
+          throw new IllegalStateException("Unable to create allocation " + name, e);
+        }
+      }
+      allocations.add(createAllocation(mfc));
     }
   }
 
-  protected abstract TA createAllocation();
-
+  protected abstract TA createAllocation(MappedFileChannel mfc);
 
   public int size() {
     return longSize < Integer.MAX_VALUE ? (int) longSize : Integer.MAX_VALUE;

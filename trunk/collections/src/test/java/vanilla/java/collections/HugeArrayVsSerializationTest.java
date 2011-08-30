@@ -63,6 +63,7 @@ public class HugeArrayVsSerializationTest {
   public void testSearchAndUpdateCollectionHeap() {
     gcPrintUsed();
     int repeats = 1000; // five seconds.
+    int length = 1000 * 1000;
     HugeArrayBuilder<MutableTypes> mtb = new HugeArrayBuilder<MutableTypes>() {
     };
     final List<MutableTypes> mts = new ArrayList<MutableTypes>();
@@ -87,9 +88,9 @@ public class HugeArrayVsSerializationTest {
   }
 
   @Test
-  public void testSearchAndUpdateCollectionExternalizable() throws IOException, ClassNotFoundException {
+  public void testSearchAndUpdateCollectionSerialization() throws IOException, ClassNotFoundException {
     gcPrintUsed();
-
+    int length = 1000 * 1000; // about 8 seconds
     List<byte[]> mts = new ArrayList<byte[]>();
     HugeArrayBuilder<MutableTypes> mtb = new HugeArrayBuilder<MutableTypes>() {
     };
@@ -99,6 +100,7 @@ public class HugeArrayVsSerializationTest {
     byte[] bytes = toBytes(bean);
     for (int i = 0; i < length; i++)
       mts.add(bytes.clone());
+    System.out.println("Per object size is " + (4 + (bytes.length + 7 + 12) / 8 * 8));
 
     gcPrintUsed();
     long start = System.nanoTime();
@@ -109,13 +111,13 @@ public class HugeArrayVsSerializationTest {
     }
     long time = System.nanoTime() - start;
     printUsed();
-    System.out.printf("List<byte[]> with Externalizable update one field took an average %,d ns.%n", time / length);
+    System.out.printf("List<byte[]> with readObject/writeObject update one field took an average %,d ns.%n", time / length);
   }
 
   @Test
-  public void testSearchAndUpdateCollectionSerialization() throws IOException, ClassNotFoundException {
+  public void testSearchAndUpdateCollectionSerialization2() throws IOException, ClassNotFoundException {
     gcPrintUsed();
-
+    int length = 1000 * 1000; // about 8 seconds
     List<byte[]> mts = new ArrayList<byte[]>();
     final PlainMutableTypes bean = new PlainMutableTypes();
     bean.setBoolean2(true);
@@ -134,7 +136,7 @@ public class HugeArrayVsSerializationTest {
     }
     long time = System.nanoTime() - start;
     printUsed();
-    System.out.printf("List<byte[]> with Serializable update one field took an average %,d ns.%n", time / length);
+    System.out.printf("List<byte[]> update one field took an average %,d ns.%n", time / length);
   }
 
   public static byte[] toBytes(Object obj) throws IOException {

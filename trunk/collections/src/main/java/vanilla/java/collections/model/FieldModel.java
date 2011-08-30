@@ -16,66 +16,73 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 
 public interface FieldModel<T> {
-    Object arrayOfField(int size);
+  Object arrayOfField(int size);
 
-    T getAllocation(Object[] arrays, int index);
+  T getAllocation(Object[] arrays, int index);
 
-    void setAllocation(Object[] arrays, int index, T value);
+  void setAllocation(Object[] arrays, int index, T value);
 
-    void setter(Method setter);
+  void setter(Method setter);
 
-    void getter(Method getter);
+  void getter(Method getter);
 
-    int fieldNumber();
+  int fieldNumber();
 
-    Method setter();
+  Method setter();
 
-    Method getter();
+  Method getter();
 
-    Class<T> type();
+  Class<T> type();
 
-    String fieldName();
+  String fieldName();
 
-    Class storeType();
+  Class storeType();
 
-    String titleFieldName();
+  String titleFieldName();
 
-    String bcModelType();
+  String bcModelType();
 
-    String bcLModelType();
+  String bcLModelType();
 
-    String bcStoreType();
+  String bcStoreType();
 
-    String bcLStoreType();
+  String bcLStoreType();
 
-    String bcFieldType();
+  String bcFieldType();
 
-    String bcLFieldType();
+  String bcLFieldType();
 
-    String bcLSetType();
+  String bcLSetType();
 
-    String bcLStoredType();
+  String bcLStoredType();
 
-    int bcFieldSize();
+  int bcFieldSize();
 
-    BCType bcType();
+  BCType bcType();
 
-    boolean virtualGetSet();
+  boolean virtualGetSet();
 
-    boolean copySimpleValue();
+  boolean copySimpleValue();
 
-    boolean isCallsNotEquals();
+  boolean isCallsNotEquals();
 
-    boolean isCallsHashCode();
+  boolean isCallsHashCode();
 
-    public void clear();
+  public void clear();
 
-    boolean isBufferStore();
+  boolean isBufferStore();
 
-    boolean isCompacting();
+  boolean isCompacting();
 
-    short equalsPreference();
+  short equalsPreference();
+
+  int sizeOf(int elements);
+
+  void baseDirectory(String baseDirectory) throws IOException;
+
+  void flush() throws IOException;
 }

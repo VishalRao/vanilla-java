@@ -16,97 +16,106 @@ package vanilla.java.collections.model;
  *    limitations under the License.
  */
 
+import vanilla.java.collections.impl.MappedFileChannel;
+
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.DoubleBuffer;
 
 public class DoubleFieldModel extends AbstractFieldModel<Double> {
-    public DoubleFieldModel(String fieldName, int fieldNumber) {
-        super(fieldName, fieldNumber);
-    }
+  public DoubleFieldModel(String fieldName, int fieldNumber) {
+    super(fieldName, fieldNumber);
+  }
 
-    @Override
-    public Object arrayOfField(int size) {
-        return newArrayOfField(size);
-    }
+  @Override
+  public Object arrayOfField(int size) {
+    return newArrayOfField(size, null);
+  }
 
-    @Override
-    public Class storeType() {
-        return DoubleBuffer.class;
-    }
+  @Override
+  public int sizeOf(int elements) {
+    return sizeOf0(elements);
+  }
 
-    public static DoubleBuffer newArrayOfField(int size) {
-        return ByteBuffer.allocateDirect(size * 8).order(ByteOrder.nativeOrder()).asDoubleBuffer();
-    }
+  private static int sizeOf0(int elements) {
+    return elements * 8;
+  }
 
-    @Override
-    public Double getAllocation(Object[] arrays, int index) {
-        DoubleBuffer array = (DoubleBuffer) arrays[fieldNumber];
-        return get(array, index);
-    }
+  public static DoubleBuffer newArrayOfField(int size, MappedFileChannel mfc) {
+    return acquireByteBuffer(mfc, sizeOf0(size)).asDoubleBuffer();
+  }
 
-    public static double get(DoubleBuffer array, int index) {
-        return array.get(index);
-    }
+  @Override
+  public Class storeType() {
+    return DoubleBuffer.class;
+  }
 
-    @Override
-    public void setAllocation(Object[] arrays, int index, Double value) {
-        DoubleBuffer array = (DoubleBuffer) arrays[fieldNumber];
-        set(array, index, value);
-    }
+  @Override
+  public Double getAllocation(Object[] arrays, int index) {
+    DoubleBuffer array = (DoubleBuffer) arrays[fieldNumber];
+    return get(array, index);
+  }
 
-    public static void set(DoubleBuffer array, int index, double value) {
-        array.put(index, value);
-    }
+  public static double get(DoubleBuffer array, int index) {
+    return array.get(index);
+  }
 
-    @Override
-    public Class<Double> type() {
-        return (Class) double.class;
-    }
+  @Override
+  public void setAllocation(Object[] arrays, int index, Double value) {
+    DoubleBuffer array = (DoubleBuffer) arrays[fieldNumber];
+    set(array, index, value);
+  }
 
-    @Override
-    public int bcFieldSize() {
-        return 2;
-    }
+  public static void set(DoubleBuffer array, int index, double value) {
+    array.put(index, value);
+  }
 
-    @Override
-    public String bcLFieldType() {
-        return "D";
-    }
+  @Override
+  public Class<Double> type() {
+    return (Class) double.class;
+  }
 
-    @Override
-    public BCType bcType() {
-        return BCType.Double;
-    }
+  @Override
+  public int bcFieldSize() {
+    return 2;
+  }
 
-    @Override
-    public boolean isCallsNotEquals() {
-        return true;
-    }
+  @Override
+  public String bcLFieldType() {
+    return "D";
+  }
 
-    @UsedFromByteCode
-    public static boolean notEquals(double d1, double d2) {
-        return Double.doubleToLongBits(d1) != Double.doubleToLongBits(d2);
-    }
+  @Override
+  public BCType bcType() {
+    return BCType.Double;
+  }
 
-    @UsedFromByteCode
-    public static int hashCode(double d) {
-        return LongFieldModel.hashCode(Double.doubleToLongBits(d));
-    }
+  @Override
+  public boolean isCallsNotEquals() {
+    return true;
+  }
 
-    @Override
-    public short equalsPreference() {
-        return 29; // 63, lower due to the increase memory requirement.
-    }
+  @UsedFromByteCode
+  public static boolean notEquals(double d1, double d2) {
+    return Double.doubleToLongBits(d1) != Double.doubleToLongBits(d2);
+  }
 
-    public static void write(ObjectOutput out, double d) throws IOException {
-        out.writeDouble(d);
-    }
+  @UsedFromByteCode
+  public static int hashCode(double d) {
+    return LongFieldModel.hashCode(Double.doubleToLongBits(d));
+  }
 
-    public static double read(ObjectInput in) throws IOException {
-        return in.readDouble();
-    }
+  @Override
+  public short equalsPreference() {
+    return 29; // 63, lower due to the increase memory requirement.
+  }
+
+  public static void write(ObjectOutput out, double d) throws IOException {
+    out.writeDouble(d);
+  }
+
+  public static double read(ObjectInput in) throws IOException {
+    return in.readDouble();
+  }
 }
