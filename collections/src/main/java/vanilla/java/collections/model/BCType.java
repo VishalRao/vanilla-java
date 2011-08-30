@@ -17,5 +17,5 @@ package vanilla.java.collections.model;
  */
 
 public enum BCType {
-    Int, Long, Double, Float, Reference
+  Int, Long, Double, Float, Reference
 }

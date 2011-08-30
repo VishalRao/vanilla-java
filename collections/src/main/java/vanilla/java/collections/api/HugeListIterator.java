@@ -19,5 +19,5 @@ package vanilla.java.collections.api;
 import java.util.ListIterator;
 
 public interface HugeListIterator<T> extends HugeIterator<T>, ListIterator<T> {
-    void index(int index);
+  void index(int index);
 }

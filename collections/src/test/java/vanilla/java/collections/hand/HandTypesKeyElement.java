@@ -59,9 +59,9 @@ public class HandTypesKeyElement extends AbstractHugeElement<HandTypesKey, HandT
   @Override
   public String toString() {
     return "HandTypesElement{" +
-        "int=" + getInt() +
-        ", boolean=" + getBoolean() +
-        '}';
+               "int=" + getInt() +
+               ", boolean=" + getBoolean() +
+               '}';
   }
 
   @Override
