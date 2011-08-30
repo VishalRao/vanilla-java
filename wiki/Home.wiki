@@ -14,3 +14,4 @@ A low GC text/binary parsing, publishing and logging library.
 
 To follow.
 
+{{{<script type="text/javascript" src="http://www.ohloh.net/p/585853/widgets/project_cocomo.js"></script>}}
