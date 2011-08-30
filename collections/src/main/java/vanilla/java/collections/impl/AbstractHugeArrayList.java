@@ -27,11 +27,9 @@ import java.util.*;
 public abstract class AbstractHugeArrayList<T, TA extends HugeAllocation, TE extends AbstractHugeElement<T, TA>> extends AbstractHugeContainer<T, TA> implements HugeArrayList<T> {
   protected final List<TE> elements = new ArrayList<TE>();
   protected final List<T> impls = new ArrayList<T>();
-  protected long longSize;
 
   public AbstractHugeArrayList(HugeArrayBuilder hab) {
     super(hab);
-
   }
 
   @Override

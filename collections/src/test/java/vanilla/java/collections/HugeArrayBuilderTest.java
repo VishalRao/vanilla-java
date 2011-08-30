@@ -404,7 +404,7 @@ public class HugeArrayBuilderTest {
       System.out.println("Updating");
       long startWrite = System.nanoTime();
       setSize.run();
-//            populate(list);
+      populate(list);
       int i;
       long timeWrite = System.nanoTime() - startWrite;
       System.out.printf("Took %,d ns per object write%n", timeWrite / list.size());

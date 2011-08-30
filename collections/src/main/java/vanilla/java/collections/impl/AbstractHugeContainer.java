@@ -21,7 +21,6 @@ import vanilla.java.collections.api.HugeAllocation;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,14 +58,6 @@ public abstract class AbstractHugeContainer<T, TA extends HugeAllocation> {
         RandomAccessFile raf = null;
         try {
           raf = new RandomAccessFile(name, "rw");
-          ByteBuffer bb = null;
-          while (file.length() < fileSize) {
-            if (bb == null)
-              bb = ByteBuffer.allocateDirect(32 * 1024);
-            else
-              bb.clear();
-            raf.getChannel().write(bb);
-          }
           mfChannels.add(mfc = new MappedFileChannel(raf));
         } catch (IOException e) {
           try {

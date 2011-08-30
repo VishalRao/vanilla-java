@@ -26,6 +26,9 @@ import static vanilla.java.collections.HugeArrayBuilderTest.populate;
 import static vanilla.java.collections.HugeArrayBuilderTest.validate;
 
 public class MemoryMappedTest {
+
+  public static final String TEMPORARY_SPACE = System.getProperty("tmp.io.dir", "tmp");
+
   interface MutableBooleans {
     public void setOne(boolean b);
 
@@ -50,7 +53,7 @@ public class MemoryMappedTest {
     final int length = 1024 * 1024;
     HugeArrayBuilder<MutableBooleans> hab = new HugeArrayBuilder<MutableBooleans>() {
       {
-        baseDirectory = "/d/tmp";
+        baseDirectory = TEMPORARY_SPACE;
         capacity = length;
         allocationSize = 256 * 1024;
       }
@@ -69,7 +72,7 @@ public class MemoryMappedTest {
 
     HugeArrayBuilder<MutableBooleans> hab2 = new HugeArrayBuilder<MutableBooleans>() {
       {
-        baseDirectory = "/d/tmp";
+        baseDirectory = TEMPORARY_SPACE;
         capacity = length;
         allocationSize = 256 * 1024;
       }
@@ -111,7 +114,7 @@ public class MemoryMappedTest {
     final int length = 1024 * 1024;
     HugeArrayBuilder<MutableBytes> hab = new HugeArrayBuilder<MutableBytes>() {
       {
-        baseDirectory = "/d/tmp";
+        baseDirectory = TEMPORARY_SPACE;
         capacity = length;
         allocationSize = 256 * 1024;
       }
@@ -130,7 +133,7 @@ public class MemoryMappedTest {
 
     HugeArrayBuilder<MutableBytes> hab2 = new HugeArrayBuilder<MutableBytes>() {
       {
-        baseDirectory = "/d/tmp";
+        baseDirectory = TEMPORARY_SPACE;
         capacity = length;
         allocationSize = 256 * 1024;
       }
@@ -163,7 +166,7 @@ public class MemoryMappedTest {
     final int length = 1024 * 1024;
     HugeArrayBuilder<MutableInts> hab = new HugeArrayBuilder<MutableInts>() {
       {
-        baseDirectory = "/d/tmp";
+        baseDirectory = TEMPORARY_SPACE;
         capacity = length;
         allocationSize = 256 * 1024;
       }
@@ -179,7 +182,7 @@ public class MemoryMappedTest {
 
     HugeArrayBuilder<MutableInts> hab2 = new HugeArrayBuilder<MutableInts>() {
       {
-        baseDirectory = "/d/tmp";
+        baseDirectory = TEMPORARY_SPACE;
         capacity = length;
         allocationSize = 256 * 1024;
       }
@@ -196,10 +199,11 @@ public class MemoryMappedTest {
 
   @Test
   public void testMemoryMapped2() throws IOException {
-    final int length = 1024 * 1024;
+    long start = System.nanoTime();
+    final int length = 100 * 1000 * 1000;
     HugeArrayBuilder<MutableTypes> hab = new HugeArrayBuilder<MutableTypes>() {
       {
-        baseDirectory = "/d/tmp";
+        baseDirectory = TEMPORARY_SPACE;
         capacity = length;
         allocationSize = 256 * 1024;
       }
@@ -208,10 +212,11 @@ public class MemoryMappedTest {
     list.setSize(length);
     populate(list);
     list.close();
+    long mid = System.nanoTime();
 
     HugeArrayBuilder<MutableTypes> hab2 = new HugeArrayBuilder<MutableTypes>() {
       {
-        baseDirectory = "/d/tmp";
+        baseDirectory = TEMPORARY_SPACE;
         capacity = length;
         allocationSize = 256 * 1024;
       }
@@ -220,5 +225,7 @@ public class MemoryMappedTest {
     list2.setSize(length);
     validate(list2);
     list2.close();
+    long end = System.nanoTime();
+    System.out.printf("Took average of %,d ns to write and %,d to read each element%n", (mid - start) / length, (end - mid) / length);
   }
 }
