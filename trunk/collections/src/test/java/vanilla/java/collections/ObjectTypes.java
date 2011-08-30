@@ -19,31 +19,31 @@ package vanilla.java.collections;
 import java.io.Serializable;
 
 public interface ObjectTypes {
-    public void setA(A a);
+  public void setA(A a);
 
-    public A getA();
+  public A getA();
 
-    public void setB(B b);
+  public void setB(B b);
 
-    public B getB();
+  public B getB();
 
-    public void setC(C c);
+  public void setC(C c);
 
-    public C getC();
+  public C getC();
 
-    public void setD(D d);
+  public void setD(D d);
 
-    public D getD();
+  public D getD();
 
-    public class A implements Serializable {
-    }
+  public class A implements Serializable {
+  }
 
-    public class B {
-    }
+  public class B {
+  }
 
-    public class C {
-    }
+  public class C {
+  }
 
-    public class D {
-    }
+  public class D {
+  }
 }

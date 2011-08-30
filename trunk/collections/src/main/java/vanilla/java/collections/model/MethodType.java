@@ -17,5 +17,5 @@ package vanilla.java.collections.model;
  */
 
 public enum MethodType {
-    GETTER, SETTER, OTHER
+  GETTER, SETTER, OTHER
 }

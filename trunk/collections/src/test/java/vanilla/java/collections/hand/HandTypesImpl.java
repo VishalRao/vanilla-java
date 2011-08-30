@@ -239,19 +239,19 @@ public class HandTypesImpl implements HandTypes, HugeElement<HandTypes>, Externa
   @Override
   public String toString() {
     return "HandTypesElement{" +
-        "boolean=" + getBoolean() +
-        ", boolean2=" + getBoolean2() +
-        ", byte=" + getByte() +
-        ", byte2=" + getByte2() +
-        ", char=" + getChar() +
-        ", short=" + getShort() +
-        ", int=" + getInt() +
-        ", float=" + getFloat() +
-        ", long=" + getLong() +
-        ", double=" + getDouble() +
-        ", elementType=" + getElementType() +
-        ", string='" + getString() + '\'' +
-        '}';
+               "boolean=" + getBoolean() +
+               ", boolean2=" + getBoolean2() +
+               ", byte=" + getByte() +
+               ", byte2=" + getByte2() +
+               ", char=" + getChar() +
+               ", short=" + getShort() +
+               ", int=" + getInt() +
+               ", float=" + getFloat() +
+               ", long=" + getLong() +
+               ", double=" + getDouble() +
+               ", elementType=" + getElementType() +
+               ", string='" + getString() + '\'' +
+               '}';
   }
 
   @Override
@@ -285,18 +285,18 @@ public class HandTypesImpl implements HandTypes, HugeElement<HandTypes>, Externa
   @Override
   public long longHashCode() {
     return ((((((((((((
-        getBoolean() ? 1 : 0) * 31L +
-        Boolean2FieldModel.hashCode(getBoolean2())) * 31L +
-        getByte()) * 31L +
-        Byte2FieldModel.hashCode(getByte2())) * 31L +
-        getChar()) * 31L +
-        getShort()) * 31L +
-        getInt()) * 31L +
-        FloatFieldModel.hashCode(getFloat())) * 31L +
-        LongFieldModel.hashCode(getLong())) * 31L +
-        DoubleFieldModel.hashCode(getDouble())) * 31L +
-        Enum8FieldModel.hashCode(getElementType())) * 31L +
-        Enumerated16FieldModel.hashCode(getString()) * 31L +
-        ObjectFieldModel.hashCode(getA()));
+                          getBoolean() ? 1 : 0) * 31L +
+                          Boolean2FieldModel.hashCode(getBoolean2())) * 31L +
+                         getByte()) * 31L +
+                        Byte2FieldModel.hashCode(getByte2())) * 31L +
+                       getChar()) * 31L +
+                      getShort()) * 31L +
+                     getInt()) * 31L +
+                    FloatFieldModel.hashCode(getFloat())) * 31L +
+                   LongFieldModel.hashCode(getLong())) * 31L +
+                  DoubleFieldModel.hashCode(getDouble())) * 31L +
+                 Enum8FieldModel.hashCode(getElementType())) * 31L +
+                Enumerated16FieldModel.hashCode(getString()) * 31L +
+                ObjectFieldModel.hashCode(getA()));
   }
 }
