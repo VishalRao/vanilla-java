@@ -54,6 +54,7 @@ public class HandTypesAllocation implements HugeAllocation {
     m_double = DoubleFieldModel.newArrayOfField(allocationSize, mfc);
     m_elementType = Enum8FieldModel.newArrayOfField(allocationSize, mfc);
     m_string = Enumerated16FieldModel.newArrayOfField(allocationSize, mfc);
+    m_a = new ObjectTypes.A[allocationSize];
   }
 
   public void clear() {
