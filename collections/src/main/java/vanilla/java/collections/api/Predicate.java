@@ -16,7 +16,6 @@ package vanilla.java.collections.api;
  *    limitations under the License.
  */
 
-import java.util.Map;
-
-public interface HugeMap<K, V> extends Map<K, V>, HugeContainer {
+public interface Predicate<T> {
+  public boolean test(T t);
 }

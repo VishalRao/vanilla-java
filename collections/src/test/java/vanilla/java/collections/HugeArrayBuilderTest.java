@@ -452,7 +452,7 @@ public class HugeArrayBuilderTest {
     int i;
     i = 0;
     for (MutableTypes mb : list) {
-      validate(mb, (int) (i + length));
+      validate(mb, i);
       i++;
       if (i % 10000000 == 0) System.out.println("... checked " + i / 1000 / 1000 + " million.");
     }
@@ -590,7 +590,7 @@ public class HugeArrayBuilderTest {
   public static void populate(List<MutableTypes> list) {
     int i = 0;
     for (MutableTypes mb : list) {
-      setFields(mb, (int) (i + length));
+      setFields(mb, i);
       i++;
       if (i % 10000000 == 0) System.out.println("... updated " + i / 1000 / 1000 + " million.");
     }

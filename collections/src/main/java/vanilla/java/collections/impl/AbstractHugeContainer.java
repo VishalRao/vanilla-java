@@ -53,12 +53,10 @@ public abstract class AbstractHugeContainer<T, TA extends HugeAllocation> {
       MappedFileChannel mfc = null;
       if (baseDirectory != null) {
         final String name = baseDirectory + "/alloc-" + allocations.size();
-        File file = new File(name);
-        final int fileSize = allocationByteSize;
         RandomAccessFile raf = null;
         try {
           raf = new RandomAccessFile(name, "rw");
-          mfChannels.add(mfc = new MappedFileChannel(raf));
+          mfChannels.add(mfc = new MappedFileChannel(raf, allocationByteSize));
         } catch (IOException e) {
           try {
             raf.close();
