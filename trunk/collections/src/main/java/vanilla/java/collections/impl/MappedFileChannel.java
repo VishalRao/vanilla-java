@@ -16,6 +16,8 @@ package vanilla.java.collections.impl;
  *    limitations under the License.
  */
 
+import sun.nio.ch.DirectBuffer;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -25,9 +27,9 @@ public class MappedFileChannel {
   private final RandomAccessFile raf;
   private final ByteBuffer buffer;
 
-  public MappedFileChannel(RandomAccessFile raf) throws IOException {
+  public MappedFileChannel(RandomAccessFile raf, int length) throws IOException {
     this.raf = raf;
-    buffer = raf.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, raf.length());
+    buffer = raf.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, length);
   }
 
   public void flush() throws IOException {
@@ -35,6 +37,7 @@ public class MappedFileChannel {
   }
 
   public void close() throws IOException {
+    ((DirectBuffer) buffer).cleaner().clean();
     raf.close();
   }
 
