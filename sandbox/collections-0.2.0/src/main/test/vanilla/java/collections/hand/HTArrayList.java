@@ -9,16 +9,8 @@ public class HTArrayList extends AbstractHugeArrayList<HT> {
     super(partitionSize, elementType, allocator);
   }
 
-  @Override
-  protected void growCapacity(long capacity) {
-    long partitions = (capacity + partitionSize - 1) / partitionSize;
-    while (this.partitions.size() < partitions)
-      this.partitions.add(new HTPartition(this, allocator));
-  }
-
-  @Override
-  protected HugeListIterator<HT> createIterator() {
-    throw new Error("Not implemented");
+  protected HTPartition createPartition() {
+    return new HTPartition(this, allocator);
   }
 
   @Override
@@ -26,7 +18,17 @@ public class HTArrayList extends AbstractHugeArrayList<HT> {
     return new HTPointer(this);
   }
 
+  @Override
+  protected HT createImpl() {
+    return new HTImpl();
+  }
+
+  @Override
+  protected HugeListIterator<HT> createIterator() {
+    throw new Error("Not implemented");
+  }
+
   public HTPartition partitionFor(long index) {
-    return (HTPartition) partitions.get((int) (index / partitionSize));
+    return (HTPartition) super.partitionFor(index);
   }
 }

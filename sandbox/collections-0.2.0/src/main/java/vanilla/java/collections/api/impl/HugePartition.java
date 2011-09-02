@@ -8,4 +8,6 @@ public interface HugePartition {
   void clear();
 
   void destroy();
+
+  void compact();
 }

@@ -2,22 +2,21 @@ package vanilla.java.collections.hand;
 
 import vanilla.java.collections.api.impl.ByteBufferAllocator;
 import vanilla.java.collections.api.impl.Cleaner;
-import vanilla.java.collections.api.impl.FieldModel;
 import vanilla.java.collections.api.impl.HugePartition;
+import vanilla.java.collections.impl.Enumerated16FieldModel;
 
 import java.nio.CharBuffer;
 import java.nio.IntBuffer;
 import java.util.concurrent.locks.ReadWriteLock;
 
 public class HTPartition implements HugePartition {
-  private final FieldModel<String> textModel;
+  private final Enumerated16FieldModel<String> textModel = new Enumerated16FieldModel<String>();
   private final HTArrayList list;
   private final Cleaner reserved;
   private final IntBuffer intBuffer;
   private final CharBuffer textBuffer;
 
   public HTPartition(HTArrayList list, ByteBufferAllocator allocator) {
-    textModel = null;
     this.list = list;
     final int partitionSize = list.partitionSize();
     reserved = allocator.reserve(partitionSize, 6);
@@ -52,10 +51,14 @@ public class HTPartition implements HugePartition {
   }
 
   public void setText(int offset, String id) {
-    throw new Error("NI");
+    textModel.set(textBuffer, offset, id);
   }
 
   public String getText(int offset) {
-    throw new Error("NI");
+    return textModel.get(textBuffer, offset);
+  }
+
+  public void compact() {
+
   }
 }

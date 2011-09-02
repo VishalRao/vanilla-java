@@ -2,6 +2,7 @@ package vanilla.java.collections.impl;
 
 import vanilla.java.collections.api.*;
 import vanilla.java.collections.api.impl.ByteBufferAllocator;
+import vanilla.java.collections.api.impl.Copyable;
 import vanilla.java.collections.api.impl.HugeElement;
 import vanilla.java.collections.api.impl.HugePartition;
 import vanilla.java.collections.util.NullReadWriteLock;
@@ -18,6 +19,7 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeContainer imp
   private final Class<E> elementType;
   private final List<E> pointerPool = new ArrayList<E>();
   private final List<HugeListIterator<E>> iteratorPool = new ArrayList<HugeListIterator<E>>();
+  private final List<E> implPool = new ArrayList<E>();
 
   protected AbstractHugeArrayList(int partitionSize, Class<E> elementType, ByteBufferAllocator allocator) {
     this.partitionSize = partitionSize;
@@ -66,12 +68,21 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeContainer imp
 
   @Override
   public void close() throws IOException {
-    throw new Error("Not implemented");
+  }
+
+  @Override
+  public void clear() {
+    super.clear();
+    for (HugePartition partition : partitions) {
+      partition.clear();
+    }
   }
 
   @Override
   public void compact() {
-    throw new Error("Not implemented");
+    for (HugePartition partition : partitions) {
+      partition.compact();
+    }
   }
 
   @Override
@@ -116,7 +127,6 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeContainer imp
 
   @Override
   public void flush() throws IOException {
-    throw new Error("Not implemented");
   }
 
   @Override
@@ -163,22 +173,26 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeContainer imp
 
   @Override
   public HugeIterator<E> iterator() {
-    throw new Error("Not implemented");
+    return listIterator();
   }
 
   @Override
   public int lastIndexOf(Object o) {
-    throw new Error("Not implemented");
+    long n = longLastIndexOf(o);
+    if (n >= Integer.MAX_VALUE)
+      throw new IllegalStateException("The last location of " + o + " was at " + n + " use longLastIndexOf()");
+    return (int) n;
   }
 
   @Override
   public HugeListIterator<E> listIterator() {
-    throw new Error("Not implemented");
+    return listIterator(0L);
   }
 
   @Override
   public HugeListIterator<E> listIterator(int index) {
-    throw new Error("Not implemented");
+    final int size = iteratorPool.size();
+    return size > 0 ? iteratorPool.remove(iteratorPool.size() - 1) : new VanillaHugeListIterator<E>(this, get(0));
   }
 
   @Override
@@ -218,7 +232,7 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeContainer imp
       iter = listIterator(0);
       while (iter.hasNext()) {
         if (iter.next().equals(o))
-          return iter.longIndex();
+          return iter.index();
       }
       return -1;
     } finally {
@@ -233,7 +247,7 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeContainer imp
       iter = listIterator(longSize() - 1);
       while (iter.hasPrevious()) {
         if (iter.previous().equals(o))
-          return iter.longIndex();
+          return iter.index();
       }
       return -1;
     } finally {
@@ -251,12 +265,13 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeContainer imp
 
   @Override
   public E remove(int index) {
-    throw new Error("Not implemented");
+    return remove((long) index);
   }
 
   @Override
   public E remove(long index) {
-    throw new Error("Not implemented");
+    if (index + 1 != size()) throw new IllegalStateException("Can only remove the last entry");
+    return ((Copyable<E>) get(--size)).copyOf();
   }
 
   @Override
@@ -276,13 +291,23 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeContainer imp
 
   @Override
   public E set(int index, E element) {
-    throw new Error("Not implemented");
+    return set((long) index, element);
   }
 
   @Override
   public E set(long index, E element) {
-    throw new Error("Not implemented");
+    E e = get(index);
+    E i = ((Copyable<E>) e).copyOf();
+    ((Copyable<E>) e).copyFrom(element);
+    return i;
   }
+
+  public E acquireImpl() {
+    final int size = implPool.size();
+    return size > 0 ? implPool.remove(size - 1) : createImpl();
+  }
+
+  protected abstract E createImpl();
 
   @Override
   public List<E> subList(int fromIndex, int toIndex) {
@@ -301,25 +326,82 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeContainer imp
 
   @Override
   public <T> T[] toArray(T[] a) {
-    throw new Error("Not implemented");
+    if (a.length != size())
+      a = (T[]) Array.newInstance(a.getClass().getComponentType(), size());
+
+    HugeIterator<E> iter = null;
+    try {
+      iter = iterator();
+      while (iter.hasNext() && iter.index() < a.length) {
+        a[((int) iter.index())] = ((Copyable<T>) iter.next()).copyOf();
+      }
+      return a;
+    } finally {
+      recycle(iter);
+    }
   }
 
   @Override
   public boolean update(long index, Updater<E> updater) {
-    throw new Error("Not implemented");
+    E e = get(index);
+    try {
+      return updater.update(e);
+    } finally {
+      recycle(e);
+    }
   }
 
   @Override
   public long update(Predicate<E> predicate, Updater<E> updater) {
-    throw new Error("Not implemented");
+    HugeIterator<E> iter = null;
+    long count = 0;
+    try {
+      iter = iterator();
+      while (iter.hasNext()) {
+        E e = iter.next();
+        if (predicate.test(e) && updater.update(e))
+          count++;
+      }
+      return count;
+    } finally {
+      recycle(iter);
+    }
   }
 
   @Override
   public long update(Updater<E> updater) {
-    throw new Error("Not implemented");
+    HugeIterator<E> iter = null;
+    long count = 0;
+    try {
+      iter = iterator();
+      while (iter.hasNext()) {
+        E e = iter.next();
+        if (updater.update(e))
+          count++;
+      }
+      return count;
+    } finally {
+      recycle(iter);
+    }
   }
 
   public int partitionSize() {
     return partitionSize;
   }
+
+  @Override
+  protected void growCapacity(long capacity) {
+    long partitions = (capacity + partitionSize - 1) / partitionSize + 1;
+    while (this.partitions.size() < partitions)
+      this.partitions.add(createPartition());
+  }
+
+  public HugePartition partitionFor(long index) {
+    final int n = (int) (index / partitionSize);
+    if (n >= partitions.size())
+      growCapacity(index);
+    return partitions.get(n);
+  }
+
+  protected abstract HugePartition createPartition();
 }

@@ -7,12 +7,6 @@ import java.nio.*;
 public interface ByteBufferAllocator extends Flushable, Closeable {
   Cleaner reserve(int partitionSize, int elementSize);
 
-  ByteBuffer startResize(int newSize);
-
-  void finishResize();
-
-  void free(Object buffer);
-
   ByteBuffer acquireBooleanBuffer();
 
   ByteBuffer acquireByteBuffer();

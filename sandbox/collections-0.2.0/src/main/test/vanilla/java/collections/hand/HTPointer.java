@@ -1,9 +1,10 @@
 package vanilla.java.collections.hand;
 
+import vanilla.java.collections.api.impl.Copyable;
 import vanilla.java.collections.api.impl.HugeElement;
 import vanilla.java.collections.util.HugeCollections;
 
-class HTPointer implements HT, HugeElement {
+class HTPointer implements HT, HugeElement, Copyable<HT> {
   private long index = Long.MIN_VALUE;
   private final HTArrayList list;
   private HTPartition partition;
@@ -54,5 +55,18 @@ class HTPointer implements HT, HugeElement {
 
   @Override
   public void recycle() {
+  }
+
+  @Override
+  public void copyFrom(HT ht) {
+    setInt(ht.getInt());
+    setText(ht.getText());
+  }
+
+  @Override
+  public HT copyOf() {
+    HT ht = list.acquireImpl();
+    ((Copyable<HT>) ht).copyFrom(this);
+    return ht;
   }
 }
