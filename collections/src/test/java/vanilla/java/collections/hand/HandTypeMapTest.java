@@ -20,6 +20,7 @@ import org.junit.Test;
 import vanilla.java.collections.HugeMapBuilder;
 
 import java.util.Arrays;
+import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -44,6 +45,10 @@ public class HandTypeMapTest {
       get(map, key, i, false);
       get(map, key, i, true);
     }
+    for (Map.Entry<HandTypesKey, HandTypes> entry : map.entrySet()) {
+      assertEquals(entry.getKey().getInt(), entry.getValue().getInt());
+      assertEquals(entry.getKey().getBoolean(), entry.getValue().getBoolean());
+    }
     long time = System.nanoTime() - start;
     System.out.printf("Took an average of %,d ns to write/read", time / size);
     System.out.println(Arrays.toString(map.sizes()));
@@ -56,14 +61,27 @@ public class HandTypeMapTest {
     key.setInt(k);
     value.setBoolean(flag);
     value.setInt(k);
+    int size = map.size();
     map.put(key, value);
+    if (size + 1 != map.size()) {
+      map.put(key, value);
+      assertEquals(size + 1, map.size());
+    }
+    HandTypes ht = map.get(key);
+    if (ht == null)
+      ht = map.get(key);
+    assertEquals(i, ht.getInt());
+    if (flag != ht.getBoolean())
+      assertEquals(flag, ht.getBoolean());
   }
 
   private static void get(HandTypesMap map, HandTypesKeyImpl key, int i, boolean flag) {
+    final int k = i;
     key.setBoolean(flag);
     key.setInt(i);
     HandTypes ht = map.get(key);
     assertEquals(i, ht.getInt());
-    assertEquals(flag, ht.getBoolean());
+    if (flag != ht.getBoolean())
+      assertEquals(flag, ht.getBoolean());
   }
 }
