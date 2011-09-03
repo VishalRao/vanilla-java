@@ -33,6 +33,9 @@ public abstract class AbstractHugeMap<K, KE extends HugeElement<K>, V, VE extend
   protected final List<K> keyImpls = new ArrayList<K>();
   protected final List<V> valueImpls = new ArrayList<V>();
   protected final IntBuffer[] keysBuffers = new IntBuffer[256];
+  private final Set<K> keySet = new AHMSet();
+  private final Collection<V> values = new AHMValues();
+  private final Set<Entry<K, V>> entrySet = new AHMEntrySet();
 
   protected AbstractHugeMap(HugeMapBuilder<K, V> hmb) {
     super(hmb);
@@ -113,15 +116,18 @@ public abstract class AbstractHugeMap<K, KE extends HugeElement<K>, V, VE extend
         final int i1 = keysBuffer.get((hiHash + i) % len);
         if (i1 == 0) {
           if (free) {
-            int used = keysBuffer.position();
             final int loc = size();
             ensureCapacity(loc + 1);
             keysBuffer.put((hiHash + i) % len, loc + 1);
 
-            if (used > keysBuffer.limit() / 2)
+            if (keysBuffer.position() >= keysBuffer.limit() * 3 / 4)
+              growBuffer(loHash);
+            else if (i > 5 && keysBuffer.position() >= keysBuffer.limit() * 2 / 3)
+              growBuffer(loHash);
+            else if (i > 15 && keysBuffer.position() >= keysBuffer.limit() / 2)
               growBuffer(loHash);
             else
-              keysBuffer.position(used + 1);
+              keysBuffer.position(keysBuffer.position() + 1);
             longSize++;
             return loc;
           }
@@ -251,16 +257,127 @@ public abstract class AbstractHugeMap<K, KE extends HugeElement<K>, V, VE extend
 
   @Override
   public Set<K> keySet() {
-    return null;
+    return keySet;
   }
 
   @Override
   public Collection<V> values() {
-    return null;
+    return values;
   }
 
   @Override
   public Set<Entry<K, V>> entrySet() {
-    return null;
+    return entrySet;
+  }
+
+  private class AHMSet extends AbstractSet<K> {
+    @Override
+    public Iterator<K> iterator() {
+      return new Iterator<K>() {
+        final KE ke = acquireKeyElement(-1);
+
+        @Override
+        public boolean hasNext() {
+          return ke.index() < longSize - 1;
+        }
+
+        @Override
+        public K next() {
+          ke.index(ke.index() + 1);
+          return (K) ke;
+        }
+
+        @Override
+        public void remove() {
+          AbstractHugeMap.this.remove(ke);
+        }
+      };
+    }
+
+    @Override
+    public int size() {
+      return AbstractHugeMap.this.size();
+    }
+  }
+
+  private class AHMValues extends AbstractCollection<V> {
+    @Override
+    public Iterator<V> iterator() {
+      return new Iterator<V>() {
+        final VE ve = acquireValueElement(-1);
+
+        @Override
+        public boolean hasNext() {
+          return ve.index() < longSize - 1;
+        }
+
+        @Override
+        public V next() {
+          ve.index(ve.index() + 1);
+          return (V) ve;
+        }
+
+        @Override
+        public void remove() {
+          AbstractHugeMap.this.remove(acquireKeyElement(ve.index()));
+        }
+      };
+    }
+
+    @Override
+    public int size() {
+      return AbstractHugeMap.this.size();
+    }
+  }
+
+  private class AHMEntrySet extends AbstractSet<Entry<K, V>> {
+    @Override
+    public Iterator<Entry<K, V>> iterator() {
+      return new EntryIterator();
+    }
+
+    @Override
+    public int size() {
+      return AbstractHugeMap.this.size();
+    }
+
+    class EntryIterator implements Iterator<Entry<K, V>>, Entry<K, V> {
+      final KE ke = acquireKeyElement(-1);
+      final VE ve = acquireValueElement(-1);
+
+      @Override
+      public boolean hasNext() {
+        return ve.index() < longSize - 1;
+      }
+
+      @Override
+      public Entry<K, V> next() {
+        final long idx = ke.index() + 1;
+        ke.index(idx);
+        ve.index(idx);
+        return this;
+      }
+
+      @Override
+      public void remove() {
+        AbstractHugeMap.this.remove(ke);
+      }
+
+      @Override
+      public K getKey() {
+        return (K) ke;
+      }
+
+      @Override
+      public V getValue() {
+        return (V) ve;
+      }
+
+      @Override
+      public V setValue(V value) {
+        ve.copyOf(value);
+        return null;
+      }
+    }
   }
 }

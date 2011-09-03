@@ -86,17 +86,17 @@ public class HandTypesKeyImpl implements HandTypesKey, HugeElement<HandTypes>, E
   @Override
   public String toString() {
     return "HandTypesElement{" +
-               "int=" + getInt() +
-               ", boolean=" + getBoolean() +
-               '}';
+        "int=" + getInt() +
+        ", boolean=" + getBoolean() +
+        '}';
   }
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (o == null || !(o instanceof HandTypesKey)) return false;
 
-    HandTypesKeyElement that = (HandTypesKeyElement) o;
+    HandTypesKey that = (HandTypesKey) o;
 
     if (getInt() != that.getInt()) return false;
     if (getBoolean() != that.getBoolean()) return false;
