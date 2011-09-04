@@ -2,11 +2,13 @@ package vanilla.java.collections.impl;
 
 import vanilla.java.collections.api.HugeList;
 import vanilla.java.collections.api.HugeListIterator;
+import vanilla.java.collections.api.Recycleable;
 import vanilla.java.collections.api.impl.ByteBufferAllocator;
 import vanilla.java.collections.api.impl.Copyable;
 import vanilla.java.collections.api.impl.HugeElement;
 import vanilla.java.collections.api.impl.HugePartition;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.RandomAccess;
@@ -63,9 +65,19 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeCollection<E>
 
   @Override
   public E remove(long index) {
-    if (index + 1 != size)
-      throw new IllegalStateException("Can only remove the last entry");
-    return ((Copyable<E>) get(--size)).copyOf();
+    if (index + 1 != size) {
+      E from = get(index + 1);
+      E to = get(index);
+      for (long i = index; i < size - 1; i++) {
+        ((HugeElement) from).index(index + 1);
+        ((HugeElement) to).index(index);
+        ((Copyable<E>) to).copyFrom(from);
+      }
+    }
+    final Copyable<E> e = (Copyable<E>) get(--size);
+    final E e2 = e.copyOf();
+    ((Recycleable) e).recycle();
+    return e2;
   }
 
   @Override
@@ -101,8 +113,12 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeCollection<E>
   @Override
   protected void growCapacity(long capacity) {
     long partitions = (capacity + partitionSize - 1) / partitionSize + 1;
-    while (this.partitions.size() < partitions)
-      this.partitions.add(createPartition());
+    try {
+      while (this.partitions.size() < partitions)
+        this.partitions.add(createPartition(this.partitions.size()));
+    } catch (IOException e) {
+      throw new IllegalStateException("Unable to grow collection", e);
+    }
   }
 
   public HugePartition partitionFor(long index) {
@@ -112,7 +128,7 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeCollection<E>
     return partitions.get(n);
   }
 
-  protected abstract HugePartition createPartition();
+  protected abstract HugePartition createPartition(int partitionNumber) throws IOException;
 
   public void subListPoolAdd(SubList<E> es) {
     subListPool.add(es);

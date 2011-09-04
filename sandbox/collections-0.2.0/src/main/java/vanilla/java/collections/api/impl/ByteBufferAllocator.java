@@ -2,10 +2,11 @@ package vanilla.java.collections.api.impl;
 
 import java.io.Closeable;
 import java.io.Flushable;
+import java.io.IOException;
 import java.nio.*;
 
 public interface ByteBufferAllocator extends Flushable, Closeable {
-  Cleaner reserve(int partitionSize, int elementSize);
+  Cleaner reserve(int partitionSize, int elementSize, String type, int num) throws IOException;
 
   ByteBuffer acquireBooleanBuffer();
 

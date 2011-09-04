@@ -5,13 +5,15 @@ import vanilla.java.collections.api.impl.ByteBufferAllocator;
 import vanilla.java.collections.impl.AbstractHugeArrayList;
 import vanilla.java.collections.impl.VanillaHugeListIterator;
 
+import java.io.IOException;
+
 class HTArrayList extends AbstractHugeArrayList<HT> {
   public HTArrayList(int partitionSize, Class<HT> elementType, ByteBufferAllocator allocator) {
     super(partitionSize, elementType, allocator);
   }
 
-  protected HTPartition createPartition() {
-    return new HTPartition(this, allocator);
+  protected HTPartition createPartition(int partitionNumber) throws IOException {
+    return new HTPartition(this, allocator, partitionNumber);
   }
 
   @Override

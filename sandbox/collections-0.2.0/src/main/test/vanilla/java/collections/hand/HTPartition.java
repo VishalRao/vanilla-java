@@ -5,6 +5,7 @@ import vanilla.java.collections.api.impl.Cleaner;
 import vanilla.java.collections.api.impl.HugePartition;
 import vanilla.java.collections.impl.Enumerated16FieldModel;
 
+import java.io.IOException;
 import java.nio.CharBuffer;
 import java.nio.IntBuffer;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -16,10 +17,10 @@ class HTPartition implements HugePartition {
   private final IntBuffer intBuffer;
   private final CharBuffer textBuffer;
 
-  public HTPartition(HTArrayList list, ByteBufferAllocator allocator) {
+  public HTPartition(HTArrayList list, ByteBufferAllocator allocator, int num) throws IOException {
     this.list = list;
     final int partitionSize = list.partitionSize();
-    reserved = allocator.reserve(partitionSize, 6);
+    reserved = allocator.reserve(partitionSize, 6, "part", num);
     intBuffer = allocator.acquireIntBuffer();
     textBuffer = allocator.acquireCharBuffer();
     allocator.endOfReserve();

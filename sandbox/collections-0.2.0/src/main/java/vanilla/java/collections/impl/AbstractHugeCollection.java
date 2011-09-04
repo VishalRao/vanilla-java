@@ -1,6 +1,7 @@
 package vanilla.java.collections.impl;
 
 import vanilla.java.collections.api.*;
+import vanilla.java.collections.api.impl.Copyable;
 import vanilla.java.collections.util.NullReadWriteLock;
 
 import java.io.IOException;
@@ -18,7 +19,8 @@ public abstract class AbstractHugeCollection<E> extends AbstractHugeContainer im
   public boolean add(E e) {
     final long size = longSize();
     setSize(size + 1);
-    set(size, e);
+    E e2 = get(size);
+    ((Copyable<E>) e2).copyFrom(e);
     return true;
   }
 
