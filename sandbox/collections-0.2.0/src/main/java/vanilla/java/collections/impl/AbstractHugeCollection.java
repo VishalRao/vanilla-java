@@ -5,10 +5,7 @@ import vanilla.java.collections.util.NullReadWriteLock;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.RandomAccess;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 
 public abstract class AbstractHugeCollection<E> extends AbstractHugeContainer implements HugeCollection<E>, RandomAccess {
@@ -212,9 +209,18 @@ public abstract class AbstractHugeCollection<E> extends AbstractHugeContainer im
 
   @Override
   public boolean removeAll(Collection<?> c) {
+    Set set = new HashSet(c);
     boolean b = false;
-    for (Object o : c) {
-      b |= remove(o);
+    HugeIterator<E> iterator = iterator();
+    try {
+      while (iterator.hasNext()) {
+        if (set.contains(iterator.next())) {
+          iterator.remove();
+          b = true;
+        }
+      }
+    } finally {
+      iterator.recycle();
     }
     return b;
   }
@@ -235,6 +241,12 @@ public abstract class AbstractHugeCollection<E> extends AbstractHugeContainer im
       recycle(iter);
     }
   }
+
+  public List<E> subList(int fromIndex, int toIndex) {
+    return subList((long) fromIndex, (long) toIndex);
+  }
+
+  protected abstract HugeList<E> subList(long fromIndex, long toIndex);
 
   @Override
   public Object[] toArray() {

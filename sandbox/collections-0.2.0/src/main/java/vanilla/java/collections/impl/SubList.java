@@ -1,10 +1,9 @@
 package vanilla.java.collections.impl;
 
+import vanilla.java.collections.api.HugeList;
 import vanilla.java.collections.api.HugeListIterator;
 
-import java.util.List;
-
-public class SubList<E> extends AbstractHugeCollection<E> implements List<E> {
+public class SubList<E> extends AbstractHugeCollection<E> implements HugeList<E> {
   private final AbstractHugeArrayList<E> list;
   private long start;
   private long end;
@@ -44,7 +43,7 @@ public class SubList<E> extends AbstractHugeCollection<E> implements List<E> {
   }
 
   @Override
-  public List<E> subList(int fromIndex, int toIndex) {
+  public HugeList<E> subList(long fromIndex, long toIndex) {
     return list.subList(start + fromIndex, start + toIndex);
   }
 
@@ -54,7 +53,7 @@ public class SubList<E> extends AbstractHugeCollection<E> implements List<E> {
   }
 
   @Override
-  protected E get(long index) {
+  public E get(long index) {
     return list.get(start + index);
   }
 

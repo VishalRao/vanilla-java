@@ -9,7 +9,7 @@ import java.nio.CharBuffer;
 import java.nio.IntBuffer;
 import java.util.concurrent.locks.ReadWriteLock;
 
-public class HTPartition implements HugePartition {
+class HTPartition implements HugePartition {
   private final Enumerated16FieldModel<String> textModel = new Enumerated16FieldModel<String>();
   private final HTArrayList list;
   private final Cleaner reserved;

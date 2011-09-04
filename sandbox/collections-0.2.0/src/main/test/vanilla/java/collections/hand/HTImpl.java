@@ -2,7 +2,7 @@ package vanilla.java.collections.hand;
 
 import vanilla.java.collections.api.impl.Copyable;
 
-public class HTImpl implements HT, Copyable<HT> {
+class HTImpl implements HT, Copyable<HT> {
   private int m_int;
   private String m_text;
 

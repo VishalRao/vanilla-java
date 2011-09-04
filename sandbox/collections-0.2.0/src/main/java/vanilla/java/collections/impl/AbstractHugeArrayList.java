@@ -89,14 +89,9 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeCollection<E>
   protected abstract E createImpl();
 
   @Override
-  public List<E> subList(int fromIndex, int toIndex) {
+  public HugeList<E> subList(long fromIndex, long toIndex) {
     final int size = subListPool.size();
     return size > 0 ? subListPool.remove(size - 1) : new SubList<E>(this, fromIndex, toIndex);
-  }
-
-  @Override
-  public HugeList<E> subList(long fromIndex, long toIndex) {
-    throw new Error("Not implemented");
   }
 
   public int partitionSize() {

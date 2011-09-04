@@ -5,7 +5,7 @@ import vanilla.java.collections.api.impl.ByteBufferAllocator;
 import vanilla.java.collections.impl.AbstractHugeArrayList;
 import vanilla.java.collections.impl.VanillaHugeListIterator;
 
-public class HTArrayList extends AbstractHugeArrayList<HT> {
+class HTArrayList extends AbstractHugeArrayList<HT> {
   public HTArrayList(int partitionSize, Class<HT> elementType, ByteBufferAllocator allocator) {
     super(partitionSize, elementType, allocator);
   }
