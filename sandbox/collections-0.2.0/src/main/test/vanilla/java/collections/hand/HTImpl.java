@@ -44,4 +44,30 @@ public class HTImpl implements HT, Copyable<HT> {
   public HT copyOf() {
     return new HTImpl(m_int, m_text);
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof HT)) return false;
+
+    HT ht = (HT) o;
+
+    if (getInt() != ht.getInt()) return false;
+    if (!getText().equals(ht.getText())) return false;
+
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    return getInt() * 31 + getText().hashCode();
+  }
+
+  @Override
+  public String toString() {
+    return "HT{" +
+        "int=" + getInt() +
+        ", text='" + getText() + '\'' +
+        '}';
+  }
 }

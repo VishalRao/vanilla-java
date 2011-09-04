@@ -30,7 +30,7 @@ public abstract class AbstractHugeContainer implements HugeContainer {
 
   @Override
   public int size() {
-    return size < Integer.MIN_VALUE ? (int) size : Integer.MIN_VALUE;
+    return size < Integer.MAX_VALUE ? (int) size : Integer.MAX_VALUE;
   }
 
   @Override
@@ -42,4 +42,9 @@ public abstract class AbstractHugeContainer implements HugeContainer {
   }
 
   protected abstract void growCapacity(long capacity);
+
+  public final int hashCode() {
+    long l = longHashCode();
+    return (int) (l ^ (l >>> 32));
+  }
 }

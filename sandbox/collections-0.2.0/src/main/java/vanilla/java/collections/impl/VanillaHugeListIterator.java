@@ -7,10 +7,12 @@ import vanilla.java.collections.api.impl.HugeElement;
 public class VanillaHugeListIterator<E> implements HugeListIterator<E> {
   private final AbstractHugeArrayList<E> list;
   private final E pointer;
+  private long end;
 
   public VanillaHugeListIterator(AbstractHugeArrayList<E> list, E pointer) {
     this.list = list;
     this.pointer = pointer;
+    index(-1);
   }
 
   @Override
@@ -31,6 +33,10 @@ public class VanillaHugeListIterator<E> implements HugeListIterator<E> {
   @Override
   public long longPreviousIndex() {
     return index() - 1;
+  }
+
+  public void end(long end) {
+    this.end = end;
   }
 
   @Override
@@ -78,7 +84,7 @@ public class VanillaHugeListIterator<E> implements HugeListIterator<E> {
 
   @Override
   public boolean hasNext() {
-    return index() + 1 < list.longSize();
+    return index() + 1 < end;
   }
 
   @Override

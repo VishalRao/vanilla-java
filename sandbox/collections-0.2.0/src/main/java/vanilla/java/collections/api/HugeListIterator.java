@@ -6,4 +6,6 @@ public interface HugeListIterator<E> extends HugeIterator<E>, ListIterator<E> {
   long longNextIndex();
 
   long longPreviousIndex();
+
+  void end(long end);
 }

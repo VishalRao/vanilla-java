@@ -18,6 +18,8 @@ public interface HugeList<E> extends HugeCollection<E>, List<E> {
 
   HugeListIterator<E> listIterator(long index);
 
+  HugeListIterator<E> listIterator(long start, long end);
+
   long longIndexOf(Object o);
 
   long longLastIndexOf(Object o);

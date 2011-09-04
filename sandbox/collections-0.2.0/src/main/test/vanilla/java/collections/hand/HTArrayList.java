@@ -3,6 +3,7 @@ package vanilla.java.collections.hand;
 import vanilla.java.collections.api.HugeListIterator;
 import vanilla.java.collections.api.impl.ByteBufferAllocator;
 import vanilla.java.collections.impl.AbstractHugeArrayList;
+import vanilla.java.collections.impl.VanillaHugeListIterator;
 
 public class HTArrayList extends AbstractHugeArrayList<HT> {
   public HTArrayList(int partitionSize, Class<HT> elementType, ByteBufferAllocator allocator) {
@@ -25,10 +26,14 @@ public class HTArrayList extends AbstractHugeArrayList<HT> {
 
   @Override
   protected HugeListIterator<HT> createIterator() {
-    throw new Error("Not implemented");
+    return new VanillaHugeListIterator<HT>(this, createPointer());
   }
 
   public HTPartition partitionFor(long index) {
     return (HTPartition) super.partitionFor(index);
+  }
+
+  public void pointerPoolAdd(HTPointer htPointer) {
+    pointerPool.add(htPointer);
   }
 }

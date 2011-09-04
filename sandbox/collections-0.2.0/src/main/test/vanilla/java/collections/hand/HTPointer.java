@@ -48,13 +48,14 @@ class HTPointer implements HT, HugeElement, Copyable<HT> {
   public void index(long index) {
     if (index / list.partitionSize() != this.index / list.partitionSize()) {
       partition = list.partitionFor(index);
-      this.index = index;
     }
+    this.index = index;
     offset = (int) (index % list.partitionSize());
   }
 
   @Override
   public void recycle() {
+    list.pointerPoolAdd(this);
   }
 
   @Override
@@ -68,5 +69,33 @@ class HTPointer implements HT, HugeElement, Copyable<HT> {
     HT ht = list.acquireImpl();
     ((Copyable<HT>) ht).copyFrom(this);
     return ht;
+  }
+
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof HT)) return false;
+
+    HT ht = (HT) o;
+
+    if (getInt() != ht.getInt()) return false;
+    if (!getText().equals(ht.getText())) return false;
+
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    return getInt() * 31 + getText().hashCode();
+  }
+
+
+  @Override
+  public String toString() {
+    return "HT{" +
+        "int=" + getInt() +
+        ", text='" + getText() + '\'' +
+        '}';
   }
 }
