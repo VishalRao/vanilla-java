@@ -1,12 +1,12 @@
 package vanilla.java.collections.impl;
 
-import vanilla.java.collections.api.*;
+import vanilla.java.collections.api.HugeList;
+import vanilla.java.collections.api.HugeListIterator;
 import vanilla.java.collections.api.impl.ByteBufferAllocator;
 import vanilla.java.collections.api.impl.Copyable;
 import vanilla.java.collections.api.impl.HugeElement;
 import vanilla.java.collections.api.impl.HugePartition;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.RandomAccess;
@@ -18,7 +18,7 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeCollection<E>
   private final Class<E> elementType;
   protected final List<E> pointerPool = new ArrayList<E>();
   private final List<HugeListIterator<E>> iteratorPool = new ArrayList<HugeListIterator<E>>();
-  private final List<E> implPool = new ArrayList<E>();
+  protected final List<E> implPool = new ArrayList<E>();
   private final List<SubList<E>> subListPool = new ArrayList<SubList<E>>();
 
   protected AbstractHugeArrayList(int partitionSize, Class<E> elementType, ByteBufferAllocator allocator) {
@@ -27,56 +27,6 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeCollection<E>
     this.elementType = elementType;
     this.allocator = allocator;
   }
-
-  @Override
-  public void close() throws IOException {
-    super.close();
-    for (HugePartition partition : partitions) {
-      partition.destroy();
-    }
-    partitions.clear();
-  }
-
-  @Override
-  public void clear() {
-    super.clear();
-    for (HugePartition partition : partitions) {
-      partition.clear();
-    }
-  }
-
-  @Override
-  public void compact() {
-    super.compact();
-    for (HugePartition partition : partitions) {
-      partition.compact();
-    }
-  }
-
-  @Override
-  public Class<E> elementType() {
-    return elementType;
-  }
-
-  @Override
-  public HugeCollection<E> filter(Predicate<E> predicate) {
-    throw new Error("Not implemented");
-  }
-
-  @Override
-  public void flush() throws IOException {
-  }
-
-  @Override
-  public <T> HugeCollection<T> forEach(Predicate<E> predicate, Procedure<E, T> etProcedure) {
-    throw new Error("Not implemented");
-  }
-
-  @Override
-  public <T> HugeCollection<T> forEach(Procedure<E, T> etProcedure) {
-    throw new Error("Not implemented");
-  }
-
 
   @Override
   public E get(long index) {
@@ -105,6 +55,10 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeCollection<E>
 
   @Override
   public void recycle(Object recycleable) {
+    if (recycleable instanceof VanillaHugeListIterator)
+      iteratorPool.add((HugeListIterator<E>) recycleable);
+    else if (recycleable instanceof SubList)
+      subListPoolAdd((SubList<E>) recycleable);
   }
 
   @Override

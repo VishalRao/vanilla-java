@@ -36,4 +36,18 @@ public class HTArrayList extends AbstractHugeArrayList<HT> {
   public void pointerPoolAdd(HTPointer htPointer) {
     pointerPool.add(htPointer);
   }
+
+  public void implPoolAdd(HTImpl htImpl) {
+    implPool.add(htImpl);
+  }
+
+  @Override
+  public void recycle(Object recycleable) {
+    if (recycleable instanceof HTPointer)
+      pointerPoolAdd((HTPointer) recycleable);
+    else if (recycleable instanceof HTImpl)
+      implPoolAdd((HTImpl) recycleable);
+    else
+      super.recycle(recycleable);
+  }
 }
