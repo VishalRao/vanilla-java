@@ -8,17 +8,9 @@ public interface FieldModel<T> extends Flushable {
 
   public void getter(Method getter);
 
-  public void fieldNumber(int num);
-
-  public int fieldNumber();
-
   public Method setter();
 
   public Method getter();
-
-  public void baseDirectory(String baseDirectory);
-
-  public String baseDirectory();
 
   public void clear();
 

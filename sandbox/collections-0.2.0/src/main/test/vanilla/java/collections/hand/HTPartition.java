@@ -5,25 +5,32 @@ import vanilla.java.collections.api.impl.Cleaner;
 import vanilla.java.collections.api.impl.HugePartition;
 import vanilla.java.collections.impl.Enumerated16FieldModel;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.CharBuffer;
 import java.nio.IntBuffer;
 import java.util.concurrent.locks.ReadWriteLock;
 
 class HTPartition implements HugePartition {
-  private final Enumerated16FieldModel<String> textModel = new Enumerated16FieldModel<String>();
+  private final Enumerated16FieldModel<String> textModel = new Enumerated16FieldModel<String>("text");
   private final HTArrayList list;
+  private final ByteBufferAllocator allocator;
+  private final int partitionNumber;
   private final Cleaner reserved;
   private final IntBuffer intBuffer;
   private final CharBuffer textBuffer;
 
-  public HTPartition(HTArrayList list, ByteBufferAllocator allocator, int num) throws IOException {
+  public HTPartition(HTArrayList list, ByteBufferAllocator allocator, int partitionNumber) throws IOException {
     this.list = list;
+    this.allocator = allocator;
+    this.partitionNumber = partitionNumber;
     final int partitionSize = list.partitionSize();
-    reserved = allocator.reserve(partitionSize, 6, "part", num);
+    reserved = allocator.reserve(partitionSize, 6, "part", partitionNumber);
     intBuffer = allocator.acquireIntBuffer();
     textBuffer = allocator.acquireCharBuffer();
     allocator.endOfReserve();
+
+    textModel.load(allocator.baseDirectory(), partitionNumber);
   }
 
   @Override
@@ -61,5 +68,16 @@ class HTPartition implements HugePartition {
 
   public void compact() {
 
+  }
+
+  public void flush() {
+    final File dir = allocator.baseDirectory();
+    if (dir == null) return;
+    textModel.save(dir, partitionNumber);
+  }
+
+  @Override
+  public void close() throws IOException {
+    flush();
   }
 }

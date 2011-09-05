@@ -3,26 +3,19 @@ package vanilla.java.collections.impl;
 import vanilla.java.collections.api.impl.BCType;
 import vanilla.java.collections.api.impl.FieldModel;
 
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.nio.CharBuffer;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Enumerated16FieldModel<T> implements FieldModel<T> {
+  private final String fieldName;
   private final Map<T, Character> map = new LinkedHashMap<T, Character>();
   private final List<T> list = new ArrayList<T>();
 
-  {
-    map.put(null, (char) 0);
-    list.add(null);
-  }
-
-  @Override
-  public String baseDirectory() {
-    throw new Error("Not implemented");
+  public Enumerated16FieldModel(String fieldName) {
+    this.fieldName = fieldName;
+    clear();
   }
 
   @Override
@@ -32,16 +25,6 @@ public class Enumerated16FieldModel<T> implements FieldModel<T> {
 
   @Override
   public void getter(Method getter) {
-    throw new Error("Not implemented");
-  }
-
-  @Override
-  public void fieldNumber(int num) {
-    throw new Error("Not implemented");
-  }
-
-  @Override
-  public int fieldNumber() {
     throw new Error("Not implemented");
   }
 
@@ -56,18 +39,16 @@ public class Enumerated16FieldModel<T> implements FieldModel<T> {
   }
 
   @Override
-  public void baseDirectory(String baseDirectory) {
-    throw new Error("Not implemented");
-  }
-
-  @Override
   public void clear() {
-    throw new Error("Not implemented");
+    map.clear();
+    list.clear();
+    map.put(null, (char) 0);
+    list.add(null);
   }
 
   @Override
   public String fieldName() {
-    throw new Error("Not implemented");
+    return fieldName;
   }
 
   @Override
@@ -180,5 +161,44 @@ public class Enumerated16FieldModel<T> implements FieldModel<T> {
       map.put(id, ch);
     }
     buffer.put(offset, ch);
+  }
+
+  public void load(File dir, int partitionNumber) {
+    if (dir == null) {
+      clear();
+      return;
+    }
+    try {
+      ObjectInputStream ois = new ObjectInputStream(
+          new BufferedInputStream(new FileInputStream(fileFor(dir, partitionNumber))));
+      list.clear();
+      list.addAll((Collection<T>) ois.readObject());
+      ois.close();
+      map.clear();
+      for (int i = 0; i < list.size(); i++)
+        map.put(list.get(i), (char) i);
+
+    } catch (FileNotFoundException ignoed) {
+      clear();
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    } catch (ClassNotFoundException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  private File fileFor(File dir, int partitionNumber) {
+    return new File(dir, fieldName + "-model-" + partitionNumber);
+  }
+
+  public void save(File dir, int partitionNumber) {
+    try {
+      ObjectOutputStream oos = new ObjectOutputStream(
+          new BufferedOutputStream(new FileOutputStream(fileFor(dir, partitionNumber))));
+      oos.writeObject(list);
+      oos.close();
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
   }
 }

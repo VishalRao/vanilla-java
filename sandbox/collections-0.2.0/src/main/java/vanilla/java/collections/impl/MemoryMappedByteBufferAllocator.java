@@ -125,6 +125,11 @@ public class MemoryMappedByteBufferAllocator implements ByteBufferAllocator {
     }
   }
 
+  @Override
+  public File baseDirectory() {
+    return baseDirectory;
+  }
+
   private class MemoryMappedSizeHolder implements SizeHolder {
     private final MappedByteBuffer buffer;
     private final LongBuffer sizes;

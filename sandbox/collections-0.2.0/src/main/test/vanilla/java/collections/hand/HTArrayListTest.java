@@ -55,7 +55,7 @@ public class HTArrayListTest {
 
   @Test
   public void testGet() {
-    List<HT> list = createList(1024);
+    List<HT> list = createList(4 * 1024);
     // force it to grow.
     for (int i = 0; i < 100 * 1000; i++)
       list.add(new HTImpl(i, "hello-" + i));

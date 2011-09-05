@@ -5,6 +5,7 @@ import vanilla.java.collections.api.impl.ByteBufferAllocator;
 import vanilla.java.collections.api.impl.Cleaner;
 import vanilla.java.collections.api.impl.SizeHolder;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.*;
 
@@ -88,5 +89,10 @@ public class DirectByteBufferAllocator implements ByteBufferAllocator {
   @Override
   public SizeHolder sizeHolder() {
     return new VanillaSizeHolder();
+  }
+
+  @Override
+  public File baseDirectory() {
+    return null;
   }
 }

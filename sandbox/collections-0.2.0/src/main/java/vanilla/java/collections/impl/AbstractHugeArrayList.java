@@ -139,12 +139,18 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeCollection<E>
   @Override
   public void flush() throws IOException {
     super.flush();
+    for (HugePartition partition : partitions) {
+      partition.flush();
+    }
     allocator.flush();
   }
 
   @Override
   public void close() throws IOException {
     super.close();
+    for (HugePartition partition : partitions) {
+      partition.close();
+    }
     allocator.close();
   }
 }
