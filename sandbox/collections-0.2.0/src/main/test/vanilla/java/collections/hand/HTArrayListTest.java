@@ -17,6 +17,9 @@
 package vanilla.java.collections.hand;
 
 import org.junit.Test;
+import vanilla.java.collections.api.HugeCollection;
+import vanilla.java.collections.api.HugeList;
+import vanilla.java.collections.api.Predicate;
 import vanilla.java.collections.impl.DirectByteBufferAllocator;
 
 import java.util.List;
@@ -35,7 +38,6 @@ public class HTArrayListTest {
   public void createClose() {
     // without close(list) this causes multiple Full GC,
     // however with close, no GCs
-    // TODO creates garbage !!
     for (int i = 0; i < 10 * 1000; i++) {
       List<HT> list = createList(64 * 1024);
       list.add(new HTImpl());
@@ -101,5 +103,41 @@ public class HTArrayListTest {
       assertEquals("" + i, i % 2 == 0 ? i / 2 : -1, idx);
     }
     close(list);
+  }
+
+  @Test
+  public void testFilter() {
+    HugeList<HT> list = createList(1024);
+    // force it to grow.
+    for (int i = 0; i < 1000; i++)
+      list.add(new HTImpl(i, "hello-" + i));
+    // filter
+    final HugeCollection<HT> list0 = list.filter(new Predicate<HT>() {
+      @Override
+      public boolean test(HT ht) {
+        final String text = ht.getText();
+        return text.endsWith("0");
+      }
+    });
+    assertEquals(list.size() / 10, list0.size());
+    int count = 0;
+    for (HT ht : list0) {
+      assertEquals(count++ * 10, ht.getInt());
+    }
+
+    // todo fix.
+/*
+    final HugeCollection<HT> list2_0 = list.filter(new Predicate<HT>() {
+      @Override
+      public boolean test(HT ht) {
+        final String text = ht.getText();
+        return text.startsWith("2");
+      }
+    });
+    assertEquals(11, list2_0.size());
+    for (HT ht : list2_0) {
+      System.out.println(ht);
+    }
+*/
   }
 }

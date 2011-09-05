@@ -18,16 +18,13 @@ package vanilla.java.collections.impl;
 
 import vanilla.java.collections.api.HugeList;
 import vanilla.java.collections.api.HugeListIterator;
-import vanilla.java.collections.api.impl.SizeHolder;
-
-import java.io.IOException;
 
 public class SubList<E> extends AbstractHugeCollection<E> implements HugeList<E> {
-  private final AbstractHugeArrayList<E> list;
+  private final AbstractHugeCollection<E> list;
   private long start;
   private long end;
 
-  public SubList(AbstractHugeArrayList<E> list, long start, long end) {
+  public SubList(AbstractHugeCollection<E> list, long start, long end) {
     super(list.elementType(), null);
     size = new SubListSizeHolder();
     this.list = list;
@@ -48,12 +45,8 @@ public class SubList<E> extends AbstractHugeCollection<E> implements HugeList<E>
   }
 
   @Override
-  public boolean remove(Object o) {
-    return true;
-  }
-
-  @Override
   public void recycle(Object recycleable) {
+    list.recycle(recycleable);
   }
 
   @Override
@@ -91,44 +84,15 @@ public class SubList<E> extends AbstractHugeCollection<E> implements HugeList<E>
     return list.partitionSize();
   }
 
-  class SubListSizeHolder implements SizeHolder {
-    @Override
-    public long size() {
-      return longSize();
-    }
-
-    @Override
-    public void size(long size) {
-      if (longSize() != size)
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void capacity(long capacity) {
-      size(capacity);
-    }
-
-    @Override
-    public long capacity() {
-      return size();
-    }
-
+  class SubListSizeHolder extends SimpleSizeHolder {
     @Override
     public long partitionSize() {
-      return list.partitionSize();
+      return SubList.this.partitionSize();
     }
 
     @Override
-    public void partitionSize(long partitionSize) {
-      throw new Error("Not implemented");
-    }
-
-    @Override
-    public void close() throws IOException {
-    }
-
-    @Override
-    public void flush() throws IOException {
+    public long size() {
+      return SubList.this.size();
     }
   }
 }

@@ -17,6 +17,11 @@
 package vanilla.java.collections.util;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.LongBuffer;
+import java.util.ArrayDeque;
+import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -60,5 +65,17 @@ public enum HugeCollections {
     } catch (IOException ignored) {
       // ignored
     }
+  }
+
+  private static final Queue<LongBuffer> LONG_BUFFER_POOL = new ArrayDeque<LongBuffer>();
+  public static final int LONG_BUFFER_SIZE = 4 * 1024;
+
+  public static LongBuffer acquireLongBuffer() {
+    LongBuffer buffer = LONG_BUFFER_POOL.poll();
+    return buffer == null ? ByteBuffer.allocateDirect(LONG_BUFFER_SIZE * 8).order(ByteOrder.nativeOrder()).asLongBuffer() : buffer;
+  }
+
+  public static void recycle(LongBuffer buffer) {
+    LONG_BUFFER_POOL.add(buffer);
   }
 }

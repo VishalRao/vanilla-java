@@ -21,11 +21,11 @@ import vanilla.java.collections.api.impl.Copyable;
 import vanilla.java.collections.api.impl.HugeElement;
 
 public class VanillaHugeListIterator<E> implements HugeListIterator<E> {
-  private final AbstractHugeArrayList<E> list;
+  private final AbstractHugeCollection<E> list;
   private final E pointer;
   private long end;
 
-  public VanillaHugeListIterator(AbstractHugeArrayList<E> list, E pointer) {
+  public VanillaHugeListIterator(AbstractHugeCollection<E> list, E pointer) {
     this.list = list;
     this.pointer = pointer;
     index(-1);

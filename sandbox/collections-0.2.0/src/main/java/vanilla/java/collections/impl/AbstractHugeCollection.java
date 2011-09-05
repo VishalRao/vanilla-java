@@ -27,6 +27,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 
 public abstract class AbstractHugeCollection<E> extends AbstractHugeContainer implements HugeCollection<E>, RandomAccess {
   private final Class<E> elementType;
+  private final Deque<SubList<E>> subListPool = new ArrayDeque<SubList<E>>();
+  private final Deque<SelectedList<E>> selectedListPool = new ArrayDeque<SelectedList<E>>();
 
   protected AbstractHugeCollection(Class<E> elementType, SizeHolder size) {
     super(size);
@@ -38,6 +40,7 @@ public abstract class AbstractHugeCollection<E> extends AbstractHugeContainer im
     setSize(size + 1);
     E e2 = get(size);
     ((Copyable<E>) e2).copyFrom(e);
+    recycle(e2);
     return true;
   }
 
@@ -113,7 +116,19 @@ public abstract class AbstractHugeCollection<E> extends AbstractHugeContainer im
 
   @Override
   public HugeCollection<E> filter(Predicate<E> predicate) {
-    throw new Error("Not implemented");
+    SelectedList<E> list = acquireSelectedList();
+    HugeIterator<E> iter = null;
+    try {
+      iter = iterator();
+      while (iter.hasNext()) {
+        final E next = iter.next();
+        if (predicate.test(next))
+          list.add(next);
+      }
+      return list;
+    } finally {
+      recycle(iter);
+    }
   }
 
   @Override
@@ -256,8 +271,6 @@ public abstract class AbstractHugeCollection<E> extends AbstractHugeContainer im
     return subList((long) fromIndex, (long) toIndex);
   }
 
-  protected abstract HugeList<E> subList(long fromIndex, long toIndex);
-
   @Override
   public Object[] toArray() {
     return toArray((Object[]) Array.newInstance(elementType, size()));
@@ -300,11 +313,26 @@ public abstract class AbstractHugeCollection<E> extends AbstractHugeContainer im
 
   public abstract E remove(long index);
 
+  @Override
+  public boolean remove(Object o) {
+    long idx = indexOf(o);
+    if (idx >= 0) {
+      recycle(remove(idx));
+      return true;
+    }
+    return false;
+  }
+
   public E set(int index, E element) {
     return set((long) index, element);
   }
 
-  public abstract E set(long index, E element);
+  public E set(long index, E element) {
+    E e = get(index);
+    E i = ((Copyable<E>) e).copyOf();
+    ((Copyable<E>) e).copyFrom(element);
+    return i;
+  }
 
   @Override
   public long update(Predicate<E> predicate, Updater<E> updater) {
@@ -338,5 +366,19 @@ public abstract class AbstractHugeCollection<E> extends AbstractHugeContainer im
     } finally {
       recycle(iter);
     }
+  }
+
+  public void subListPoolAdd(SubList<E> es) {
+    subListPool.add(es);
+  }
+
+  public HugeList<E> subList(long fromIndex, long toIndex) {
+    final SubList<E> subList = subListPool.poll();
+    return subList == null ? new SubList<E>(this, fromIndex, toIndex) : subList;
+  }
+
+  protected SelectedList<E> acquireSelectedList() {
+    final SelectedList<E> list = selectedListPool.poll();
+    return list == null ? new SelectedList<E>(elementType, this) : list;
   }
 }

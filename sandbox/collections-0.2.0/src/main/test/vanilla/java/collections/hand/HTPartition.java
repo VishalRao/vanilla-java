@@ -95,5 +95,6 @@ class HTPartition implements HugePartition {
   @Override
   public void close() throws IOException {
     flush();
+    reserved.clean();
   }
 }

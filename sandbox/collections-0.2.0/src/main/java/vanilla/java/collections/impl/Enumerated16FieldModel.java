@@ -211,10 +211,18 @@ public class Enumerated16FieldModel<T> implements FieldModel<T> {
 
   public void save(File dir, int partitionNumber) {
     try {
+      final File file = fileFor(dir, partitionNumber);
+      if (list.size() <= 1) {
+        file.delete();
+        return;
+      }
       ObjectOutputStream oos = new ObjectOutputStream(
-                                                         new DeflaterOutputStream(new BufferedOutputStream(new FileOutputStream(fileFor(dir, partitionNumber)))));
+                                                         new DeflaterOutputStream(new BufferedOutputStream(new FileOutputStream(file + ".tmp"))));
       oos.writeObject(list);
       oos.close();
+      if (!file.exists() || file.delete())
+        if (!new File(file + ".tmp").renameTo(file))
+          throw new IllegalStateException("Unable to rename " + file + ".tmp");
     } catch (IOException e) {
       throw new IllegalStateException(e);
     }

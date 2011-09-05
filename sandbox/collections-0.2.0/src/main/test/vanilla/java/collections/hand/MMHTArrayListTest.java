@@ -40,8 +40,9 @@ public class MMHTArrayListTest {
   public void createClose() {
     // without close(list) this causes multiple Full GC,
     // however with close, no GCs
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 1000; i++) {
       List<HT> list = createList(PARTITION_SIZE);
+      list.clear();
       list.add(new HTImpl());
       close(list);
     }
