@@ -24,7 +24,7 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeCollection<E>
   private final List<SubList<E>> subListPool = new ArrayList<SubList<E>>();
 
   protected AbstractHugeArrayList(int partitionSize, Class<E> elementType, ByteBufferAllocator allocator) {
-    super(elementType);
+    super(elementType, allocator.sizeHolder());
     this.partitionSize = partitionSize;
     this.elementType = elementType;
     this.allocator = allocator;
@@ -65,16 +65,18 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeCollection<E>
 
   @Override
   public E remove(long index) {
-    if (index + 1 != size) {
+    final long size1 = longSize() - 1;
+    if (index != size1) {
       E from = get(index + 1);
       E to = get(index);
-      for (long i = index; i < size - 1; i++) {
+      for (long i = index; i < size1; i++) {
         ((HugeElement) from).index(index + 1);
         ((HugeElement) to).index(index);
         ((Copyable<E>) to).copyFrom(from);
       }
     }
-    final Copyable<E> e = (Copyable<E>) get(--size);
+    final Copyable<E> e = (Copyable<E>) get(size1);
+    setSize(size1);
     final E e2 = e.copyOf();
     ((Recycleable) e).recycle();
     return e2;
@@ -132,5 +134,17 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeCollection<E>
 
   public void subListPoolAdd(SubList<E> es) {
     subListPool.add(es);
+  }
+
+  @Override
+  public void flush() throws IOException {
+    super.flush();
+    allocator.flush();
+  }
+
+  @Override
+  public void close() throws IOException {
+    super.close();
+    allocator.close();
   }
 }

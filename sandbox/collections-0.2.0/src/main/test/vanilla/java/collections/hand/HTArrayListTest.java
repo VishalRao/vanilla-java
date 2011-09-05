@@ -19,6 +19,7 @@ public class HTArrayListTest {
   public void createClose() {
     // without close(list) this causes multiple Full GC,
     // however with close, no GCs
+    // TODO creates garbage !!
     for (int i = 0; i < 10 * 1000; i++) {
       List<HT> list = createList(64 * 1024);
       list.add(new HTImpl());

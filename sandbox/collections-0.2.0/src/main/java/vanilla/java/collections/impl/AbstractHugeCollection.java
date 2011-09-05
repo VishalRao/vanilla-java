@@ -2,9 +2,9 @@ package vanilla.java.collections.impl;
 
 import vanilla.java.collections.api.*;
 import vanilla.java.collections.api.impl.Copyable;
+import vanilla.java.collections.api.impl.SizeHolder;
 import vanilla.java.collections.util.NullReadWriteLock;
 
-import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -12,7 +12,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 public abstract class AbstractHugeCollection<E> extends AbstractHugeContainer implements HugeCollection<E>, RandomAccess {
   private final Class<E> elementType;
 
-  protected AbstractHugeCollection(Class<E> elementType) {
+  protected AbstractHugeCollection(Class<E> elementType, SizeHolder size) {
+    super(size);
     this.elementType = elementType;
   }
 
@@ -49,10 +50,6 @@ public abstract class AbstractHugeCollection<E> extends AbstractHugeContainer im
   public boolean addAll(long index, Collection<? extends E> c) {
     if (index != longSize() - 1) throw new UnsupportedOperationException("Can only add to the end.");
     return addAll(c);
-  }
-
-  @Override
-  public void close() throws IOException {
   }
 
   @Override
@@ -100,11 +97,6 @@ public abstract class AbstractHugeCollection<E> extends AbstractHugeContainer im
 
   @Override
   public HugeCollection<E> filter(Predicate<E> predicate) {
-    throw new Error("Not implemented");
-  }
-
-  @Override
-  public void flush() throws IOException {
     throw new Error("Not implemented");
   }
 

@@ -3,6 +3,7 @@ package vanilla.java.collections.impl;
 import sun.nio.ch.DirectBuffer;
 import vanilla.java.collections.api.impl.ByteBufferAllocator;
 import vanilla.java.collections.api.impl.Cleaner;
+import vanilla.java.collections.api.impl.SizeHolder;
 
 import java.io.IOException;
 import java.nio.*;
@@ -82,5 +83,10 @@ public class DirectByteBufferAllocator implements ByteBufferAllocator {
 
   @Override
   public void flush() throws IOException {
+  }
+
+  @Override
+  public SizeHolder sizeHolder() {
+    return new VanillaSizeHolder();
   }
 }

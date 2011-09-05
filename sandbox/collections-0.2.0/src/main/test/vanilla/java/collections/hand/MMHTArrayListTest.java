@@ -20,7 +20,7 @@ public class MMHTArrayListTest {
   public void createClose() {
     // without close(list) this causes multiple Full GC,
     // however with close, no GCs
-    for (int i = 0; i < 10 * 1000; i++) {
+    for (int i = 0; i < 100; i++) {
       List<HT> list = createList(64 * 1024);
       list.add(new HTImpl());
       close(list);
@@ -30,18 +30,27 @@ public class MMHTArrayListTest {
   @Test
   public void testAdd() {
     List<HT> list = createList(1024);
+    list.clear();
     // force it to grow.
-    for (int i = 0; i < 100 * 1000; i++)
+    final int size = 100 * 1000;
+    for (int i = 0; i < size; i++)
       list.add(new HTImpl(i, "hello"));
     // check the values added are there
-    for (int i = 0; i < 100 * 1000; i++)
+    for (int i = 0; i < size; i++)
       assertEquals(i, list.get(i).getInt());
     close(list);
+    List<HT> list2 = createList(1024);
+    assertEquals(size, list2.size());
+    // check the values added are there
+    for (int i = 0; i < size; i++)
+      assertEquals(i, list2.get(i).getInt());
+    close(list2);
   }
 
   @Test
   public void testRemove() {
     List<HT> list = createList(1024);
+    list.clear();
     // force it to grow.
     for (int i = 0; i < 100 * 1000; i++)
       list.add(new HTImpl(i, "hello"));
@@ -51,27 +60,43 @@ public class MMHTArrayListTest {
       assertEquals(i, list.size());
     }
     close(list);
+    List<HT> list2 = createList(1024);
+    assertEquals(0, list2.size());
+    close(list2);
   }
 
   @Test
   public void testGet() {
     List<HT> list = createList(1024);
+    list.clear();
     // force it to grow.
-    for (int i = 0; i < 100 * 1000; i++)
+    final int size = 100 * 1000;
+    for (int i = 0; i < size; i++)
       list.add(new HTImpl(i, "hello-" + i));
     // check the values added are there
-    for (int i = 0; i < 100 * 1000; i++) {
+    for (int i = 0; i < size; i++) {
       final HT ht = list.get(i);
       assertEquals(i, ht.getInt());
       assertEquals("hello-" + i, ht.getText());
       recycle(ht);
     }
     close(list);
+    List<HT> list2 = createList(1024);
+    assertEquals(size, list2.size());
+    // check the values added are there
+    for (int i = 0; i < size; i++) {
+      final HT ht = list2.get(i);
+      assertEquals(i, ht.getInt());
+      assertEquals("hello-" + i, ht.getText());
+      recycle(ht);
+    }
+    close(list2);
   }
 
   @Test
   public void testContainsIndexOf() {
     List<HT> list = createList(1024);
+    list.clear();
     // force it to grow.
     final int size = 5 * 1000;
     for (int i = 0; i < size; i += 2)

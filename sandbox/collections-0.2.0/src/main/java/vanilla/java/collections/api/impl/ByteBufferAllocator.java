@@ -25,4 +25,6 @@ public interface ByteBufferAllocator extends Flushable, Closeable {
   DoubleBuffer acquireDoubleBuffer();
 
   void endOfReserve();
+
+  SizeHolder sizeHolder();
 }
