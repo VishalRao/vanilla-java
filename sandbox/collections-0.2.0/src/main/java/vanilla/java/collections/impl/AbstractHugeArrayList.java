@@ -15,7 +15,6 @@ import java.util.RandomAccess;
 
 public abstract class AbstractHugeArrayList<E> extends AbstractHugeCollection<E> implements HugeList<E>, RandomAccess {
   protected final List<HugePartition> partitions = new ArrayList<HugePartition>();
-  protected final int partitionSize;
   protected final ByteBufferAllocator allocator;
   private final Class<E> elementType;
   protected final List<E> pointerPool = new ArrayList<E>();
@@ -25,7 +24,8 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeCollection<E>
 
   protected AbstractHugeArrayList(int partitionSize, Class<E> elementType, ByteBufferAllocator allocator) {
     super(elementType, allocator.sizeHolder());
-    this.partitionSize = partitionSize;
+    if (this.size.partitionSize() < 1)
+      this.size.partitionSize(partitionSize);
     this.elementType = elementType;
     this.allocator = allocator;
   }
@@ -109,12 +109,12 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeCollection<E>
   }
 
   public int partitionSize() {
-    return partitionSize;
+    return (int) this.size.partitionSize();
   }
 
   @Override
   protected void growCapacity(long capacity) {
-    long partitions = (capacity + partitionSize - 1) / partitionSize + 1;
+    long partitions = (capacity + partitionSize() - 1) / partitionSize() + 1;
     try {
       while (this.partitions.size() < partitions)
         this.partitions.add(createPartition(this.partitions.size()));
@@ -124,7 +124,7 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeCollection<E>
   }
 
   public HugePartition partitionFor(long index) {
-    final int n = (int) (index / partitionSize);
+    final int n = (int) (index / partitionSize());
     if (n >= partitions.size())
       growCapacity(index);
     return partitions.get(n);

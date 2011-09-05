@@ -1,6 +1,7 @@
 package vanilla.java.collections.hand;
 
 import org.junit.Test;
+import vanilla.java.collections.api.HugeContainer;
 import vanilla.java.collections.impl.MemoryMappedByteBufferAllocator;
 
 import java.io.File;
@@ -11,6 +12,9 @@ import static vanilla.java.collections.util.HugeCollections.close;
 import static vanilla.java.collections.util.HugeCollections.recycle;
 
 public class MMHTArrayListTest {
+
+  public static final int PARTITION_SIZE = 8 * 1024;
+
   public static HTArrayList createList(int partitionSize) {
     // a very small partition size to show problems quickly.
     return new HTArrayList(partitionSize, HT.class, new MemoryMappedByteBufferAllocator(new File("tmp")));
@@ -21,7 +25,7 @@ public class MMHTArrayListTest {
     // without close(list) this causes multiple Full GC,
     // however with close, no GCs
     for (int i = 0; i < 100; i++) {
-      List<HT> list = createList(64 * 1024);
+      List<HT> list = createList(PARTITION_SIZE);
       list.add(new HTImpl());
       close(list);
     }
@@ -29,7 +33,7 @@ public class MMHTArrayListTest {
 
   @Test
   public void testAdd() {
-    List<HT> list = createList(1024);
+    List<HT> list = createList(PARTITION_SIZE);
     list.clear();
     // force it to grow.
     final int size = 100 * 1000;
@@ -39,7 +43,7 @@ public class MMHTArrayListTest {
     for (int i = 0; i < size; i++)
       assertEquals(i, list.get(i).getInt());
     close(list);
-    List<HT> list2 = createList(1024);
+    List<HT> list2 = createList(PARTITION_SIZE);
     assertEquals(size, list2.size());
     // check the values added are there
     for (int i = 0; i < size; i++)
@@ -49,7 +53,7 @@ public class MMHTArrayListTest {
 
   @Test
   public void testRemove() {
-    List<HT> list = createList(1024);
+    List<HT> list = createList(PARTITION_SIZE);
     list.clear();
     // force it to grow.
     for (int i = 0; i < 100 * 1000; i++)
@@ -60,14 +64,14 @@ public class MMHTArrayListTest {
       assertEquals(i, list.size());
     }
     close(list);
-    List<HT> list2 = createList(1024);
+    List<HT> list2 = createList(PARTITION_SIZE);
     assertEquals(0, list2.size());
     close(list2);
   }
 
   @Test
   public void testGet() {
-    List<HT> list = createList(1024);
+    List<HT> list = createList(PARTITION_SIZE);
     list.clear();
     // force it to grow.
     final int size = 100 * 1000;
@@ -81,7 +85,8 @@ public class MMHTArrayListTest {
       recycle(ht);
     }
     close(list);
-    List<HT> list2 = createList(1024);
+    List<HT> list2 = createList(PARTITION_SIZE * 2);
+    assertEquals(PARTITION_SIZE, ((HugeContainer) list2).partitionSize());
     assertEquals(size, list2.size());
     // check the values added are there
     for (int i = 0; i < size; i++) {
@@ -95,7 +100,7 @@ public class MMHTArrayListTest {
 
   @Test
   public void testContainsIndexOf() {
-    List<HT> list = createList(1024);
+    List<HT> list = createList(PARTITION_SIZE);
     list.clear();
     // force it to grow.
     final int size = 5 * 1000;

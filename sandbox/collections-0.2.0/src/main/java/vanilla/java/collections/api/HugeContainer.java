@@ -33,6 +33,11 @@ public interface HugeContainer extends Flushable, Closeable {
   long longSize();
 
   /**
+   * @return the size in elements of each partition.
+   */
+  int partitionSize();
+
+  /**
    * @return is the collection empty.
    */
   boolean isEmpty();

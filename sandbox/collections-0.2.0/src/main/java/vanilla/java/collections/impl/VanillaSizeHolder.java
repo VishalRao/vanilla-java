@@ -7,6 +7,7 @@ import java.io.IOException;
 public class VanillaSizeHolder implements SizeHolder {
   private long size;
   private long capacity;
+  private long partitionSize;
 
   @Override
   public void size(long size) {
@@ -26,6 +27,14 @@ public class VanillaSizeHolder implements SizeHolder {
   @Override
   public long capacity() {
     return capacity;
+  }
+
+  public void partitionSize(long partitionSize) {
+    this.partitionSize = partitionSize;
+  }
+
+  public long partitionSize() {
+    return partitionSize;
   }
 
   @Override

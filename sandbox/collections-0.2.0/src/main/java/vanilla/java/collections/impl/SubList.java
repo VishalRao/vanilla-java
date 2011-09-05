@@ -70,6 +70,11 @@ public class SubList<E> extends AbstractHugeCollection<E> implements HugeList<E>
     return list.set(start + index, element);
   }
 
+  @Override
+  public int partitionSize() {
+    return list.partitionSize();
+  }
+
   class SubListSizeHolder implements SizeHolder {
     @Override
     public long size() {
@@ -90,6 +95,16 @@ public class SubList<E> extends AbstractHugeCollection<E> implements HugeList<E>
     @Override
     public long capacity() {
       return size();
+    }
+
+    @Override
+    public long partitionSize() {
+      return list.partitionSize();
+    }
+
+    @Override
+    public void partitionSize(long partitionSize) {
+      throw new Error("Not implemented");
     }
 
     @Override

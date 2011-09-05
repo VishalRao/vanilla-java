@@ -11,4 +11,8 @@ public interface SizeHolder extends Flushable, Closeable {
   public void capacity(long capacity);
 
   public long capacity();
+
+  public void partitionSize(long partitionSize);
+
+  public long partitionSize();
 }

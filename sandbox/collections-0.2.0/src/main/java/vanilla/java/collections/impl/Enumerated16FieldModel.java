@@ -7,6 +7,8 @@ import java.io.*;
 import java.lang.reflect.Method;
 import java.nio.CharBuffer;
 import java.util.*;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterInputStream;
 
 public class Enumerated16FieldModel<T> implements FieldModel<T> {
   private final String fieldName;
@@ -170,7 +172,7 @@ public class Enumerated16FieldModel<T> implements FieldModel<T> {
     }
     try {
       ObjectInputStream ois = new ObjectInputStream(
-          new BufferedInputStream(new FileInputStream(fileFor(dir, partitionNumber))));
+                                                       new InflaterInputStream(new BufferedInputStream(new FileInputStream(fileFor(dir, partitionNumber)))));
       list.clear();
       list.addAll((Collection<T>) ois.readObject());
       ois.close();
@@ -194,7 +196,7 @@ public class Enumerated16FieldModel<T> implements FieldModel<T> {
   public void save(File dir, int partitionNumber) {
     try {
       ObjectOutputStream oos = new ObjectOutputStream(
-          new BufferedOutputStream(new FileOutputStream(fileFor(dir, partitionNumber))));
+                                                         new DeflaterOutputStream(new BufferedOutputStream(new FileOutputStream(fileFor(dir, partitionNumber)))));
       oos.writeObject(list);
       oos.close();
     } catch (IOException e) {
