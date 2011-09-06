@@ -126,15 +126,15 @@ public class HTArrayListTest {
     }
 
     // todo fix.
-/*
-    final HugeCollection<HT> list2_0 = list.filter(new Predicate<HT>() {
+    final HugeCollection<HT> list2_0 = list0.filter(new Predicate<HT>() {
       @Override
       public boolean test(HT ht) {
         final String text = ht.getText();
-        return text.startsWith("2");
+        return text.startsWith("hello-2");
       }
     });
     assertEquals(11, list2_0.size());
+/*
     for (HT ht : list2_0) {
       System.out.println(ht);
     }

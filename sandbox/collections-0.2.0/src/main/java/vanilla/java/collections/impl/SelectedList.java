@@ -65,45 +65,7 @@ public class SelectedList<E> extends AbstractHugeCollection<E> {
 
   @Override
   public HugeIterator<E> iterator() {
-    return new HugeIterator<E>() {
-      final HugeElement e = (HugeElement) list.get(0);
-      long index = -1;
-
-      @Override
-      public HugeElement nextElement() {
-        return e;
-      }
-
-      @Override
-      public void index(long index) {
-        this.index = index;
-      }
-
-      @Override
-      public long index() {
-        return index;
-      }
-
-      @Override
-      public boolean hasNext() {
-        return index + 1 < size;
-      }
-
-      @Override
-      public E next() {
-        e.index(mapIndex(++index));
-        return (E) e;
-      }
-
-      @Override
-      public void remove() {
-        list.remove(e.index());
-      }
-
-      @Override
-      public void recycle() {
-      }
-    };
+    return new SelectedHugeIterator<E>();
   }
 
   @Override
@@ -159,4 +121,43 @@ public class SelectedList<E> extends AbstractHugeCollection<E> {
     }
   }
 
+  class SelectedHugeIterator<E> implements HugeIterator<E> {
+    final HugeElement e = (HugeElement) list.get(0);
+    long index = -1;
+
+    @Override
+    public HugeElement nextElement() {
+      return e;
+    }
+
+    @Override
+    public void index(long index) {
+      this.index = index;
+    }
+
+    @Override
+    public long index() {
+      return index;
+    }
+
+    @Override
+    public boolean hasNext() {
+      return index + 1 < size;
+    }
+
+    @Override
+    public E next() {
+      e.index(mapIndex(++index));
+      return (E) e;
+    }
+
+    @Override
+    public void remove() {
+      list.remove(e.index());
+    }
+
+    @Override
+    public void recycle() {
+    }
+  }
 }
