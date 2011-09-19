@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>vanilla.java</groupId>
-	<artifactId>test-collections</artifactId>
+	<artifactId>collections-comparison</artifactId>
 	<version>0.2.0</version>
 	<packaging>jar</packaging>
 
-	<name>test-collections</name>
+	<name>collections-comparison</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
