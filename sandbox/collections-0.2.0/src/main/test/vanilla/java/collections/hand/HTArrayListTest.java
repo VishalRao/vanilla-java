@@ -16,17 +16,23 @@
 
 package vanilla.java.collections.hand;
 
+import static junit.framework.Assert.assertEquals;
+import static vanilla.java.collections.util.HugeCollections.close;
+import static vanilla.java.collections.util.HugeCollections.recycle;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+
+import org.junit.Ignore;
 import org.junit.Test;
+
+import com.sun.org.apache.bcel.internal.generic.ARRAYLENGTH;
+
 import vanilla.java.collections.api.HugeCollection;
 import vanilla.java.collections.api.HugeList;
 import vanilla.java.collections.api.Predicate;
 import vanilla.java.collections.impl.DirectByteBufferAllocator;
-
-import java.util.List;
-
-import static junit.framework.Assert.assertEquals;
-import static vanilla.java.collections.util.HugeCollections.close;
-import static vanilla.java.collections.util.HugeCollections.recycle;
 
 public class HTArrayListTest {
   public static HTArrayList createList(int partitionSize) {
@@ -55,6 +61,46 @@ public class HTArrayListTest {
     for (int i = 0; i < 100 * 1000; i++)
       assertEquals(i, list.get(i).getInt());
     close(list);
+  }
+  
+  @Test
+  public void testAddAll() {
+	    List<HT> list0 = createList(100);	   
+	    for (int i = 0; i < 100; i++) {
+	    	list0.add(new HTImpl(i, "hello-" + i));
+	    }	      
+	    assertEquals(100, list0.size());
+
+	    List<HT> list1 = createList(100);	   
+	    for (int i = 0; i < 100; i++) {
+	    	list1.add(new HTImpl(i, "hello-" + i));
+	    }	      
+	    assertEquals(100, list1.size());
+	    
+	    list0.addAll(list1);
+	    assertEquals(200, list0.size());
+	    
+	    close(list0);
+	    close(list1);
+  }
+  
+  @Test
+  @Ignore("ListIterator not yet implemented?")
+  public void testListIterator() {
+	  List<HT> list = createList(10); //new ArrayList<HT>();
+      HT ht = new HTImpl(0, "hello-0");
+          
+      ListIterator<HT> iter = list.listIterator();
+      iter.add(ht);
+      assertEquals("hello-0", list.get(0).getText());
+      
+      iter.previous();
+      iter.next();
+      iter.remove();
+      assertEquals(0, list.size());
+      
+      iter.add(ht);
+      assertEquals(0, list.get(0).getInt());
   }
 
   @Test
