@@ -20,14 +20,11 @@ import static junit.framework.Assert.assertEquals;
 import static vanilla.java.collections.util.HugeCollections.close;
 import static vanilla.java.collections.util.HugeCollections.recycle;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
 import org.junit.Ignore;
 import org.junit.Test;
-
-import com.sun.org.apache.bcel.internal.generic.ARRAYLENGTH;
 
 import vanilla.java.collections.api.HugeCollection;
 import vanilla.java.collections.api.HugeList;
