@@ -16,16 +16,18 @@
 
 package vanilla.java.collections.impl;
 
-import vanilla.java.collections.api.HugeList;
-import vanilla.java.collections.api.HugeListIterator;
-import vanilla.java.collections.api.Recycleable;
+import vanilla.java.collections.api.*;
 import vanilla.java.collections.api.impl.ByteBufferAllocator;
 import vanilla.java.collections.api.impl.Copyable;
 import vanilla.java.collections.api.impl.HugeElement;
 import vanilla.java.collections.api.impl.HugePartition;
+import vanilla.java.collections.util.HugeCollections;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public abstract class AbstractHugeArrayList<E> extends AbstractHugeCollection<E> implements HugeList<E>, RandomAccess {
   protected final List<HugePartition> partitions = new ArrayList<HugePartition>();
@@ -102,10 +104,6 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeCollection<E>
 
   protected abstract E createImpl();
 
-  public int partitionSize() {
-    return (int) this.size.partitionSize();
-  }
-
   @Override
   protected void growCapacity(long capacity) {
     final int partitionSize = partitionSize();
@@ -148,5 +146,48 @@ public abstract class AbstractHugeArrayList<E> extends AbstractHugeCollection<E>
       partition.close();
     }
     allocator.close();
+  }
+
+  //// MULTI_THREADED SUPPORT.
+
+  @Override
+  public long update(final Predicate<E> predicate, final Updater<E> updater) {
+    List<Future<Long>> tasks = new ArrayList<Future<Long>>();
+    final int partitionSize = partitionSize();
+    for (long start = 0, size = longSize(); start < size; start += partitionSize) {
+      final long partitionEnd = Math.min(start + partitionSize, size);
+      if (partitionEnd <= start) break;
+
+      final HugeElement he = (HugeElement) get(start);
+      final long finalStart = start;
+      tasks.add(HugeCollections.EXECUTOR_SERVICE.submit(new Callable<Long>() {
+        @Override
+        public Long call() throws Exception {
+          long count = 0;
+          for (long i = finalStart; i < partitionEnd; i++) {
+            he.index(i);
+            if (predicate.test((E) he) && updater.update((E) he))
+              count++;
+          }
+          return count;
+        }
+      }));
+    }
+    long count = 0;
+    try {
+      for (Future<Long> task : tasks) {
+        count += task.get();
+      }
+    } catch (InterruptedException e) {
+      throw new IllegalStateException(e);
+    } catch (ExecutionException e) {
+      Thread.currentThread().stop(e.getCause());
+    }
+    return count;
+  }
+
+  @Override
+  public long update(Updater<E> updater) {
+    return update((Predicate<E>) Predicates.ALL, updater);
   }
 }

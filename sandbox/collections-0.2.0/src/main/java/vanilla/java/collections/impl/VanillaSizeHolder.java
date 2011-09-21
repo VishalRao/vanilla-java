@@ -16,14 +16,10 @@
 
 package vanilla.java.collections.impl;
 
-import vanilla.java.collections.api.impl.SizeHolder;
-
-import java.io.IOException;
-
-public class VanillaSizeHolder implements SizeHolder {
+public class VanillaSizeHolder extends SimpleSizeHolder {
   private long size;
   private long capacity;
-  private long partitionSize;
+  private int partitionSize;
 
   @Override
   public void size(long size) {
@@ -45,21 +41,11 @@ public class VanillaSizeHolder implements SizeHolder {
     return capacity;
   }
 
-  public void partitionSize(long partitionSize) {
+  public void partitionSize(int partitionSize) {
     this.partitionSize = partitionSize;
   }
 
-  public long partitionSize() {
+  public int partitionSize() {
     return partitionSize;
-  }
-
-  @Override
-  public void close() throws IOException {
-
-  }
-
-  @Override
-  public void flush() throws IOException {
-
   }
 }

@@ -35,6 +35,10 @@ public class DirectByteBufferAllocator implements ByteBufferAllocator {
     final ByteBuffer buffer = this.buffer = ByteBuffer.allocateDirect(partitionSize * elementSize);
     return new Cleaner() {
       @Override
+      public void flush() {
+      }
+
+      @Override
       public void clean() {
         ((DirectBuffer) buffer).cleaner().clean();
       }

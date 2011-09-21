@@ -35,6 +35,7 @@ public interface HugeCollection<E> extends HugeContainer, Collection<E>, HugeIte
    *
    * @param procedure to apply to each element.
    * @return a collection of all the results.
+   * @since Not implemented yet.
    */
   <T> HugeCollection<T> forEach(Procedure<E, T> procedure);
 
@@ -44,6 +45,7 @@ public interface HugeCollection<E> extends HugeContainer, Collection<E>, HugeIte
    * @param predicate matching elements to process
    * @param procedure to apply to each matched element.
    * @return a collection of all the results.
+   * @since Not implemented yet.
    */
   <T> HugeCollection<T> forEach(Predicate<E> predicate, Procedure<E, T> procedure);
 

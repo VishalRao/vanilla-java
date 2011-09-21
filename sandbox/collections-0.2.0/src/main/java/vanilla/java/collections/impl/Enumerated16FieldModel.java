@@ -173,7 +173,7 @@ public class Enumerated16FieldModel<T> implements FieldModel<T> {
     if (ch == null) {
       final int size = list.size();
       if (size >= Character.MAX_VALUE)
-        throw new IllegalStateException("Cannot enumerate more than " + Character.MAX_VALUE + " values in a partition.");
+        throw new IllegalStateException("Cannot enumerate more than " + (int) Character.MAX_VALUE + " values in a partition.");
       list.add(id);
       ch = (char) size;
       map.put(id, ch);

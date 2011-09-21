@@ -16,22 +16,26 @@
 
 package vanilla.java.collections.hand;
 
-import static junit.framework.Assert.assertEquals;
-import static vanilla.java.collections.util.HugeCollections.close;
-import static vanilla.java.collections.util.HugeCollections.recycle;
+import org.junit.Ignore;
+import org.junit.Test;
+import vanilla.java.collections.api.HugeCollection;
+import vanilla.java.collections.api.HugeList;
+import vanilla.java.collections.api.Predicate;
+import vanilla.java.collections.api.Updater;
+import vanilla.java.collections.api.impl.HugeElement;
+import vanilla.java.collections.impl.DirectByteBufferAllocator;
 
 import java.util.List;
 import java.util.ListIterator;
 
-import org.junit.Ignore;
-import org.junit.Test;
-
-import vanilla.java.collections.api.HugeCollection;
-import vanilla.java.collections.api.HugeList;
-import vanilla.java.collections.api.Predicate;
-import vanilla.java.collections.impl.DirectByteBufferAllocator;
+import static junit.framework.Assert.assertEquals;
+import static vanilla.java.collections.util.HugeCollections.close;
+import static vanilla.java.collections.util.HugeCollections.recycle;
 
 public class HTArrayListTest {
+
+  public static final int PARTITION_SIZE = 1024;
+
   public static HTArrayList createList(int partitionSize) {
     // a very small partition size to show problems quickly.
     return new HTArrayList(partitionSize, HT.class, new DirectByteBufferAllocator());
@@ -59,45 +63,45 @@ public class HTArrayListTest {
       assertEquals(i, list.get(i).getInt());
     close(list);
   }
-  
+
   @Test
   public void testAddAll() {
-	    List<HT> list0 = createList(100);	   
-	    for (int i = 0; i < 100; i++) {
-	    	list0.add(new HTImpl(i, "hello-" + i));
-	    }	      
-	    assertEquals(100, list0.size());
+    List<HT> list0 = createList(100);
+    for (int i = 0; i < 100; i++) {
+      list0.add(new HTImpl(i, "hello-" + i));
+    }
+    assertEquals(100, list0.size());
 
-	    List<HT> list1 = createList(100);	   
-	    for (int i = 0; i < 100; i++) {
-	    	list1.add(new HTImpl(i, "hello-" + i));
-	    }	      
-	    assertEquals(100, list1.size());
-	    
-	    list0.addAll(list1);
-	    assertEquals(200, list0.size());
-	    
-	    close(list0);
-	    close(list1);
+    List<HT> list1 = createList(100);
+    for (int i = 0; i < 100; i++) {
+      list1.add(new HTImpl(i, "hello-" + i));
+    }
+    assertEquals(100, list1.size());
+
+    list0.addAll(list1);
+    assertEquals(200, list0.size());
+
+    close(list0);
+    close(list1);
   }
-  
+
   @Test
   @Ignore("ListIterator not yet implemented?")
   public void testListIterator() {
-	  List<HT> list = createList(10); //new ArrayList<HT>();
-      HT ht = new HTImpl(0, "hello-0");
-          
-      ListIterator<HT> iter = list.listIterator();
-      iter.add(ht);
-      assertEquals("hello-0", list.get(0).getText());
-      
-      iter.previous();
-      iter.next();
-      iter.remove();
-      assertEquals(0, list.size());
-      
-      iter.add(ht);
-      assertEquals(0, list.get(0).getInt());
+    List<HT> list = createList(10); //new ArrayList<HT>();
+    HT ht = new HTImpl(0, "hello-0");
+
+    ListIterator<HT> iter = list.listIterator();
+    iter.add(ht);
+    assertEquals("hello-0", list.get(0).getText());
+
+    iter.previous();
+    iter.next();
+    iter.remove();
+    assertEquals(0, list.size());
+
+    iter.add(ht);
+    assertEquals(0, list.get(0).getInt());
   }
 
   @Test
@@ -150,7 +154,7 @@ public class HTArrayListTest {
 
   @Test
   public void testFilter() {
-    HugeList<HT> list = createList(1024);
+    HugeList<HT> list = createList(PARTITION_SIZE);
     // force it to grow.
     for (int i = 0; i < 1000; i++)
       list.add(new HTImpl(i, "hello-" + i));
@@ -182,5 +186,33 @@ public class HTArrayListTest {
       System.out.println(ht);
     }
 */
+  }
+
+
+  @Test
+  public void testUpdater() {
+    for (int r = 0; r < 9; r++) {
+      HugeList<HT> list = createList(16 * PARTITION_SIZE);
+      list.clear();
+      long start1 = System.nanoTime();
+      for (int i = 0; i < 10 * 1000 * 1000; i++)
+        list.add(new HTImpl(i, "hello-" + i));
+      long time1 = System.nanoTime() - start1;
+
+      // concurrently.
+      long start2 = System.nanoTime();
+      assertEquals(list.size(), list.update(new Updater<HT>() {
+        @Override
+        public boolean update(HT ht) {
+          long index = ((HugeElement) ht).index();
+          ht.setText("hello-" + index);
+          return true;
+        }
+      }));
+      long time2 = System.nanoTime() - start2;
+
+      System.out.printf("Single threaded %,d ns each%nMulti-threaded %,d ns each%n", time1 / list.size(), time2 / list.size());
+      close(list);
+    }
   }
 }

@@ -14,55 +14,46 @@
  * limitations under the License.
  */
 
-package vanilla.java.collections.impl;
+package vanilla.java.collections.hand;
 
-import vanilla.java.collections.api.impl.SizeHolder;
+import vanilla.java.collections.api.impl.ByteBufferAllocator;
+import vanilla.java.collections.api.impl.HugePartition;
+import vanilla.java.collections.impl.AbstractHugeHashMap;
 
 import java.io.IOException;
 
-public abstract class SimpleSizeHolder implements SizeHolder {
-  @Override
-  public void size(long size) {
-    if (size() != size)
-      throw new UnsupportedOperationException();
+public class HTMap extends AbstractHugeHashMap<HTKey, HT> {
+  public HTMap(int partitionSize, Class<HTKey> keyType, Class<HT> valueType, ByteBufferAllocator allocator) {
+    super(partitionSize, keyType, valueType, allocator);
   }
 
   @Override
-  public void capacity(long capacity) {
-    size(capacity);
-  }
-
-  @Override
-  public long capacity() {
-    return size();
-  }
-
-  @Override
-  public void close() throws IOException {
-  }
-
-  @Override
-  public void flush() throws IOException {
-  }
-
-
-  @Override
-  public void addToSize(int i) {
+  protected HugePartition createPartition(int partitionNumber) throws IOException {
     throw new Error("Not implemented");
   }
 
   @Override
-  public void partitionSize(int partitionSize) {
+  protected void copyValue(HT ht, HT value) {
     throw new Error("Not implemented");
   }
 
   @Override
-  public void keyPartitions(int keyPartitions) {
+  protected long longHashCodeFor(HTKey key) {
     throw new Error("Not implemented");
   }
 
   @Override
-  public int keyPartitions() {
+  protected HTKey acquireKeyElement(long index) {
+    throw new Error("Not implemented");
+  }
+
+  @Override
+  protected void growBuffer(int loHash) {
+    throw new Error("Not implemented");
+  }
+
+  @Override
+  protected void ensureCapacity(long i) {
     throw new Error("Not implemented");
   }
 }

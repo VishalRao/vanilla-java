@@ -111,7 +111,7 @@ public class SelectedList<E> extends AbstractHugeCollection<E> {
     }
 
     @Override
-    public long partitionSize() {
+    public int partitionSize() {
       return SelectedList.this.partitionSize();
     }
 

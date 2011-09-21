@@ -71,6 +71,11 @@ public abstract class AbstractHugeContainer implements HugeContainer {
     return (int) (l ^ (l >>> 32));
   }
 
+  public int partitionSize() {
+    return (int) this.size.partitionSize();
+  }
+
+
   @Override
   public void close() throws IOException {
     size.close();

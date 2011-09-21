@@ -86,7 +86,7 @@ public class SubList<E> extends AbstractHugeCollection<E> implements HugeList<E>
 
   class SubListSizeHolder extends SimpleSizeHolder {
     @Override
-    public long partitionSize() {
+    public int partitionSize() {
       return SubList.this.partitionSize();
     }
 

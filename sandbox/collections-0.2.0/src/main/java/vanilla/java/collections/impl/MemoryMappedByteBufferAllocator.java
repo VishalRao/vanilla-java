@@ -44,13 +44,22 @@ public class MemoryMappedByteBufferAllocator implements ByteBufferAllocator {
   @Override
   public Cleaner reserve(int partitionSize, int elementSize, String type, int num) throws IOException {
     this.partitionSize = partitionSize;
-    final int capacity = partitionSize * elementSize;
-    final RandomAccessFile raf = new RandomAccessFile(new File(baseDirectory, type + "-" + num), "rw");
+    final File file = new File(baseDirectory, type + "-" + num);
+    int capacity = partitionSize * elementSize;
+    long fileSize = file.length();
+    if (fileSize > capacity) capacity = (int) fileSize;
+
+    final RandomAccessFile raf = new RandomAccessFile(file, "rw");
 
     final MappedByteBuffer buffer = raf.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, capacity);
     this.lastBuffer = buffer;
     files.put(raf, buffer);
     return new Cleaner() {
+      @Override
+      public void flush() throws IOException {
+        buffer.force();
+      }
+
       @Override
       public void clean() {
         buffer.force();
@@ -133,7 +142,7 @@ public class MemoryMappedByteBufferAllocator implements ByteBufferAllocator {
   public SizeHolder sizeHolder() {
     try {
       final RandomAccessFile raf = new RandomAccessFile(new File(baseDirectory, "size"), "rw");
-      final MappedByteBuffer buffer = raf.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, 8 * MemoryMappedSizeHolder.LONGS);
+      final MappedByteBuffer buffer = raf.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, MemoryMappedSizeHolder.LENGTH);
       files.put(raf, buffer);
       return new MemoryMappedSizeHolder(buffer, raf);
     } catch (IOException e) {
@@ -148,48 +157,63 @@ public class MemoryMappedByteBufferAllocator implements ByteBufferAllocator {
 
   class MemoryMappedSizeHolder implements SizeHolder {
     static final int SIZE = 0;
-    static final int CAPACITY = 1;
-    static final int PARTITION_SIZE = 2;
-    static final int LONGS = 3;
+    static final int CAPACITY = SIZE + 8;
+    static final int PARTITION_SIZE = CAPACITY + 8;
+    static final int KEY_PARTITIONS = PARTITION_SIZE + 4;
+    static final int LENGTH = KEY_PARTITIONS + 4;
 
     private final MappedByteBuffer buffer;
-    private final LongBuffer sizes;
     private final RandomAccessFile raf;
 
     public MemoryMappedSizeHolder(MappedByteBuffer buffer, RandomAccessFile raf) {
       this.buffer = buffer;
-      this.sizes = buffer.order(ByteOrder.nativeOrder()).asLongBuffer();
+      buffer.order(ByteOrder.nativeOrder());
       this.raf = raf;
     }
 
     @Override
     public void size(long size) {
-      sizes.put(SIZE, size);
+      buffer.putLong(SIZE, size);
     }
 
     @Override
     public long size() {
-      return sizes.get(SIZE);
+      return buffer.getLong(SIZE);
+    }
+
+    @Override
+    public void addToSize(int i) {
+      buffer.putLong(SIZE, buffer.getLong(SIZE) + i);
     }
 
     @Override
     public void capacity(long capacity) {
-      sizes.put(CAPACITY, capacity);
+      buffer.putLong(CAPACITY, capacity);
     }
 
     @Override
     public long capacity() {
-      return sizes.get(CAPACITY);
+      return buffer.getLong(CAPACITY);
     }
 
     @Override
-    public void partitionSize(long partitionSize) {
-      sizes.put(PARTITION_SIZE, partitionSize);
+    public void partitionSize(int partitionSize) {
+      buffer.putInt(PARTITION_SIZE, partitionSize);
     }
 
     @Override
-    public long partitionSize() {
-      return sizes.get(PARTITION_SIZE);
+    public int partitionSize() {
+      return buffer.get(PARTITION_SIZE);
+    }
+
+    @Override
+    public void keyPartitions(int keyPartitions) {
+      buffer.putInt(KEY_PARTITIONS, keyPartitions);
+    }
+
+    @Override
+    public int keyPartitions() {
+      return buffer.getInt(KEY_PARTITIONS);
     }
 
     @Override

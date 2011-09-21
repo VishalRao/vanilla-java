@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package vanilla.java.collections.expr;
+package vanilla.java.collections.api;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

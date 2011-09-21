@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package vanilla.java.collections.api.impl;
+package vanilla.java.collections.hand;
 
-import java.io.Flushable;
+public interface HTKey {
+  // primitive type
+  void setInt(int i);
 
-public interface Cleaner extends Flushable {
-  public void clean();
+  int getInt();
 }

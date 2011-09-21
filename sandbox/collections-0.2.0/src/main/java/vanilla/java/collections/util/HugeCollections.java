@@ -29,7 +29,7 @@ import java.util.concurrent.ThreadFactory;
 public enum HugeCollections {
   ;
   private static final int PROCESSORS = Runtime.getRuntime().availableProcessors();
-  private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(PROCESSORS, new ThreadFactory() {
+  public static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(PROCESSORS, new ThreadFactory() {
     private int n;
 
     @Override
