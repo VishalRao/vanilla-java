@@ -21,16 +21,16 @@ import java.io.IOException;
 import java.util.List;
 
 public interface HugeArrayList<T> extends List<T>, Closeable, HugeContainer {
-  public T get(long n) throws IndexOutOfBoundsException;
+    public T get(long n) throws IndexOutOfBoundsException;
 
-  public HugeIterator<T> iterator();
+    public HugeIterator<T> iterator();
 
-  public HugeIterator<T> listIterator();
+    public HugeIterator<T> listIterator();
 
-  public T remove(long n) throws IndexOutOfBoundsException;
+    public T remove(long n) throws IndexOutOfBoundsException;
 
-  public T set(long n, T t) throws IndexOutOfBoundsException;
+    public T set(long n, T t) throws IndexOutOfBoundsException;
 
-  public void flush() throws IOException;
+    public void flush() throws IOException;
 
 }

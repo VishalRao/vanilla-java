@@ -19,7 +19,7 @@ package vanilla.java.collections;
 import vanilla.java.collections.impl.HugeCollectionBuilder;
 
 public class HugeMapBuilder<K, V> extends HugeCollectionBuilder<V> {
-  public HugeMapBuilder() {
-    super(1);
-  }
+    public HugeMapBuilder() {
+        super(1);
+    }
 }

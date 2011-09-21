@@ -27,90 +27,90 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 public class HandTypesKeyImpl implements HandTypesKey, HugeElement<HandTypes>, Externalizable {
-  private boolean m_boolean;
-  private int m_int;
+    private boolean m_boolean;
+    private int m_int;
 
-  @Override
-  public void setBoolean(boolean b) {
-    this.m_boolean = b;
-  }
+    @Override
+    public void setBoolean(boolean b) {
+        this.m_boolean = b;
+    }
 
-  @Override
-  public boolean getBoolean() {
-    return m_boolean;
-  }
+    @Override
+    public boolean getBoolean() {
+        return m_boolean;
+    }
 
-  @Override
-  public void setInt(int i) {
-    this.m_int = i;
-  }
+    @Override
+    public void setInt(int i) {
+        this.m_int = i;
+    }
 
-  @Override
-  public int getInt() {
-    return m_int;
-  }
+    @Override
+    public int getInt() {
+        return m_int;
+    }
 
-  @Override
-  public void index(long n) {
-    throw new UnsupportedOperationException();
-  }
+    @Override
+    public void index(long n) {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public long index() {
-    return -1;
-  }
+    @Override
+    public long index() {
+        return -1;
+    }
 
-  @Override
-  public void writeExternal(ObjectOutput out) throws IOException {
-    BooleanFieldModel.write(out, getBoolean());
-    IntFieldModel.write(out, getInt());
-  }
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        BooleanFieldModel.write(out, getBoolean());
+        IntFieldModel.write(out, getInt());
+    }
 
-  @Override
-  public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-    setBoolean(BooleanFieldModel.read(in));
-    setInt(IntFieldModel.read(in));
-  }
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        setBoolean(BooleanFieldModel.read(in));
+        setInt(IntFieldModel.read(in));
+    }
 
-  @Override
-  public void copyOf(HandTypes t) {
-    setBoolean(t.getBoolean());
-    setInt(t.getInt());
-  }
+    @Override
+    public void copyOf(HandTypes t) {
+        setBoolean(t.getBoolean());
+        setInt(t.getInt());
+    }
 
-  @Override
-  public HugeElementType hugeElementType() {
-    return HugeElementType.KeyImpl;
-  }
+    @Override
+    public HugeElementType hugeElementType() {
+        return HugeElementType.KeyImpl;
+    }
 
-  @Override
-  public String toString() {
-    return "HandTypesElement{" +
-               "int=" + getInt() +
-               ", boolean=" + getBoolean() +
-               '}';
-  }
+    @Override
+    public String toString() {
+        return "HandTypesElement{" +
+                "int=" + getInt() +
+                ", boolean=" + getBoolean() +
+                '}';
+    }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-    HandTypesKeyElement that = (HandTypesKeyElement) o;
+        HandTypesKeyElement that = (HandTypesKeyElement) o;
 
-    if (getInt() != that.getInt()) return false;
-    if (getBoolean() != that.getBoolean()) return false;
+        if (getInt() != that.getInt()) return false;
+        if (getBoolean() != that.getBoolean()) return false;
 
-    return true;
-  }
+        return true;
+    }
 
-  @Override
-  public int hashCode() {
-    return (int) longHashCode();
-  }
+    @Override
+    public int hashCode() {
+        return (int) longHashCode();
+    }
 
-  @Override
-  public long longHashCode() {
-    return getInt() * 31L + (getBoolean() ? 1 : 0);
-  }
+    @Override
+    public long longHashCode() {
+        return getInt() * 31L + (getBoolean() ? 1 : 0);
+    }
 }

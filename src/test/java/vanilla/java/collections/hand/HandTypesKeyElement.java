@@ -24,75 +24,75 @@ import vanilla.java.collections.model.BooleanFieldModel;
 import vanilla.java.collections.model.IntFieldModel;
 
 public class HandTypesKeyElement extends AbstractHugeElement<HandTypesKey, HandTypesAllocation> implements HandTypesKey {
-  HandTypesAllocation allocation;
+    HandTypesAllocation allocation;
 
-  public HandTypesKeyElement(AbstractHugeMap<HandTypesKey, HandTypesKeyElement, HandTypes, HandTypesValueElement, HandTypesAllocation> map, long n) {
-    super((AbstractHugeContainer) map, n);
-  }
+    public HandTypesKeyElement(AbstractHugeMap<HandTypesKey, HandTypesKeyElement, HandTypes, HandTypesValueElement, HandTypesAllocation> map, long n) {
+        super((AbstractHugeContainer) map, n);
+    }
 
-  @Override
-  public void setBoolean(boolean b) {
-    throw new UnsupportedOperationException();
-  }
+    @Override
+    public void setBoolean(boolean b) {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public boolean getBoolean() {
-    return BooleanFieldModel.get(allocation.m_boolean, offset);
-  }
+    @Override
+    public boolean getBoolean() {
+        return BooleanFieldModel.get(allocation.m_boolean, offset);
+    }
 
-  @Override
-  public void setInt(int i) {
-    throw new UnsupportedOperationException();
-  }
+    @Override
+    public void setInt(int i) {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public int getInt() {
-    return IntFieldModel.get(allocation.m_int, offset);
-  }
+    @Override
+    public int getInt() {
+        return IntFieldModel.get(allocation.m_int, offset);
+    }
 
-  @Override
-  protected void updateAllocation0(int allocationSize) {
-    allocation = container.getAllocation(index);
-  }
+    @Override
+    protected void updateAllocation0(int allocationSize) {
+        allocation = container.getAllocation(index);
+    }
 
 
-  @Override
-  public String toString() {
-    return "HandTypesElement{" +
-               "int=" + getInt() +
-               ", boolean=" + getBoolean() +
-               '}';
-  }
+    @Override
+    public String toString() {
+        return "HandTypesElement{" +
+                "int=" + getInt() +
+                ", boolean=" + getBoolean() +
+                '}';
+    }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || !(o instanceof HandTypesKey)) return false;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || !(o instanceof HandTypesKey)) return false;
 
-    HandTypesKey that = (HandTypesKey) o;
+        HandTypesKey that = (HandTypesKey) o;
 
-    if (getInt() != that.getInt()) return false;
-    if (getBoolean() != that.getBoolean()) return false;
+        if (getInt() != that.getInt()) return false;
+        if (getBoolean() != that.getBoolean()) return false;
 
-    return true;
-  }
+        return true;
+    }
 
-  @Override
-  public long longHashCode() {
-    return getInt() * 31L + (getBoolean() ? 1 : 0);
-  }
+    @Override
+    public long longHashCode() {
+        return getInt() * 31L + (getBoolean() ? 1 : 0);
+    }
 
-  @Override
-  public int hashCode() {
-    return (int) longHashCode();
-  }
+    @Override
+    public int hashCode() {
+        return (int) longHashCode();
+    }
 
-  @Override
-  public void copyOf(HandTypesKey t) {
-    throw new UnsupportedOperationException();
-  }
+    @Override
+    public void copyOf(HandTypesKey t) {
+        throw new UnsupportedOperationException();
+    }
 
-  public HugeElementType hugeElementType() {
-    return HugeElementType.KeyElement;
-  }
+    public HugeElementType hugeElementType() {
+        return HugeElementType.KeyElement;
+    }
 }

@@ -27,52 +27,52 @@ import java.io.IOException;
 import java.lang.annotation.ElementType;
 
 public class HandTypesArrayList extends AbstractHugeArrayList<HandTypes, HandTypesAllocation, HandTypesElement> {
-  final Enum8FieldModel<ElementType> elementTypeFieldModel
-      = new Enum8FieldModel<ElementType>("elementType", 10, ElementType.class, ElementType.values());
-  final Enumerated16FieldModel<String> stringEnumerated16FieldModel
-      = new Enumerated16FieldModel<String>("text", 11, String.class);
+    final Enum8FieldModel<ElementType> elementTypeFieldModel
+            = new Enum8FieldModel<ElementType>("elementType", 10, ElementType.class, ElementType.values());
+    final Enumerated16FieldModel<String> stringEnumerated16FieldModel
+            = new Enumerated16FieldModel<String>("text", 11, String.class);
 
-  public HandTypesArrayList(HugeArrayBuilder hab) throws IOException {
-    super(hab);
-    elementTypeFieldModel.baseDirectory(hab.baseDirectory());
-    stringEnumerated16FieldModel.baseDirectory(hab.baseDirectory());
-  }
+    public HandTypesArrayList(HugeArrayBuilder hab) throws IOException {
+        super(hab);
+        elementTypeFieldModel.baseDirectory(hab.baseDirectory());
+        stringEnumerated16FieldModel.baseDirectory(hab.baseDirectory());
+    }
 
-  @Override
-  protected HandTypesAllocation createAllocation(MappedFileChannel mfc) {
-    return new HandTypesAllocation(allocationSize, mfc);
-  }
+    @Override
+    protected HandTypesAllocation createAllocation(MappedFileChannel mfc) {
+        return new HandTypesAllocation(allocationSize, mfc);
+    }
 
-  @Override
-  protected HandTypesElement createElement(long n) {
-    return new HandTypesElement(this, n);
-  }
+    @Override
+    protected HandTypesElement createElement(long n) {
+        return new HandTypesElement(this, n);
+    }
 
-  @Override
-  protected HandTypes createImpl() {
-    return new HandTypesImpl();
-  }
+    @Override
+    protected HandTypes createImpl() {
+        return new HandTypesImpl();
+    }
 
-  protected void compactStart() {
-    stringEnumerated16FieldModel.compactStart();
-  }
+    protected void compactStart() {
+        stringEnumerated16FieldModel.compactStart();
+    }
 
-  protected void compactOnAllocation0(HugeAllocation allocation, long thisSize) {
-    compactOnAllocation((HandTypesAllocation) allocation, thisSize);
-  }
+    protected void compactOnAllocation0(HugeAllocation allocation, long thisSize) {
+        compactOnAllocation((HandTypesAllocation) allocation, thisSize);
+    }
 
-  protected void compactOnAllocation(HandTypesAllocation allocation, long thisSize) {
-    stringEnumerated16FieldModel.compactScan(allocation.m_string, thisSize);
-  }
+    protected void compactOnAllocation(HandTypesAllocation allocation, long thisSize) {
+        stringEnumerated16FieldModel.compactScan(allocation.m_string, thisSize);
+    }
 
-  protected void compactEnd() {
-    stringEnumerated16FieldModel.compactEnd();
-  }
+    protected void compactEnd() {
+        stringEnumerated16FieldModel.compactEnd();
+    }
 
-  @Override
-  public void clear() {
-    super.clear();
-    elementTypeFieldModel.clear();
-    stringEnumerated16FieldModel.clear();
-  }
+    @Override
+    public void clear() {
+        super.clear();
+        elementTypeFieldModel.clear();
+        stringEnumerated16FieldModel.clear();
+    }
 }

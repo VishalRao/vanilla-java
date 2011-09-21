@@ -24,73 +24,73 @@ import java.io.ObjectOutput;
 import java.nio.IntBuffer;
 
 public class IntFieldModel extends AbstractFieldModel<Integer> {
-  public IntFieldModel(String fieldName, int fieldNumber) {
-    super(fieldName, fieldNumber);
-  }
+    public IntFieldModel(String fieldName, int fieldNumber) {
+        super(fieldName, fieldNumber);
+    }
 
-  @Override
-  public Object arrayOfField(int size) {
-    return newArrayOfField(size, null);
-  }
+    @Override
+    public Object arrayOfField(int size) {
+        return newArrayOfField(size, null);
+    }
 
-  @Override
-  public int sizeOf(int elements) {
-    return sizeOf0(elements);
-  }
+    @Override
+    public int sizeOf(int elements) {
+        return sizeOf0(elements);
+    }
 
-  private static int sizeOf0(int elements) {
-    return elements * 4;
-  }
+    private static int sizeOf0(int elements) {
+        return elements * 4;
+    }
 
-  public static IntBuffer newArrayOfField(int size, MappedFileChannel mfc) {
-    return acquireByteBuffer(mfc, sizeOf0(size)).asIntBuffer();
-  }
+    public static IntBuffer newArrayOfField(int size, MappedFileChannel mfc) {
+        return acquireByteBuffer(mfc, sizeOf0(size)).asIntBuffer();
+    }
 
-  @Override
-  public Class storeType() {
-    return IntBuffer.class;
-  }
+    @Override
+    public Class storeType() {
+        return IntBuffer.class;
+    }
 
-  @Override
-  public Integer getAllocation(Object[] arrays, int index) {
-    IntBuffer array = (IntBuffer) arrays[fieldNumber];
-    return get(array, index);
-  }
+    @Override
+    public Integer getAllocation(Object[] arrays, int index) {
+        IntBuffer array = (IntBuffer) arrays[fieldNumber];
+        return get(array, index);
+    }
 
-  public static int get(IntBuffer array, int index) {
-    return array.get(index);
-  }
+    public static int get(IntBuffer array, int index) {
+        return array.get(index);
+    }
 
-  @Override
-  public void setAllocation(Object[] arrays, int index, Integer value) {
-    IntBuffer array = (IntBuffer) arrays[fieldNumber];
-    set(array, index, value);
-  }
+    @Override
+    public void setAllocation(Object[] arrays, int index, Integer value) {
+        IntBuffer array = (IntBuffer) arrays[fieldNumber];
+        set(array, index, value);
+    }
 
-  public static void set(IntBuffer array, int index, int value) {
-    array.put(index, value);
-  }
+    public static void set(IntBuffer array, int index, int value) {
+        array.put(index, value);
+    }
 
-  @Override
-  public Class<Integer> type() {
-    return (Class) int.class;
-  }
+    @Override
+    public Class<Integer> type() {
+        return (Class) int.class;
+    }
 
-  @Override
-  public String bcLFieldType() {
-    return "I";
-  }
+    @Override
+    public String bcLFieldType() {
+        return "I";
+    }
 
-  @Override
-  public short equalsPreference() {
-    return 32;
-  }
+    @Override
+    public short equalsPreference() {
+        return 32;
+    }
 
-  public static void write(ObjectOutput out, int i) throws IOException {
-    out.writeInt(i);
-  }
+    public static void write(ObjectOutput out, int i) throws IOException {
+        out.writeInt(i);
+    }
 
-  public static int read(ObjectInput in) throws IOException {
-    return in.readInt();
-  }
+    public static int read(ObjectInput in) throws IOException {
+        return in.readInt();
+    }
 }

@@ -17,5 +17,5 @@ package vanilla.java.collections.api;
  */
 
 public interface Predicate<T> {
-  public boolean test(T t);
+    public boolean test(T t);
 }

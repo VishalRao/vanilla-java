@@ -17,5 +17,5 @@ package vanilla.java.collections.api;
  */
 
 public interface Visitor<T, R> {
-  public R visit(T t);
+    public R visit(T t);
 }

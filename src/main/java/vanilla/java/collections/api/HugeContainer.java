@@ -1,15 +1,15 @@
 package vanilla.java.collections.api;
 
 public interface HugeContainer {
-  public int size();
+    public int size();
 
-  public long longSize();
+    public long longSize();
 
-  public void setSize(long length);
+    public void setSize(long length);
 
-  public void recycle(Object o);
+    public void recycle(Object o);
 
-  public void ensureCapacity(long capacity);
+    public void ensureCapacity(long capacity);
 
-  public void compact();
+    public void compact();
 }

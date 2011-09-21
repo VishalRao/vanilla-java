@@ -25,109 +25,109 @@ import java.nio.IntBuffer;
 
 public class Boolean2FieldModel extends AbstractFieldModel<Boolean> {
 
-  public Boolean2FieldModel(String fieldName, int fieldNumber) {
-    super(fieldName, fieldNumber);
-  }
-
-  @Override
-  public Object arrayOfField(int size) {
-    return newArrayOfField(size, null);
-  }
-
-  @Override
-  public int sizeOf(int elements) {
-    return sizeOf0(elements);
-  }
-
-  private static int sizeOf0(int elements) {
-    return (elements + 3) / 4;
-  }
-
-  public static IntBuffer newArrayOfField(int size, MappedFileChannel mfc) {
-    return acquireByteBuffer(mfc, sizeOf0(size)).asIntBuffer();
-  }
-
-  @Override
-  public Class storeType() {
-    return IntBuffer.class;
-  }
-
-  @Override
-  public Boolean getAllocation(Object[] arrays, int index) {
-    IntBuffer array = (IntBuffer) arrays[fieldNumber];
-    return get(array, index);
-  }
-
-  public static Boolean get(IntBuffer array, int index) {
-    int value = array.get(index >>> 4) >> ((index & 15) << 1);
-    switch (value & 3) {
-      case 0:
-        return false;
-      case 1:
-        return true;
-      case 2:
-        return null;
-      default:
-        throw new AssertionError();
+    public Boolean2FieldModel(String fieldName, int fieldNumber) {
+        super(fieldName, fieldNumber);
     }
-  }
 
-  @Override
-  public void setAllocation(Object[] arrays, int index, Boolean value) {
-    IntBuffer array = (IntBuffer) arrays[fieldNumber];
-    set(array, index, value);
-  }
+    @Override
+    public Object arrayOfField(int size) {
+        return newArrayOfField(size, null);
+    }
 
-  public static void set(IntBuffer array, int index, Boolean value) {
-    int value2 = value == null ? 2 : value ? 1 : 0;
-    int byteIndex = index >>> 4;
-    int index2 = (index & 15) << 1;
-    int mask = ~(3 << index2);
-    int value3 = (array.get(byteIndex) & mask) | (value2 << index2);
-    array.put(byteIndex, value3);
-  }
+    @Override
+    public int sizeOf(int elements) {
+        return sizeOf0(elements);
+    }
 
-  public static void write(ObjectOutput oo, Boolean b) throws IOException {
-    oo.writeByte(b == null ? Byte.MIN_VALUE : b ? 1 : 0);
-  }
+    private static int sizeOf0(int elements) {
+        return (elements + 3) / 4;
+    }
 
-  public static Boolean read(ObjectInput oi) throws IOException {
-    byte b = oi.readByte();
-    return b < 0 ? null : (Boolean) (b > 0);
-  }
+    public static IntBuffer newArrayOfField(int size, MappedFileChannel mfc) {
+        return acquireByteBuffer(mfc, sizeOf0(size)).asIntBuffer();
+    }
 
-  @Override
-  public Class<Boolean> type() {
-    return Boolean.class;
-  }
+    @Override
+    public Class storeType() {
+        return IntBuffer.class;
+    }
 
-  @Override
-  public BCType bcType() {
-    return BCType.Reference;
-  }
+    @Override
+    public Boolean getAllocation(Object[] arrays, int index) {
+        IntBuffer array = (IntBuffer) arrays[fieldNumber];
+        return get(array, index);
+    }
 
-  @Override
-  public boolean isCallsNotEquals() {
-    return true;
-  }
+    public static Boolean get(IntBuffer array, int index) {
+        int value = array.get(index >>> 4) >> ((index & 15) << 1);
+        switch (value & 3) {
+            case 0:
+                return false;
+            case 1:
+                return true;
+            case 2:
+                return null;
+            default:
+                throw new AssertionError();
+        }
+    }
 
-  @UsedFromByteCode
-  public static boolean notEquals(Boolean t1, Boolean t2) {
-    return t1 == null ? t2 != null : !t1.equals(t2);
-  }
+    @Override
+    public void setAllocation(Object[] arrays, int index, Boolean value) {
+        IntBuffer array = (IntBuffer) arrays[fieldNumber];
+        set(array, index, value);
+    }
 
-  @UsedFromByteCode
-  public static int hashCode(Boolean b) {
-    return b == null ? 0 : b.hashCode();
-  }
+    public static void set(IntBuffer array, int index, Boolean value) {
+        int value2 = value == null ? 2 : value ? 1 : 0;
+        int byteIndex = index >>> 4;
+        int index2 = (index & 15) << 1;
+        int mask = ~(3 << index2);
+        int value3 = (array.get(byteIndex) & mask) | (value2 << index2);
+        array.put(byteIndex, value3);
+    }
 
-  @Override
-  public boolean copySimpleValue() {
-    return false;
-  }
+    public static void write(ObjectOutput oo, Boolean b) throws IOException {
+        oo.writeByte(b == null ? Byte.MIN_VALUE : b ? 1 : 0);
+    }
 
-  @Override
-  public short equalsPreference() {
-    return 0;
-  }
+    public static Boolean read(ObjectInput oi) throws IOException {
+        byte b = oi.readByte();
+        return b < 0 ? null : (Boolean) (b > 0);
+    }
+
+    @Override
+    public Class<Boolean> type() {
+        return Boolean.class;
+    }
+
+    @Override
+    public BCType bcType() {
+        return BCType.Reference;
+    }
+
+    @Override
+    public boolean isCallsNotEquals() {
+        return true;
+    }
+
+    @UsedFromByteCode
+    public static boolean notEquals(Boolean t1, Boolean t2) {
+        return t1 == null ? t2 != null : !t1.equals(t2);
+    }
+
+    @UsedFromByteCode
+    public static int hashCode(Boolean b) {
+        return b == null ? 0 : b.hashCode();
+    }
+
+    @Override
+    public boolean copySimpleValue() {
+        return false;
+    }
+
+    @Override
+    public short equalsPreference() {
+        return 0;
+    }
 }
