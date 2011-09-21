@@ -4,6 +4,7 @@ import com.sun.jmx.remote.internal.ArrayQueue;
 import gnu.trove.TIntArrayList;
 import javolution.util.FastList;
 import javolution.util.FastTable;
+import vanilla.java.collections.HugeArrayBuilder;
 
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -33,6 +34,7 @@ public class RunAddIntComparison {
 		operations.add(createListAddOperation(Stack.class));
 		operations.add(createListAddOperation(FastList.class));
 		operations.add(createListAddOperation(FastTable.class));
+		operations.add(createHugeArrayListAddOperation());
 		//TODO add HugeCollection
 		//TODO add Google Collections - http://code.google.com/p/guava-libraries
 		//TODO add PCJ - http://pcj.sourceforge.net
@@ -79,6 +81,31 @@ public class RunAddIntComparison {
 				TIntArrayList list = new TIntArrayList();
 				for (int i = 0; i < iterations; i++) {
 					list.add(i);
+				}
+				return list;
+			}
+		};
+	}
+
+	interface Int {
+		public void setInt(int i);
+
+		public int getInt();
+	}
+
+	private Operation createHugeArrayListAddOperation() {
+		return new Operation("Performing {0} HugeArrayList<Int>.add(int) operations", ADD_ITERATIONS) {
+
+			@Override
+			public Object execute() {
+				final HugeArrayBuilder<Int> builder = new HugeArrayBuilder<Int>() {{
+					capacity = ADD_ITERATIONS;
+				}};
+				List<Int> list = builder.create();
+				Int element = builder.createBean();
+				for (int i = 0; i < iterations; i++) {
+					element.setInt(i);
+					list.add(element); // copies the value.
 				}
 				return list;
 			}

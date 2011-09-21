@@ -4,23 +4,28 @@ import java.lang.instrument.Instrumentation;
 
 /**
  * Determine the size of an object using instrumentation.
- * 
- * @author c.cerbo
  *
+ * @author c.cerbo
  */
 public class ObjectSizeFetcher {
-    private static Instrumentation instrumentation;
+	private static Instrumentation instrumentation;
+	private static boolean logged = false;
 
-    public static void premain(String args, Instrumentation inst) {
-        instrumentation = inst;
-    }
+	public static void premain(String args, Instrumentation inst) {
+		instrumentation = inst;
+	}
 
-    //TODO instrumentation
-    public static long getObjectSize(Object o) {
-    	if (instrumentation == null) {
-    		return -1;
-    	}
-        return instrumentation.getObjectSize(o);
-    }
+	//TODO instrumentation
+	public static long getObjectSize(Object o) {
+		if (instrumentation == null) {
+			if (!logged) {
+				// TODO add instructions here
+				System.out.println("To enable the ObjectSizeFetcher add to the command line: .........");
+				logged = true;
+			}
+			return -1;
+		}
+		return instrumentation.getObjectSize(o);
+	}
 }
 
