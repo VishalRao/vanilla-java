@@ -21,7 +21,6 @@ import sun.misc.Cleaner;
 import sun.nio.ch.DirectBuffer;
 import vanilla.java.collections.model.*;
 
-import java.awt.image.DataBuffer;
 import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1061,7 +1060,7 @@ public enum GenerateHugeArrays {
 
     public static void clean(Buffer buffer) {
         DirectBuffer db = (DirectBuffer) buffer;
-        if (db.viewedBuffer() instanceof DataBuffer)
+        if (db.viewedBuffer() instanceof DirectBuffer)
             db = (DirectBuffer) db.viewedBuffer();
         final Cleaner cleaner = db.cleaner();
         if (cleaner != null)
