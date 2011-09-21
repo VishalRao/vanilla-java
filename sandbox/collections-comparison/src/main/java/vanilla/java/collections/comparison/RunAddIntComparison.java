@@ -1,48 +1,68 @@
 package vanilla.java.collections.comparison;
 
+import com.sun.jmx.remote.internal.ArrayQueue;
 import gnu.trove.TIntArrayList;
+import javolution.util.FastList;
+import javolution.util.FastTable;
 
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-
-import javolution.util.FastList;
+import java.util.*;
 
 /**
  * Measure time and memory consumption of an add operation.
- * 
- * @author c.cerbo
  *
+ * @author c.cerbo
  */
 public class RunAddIntComparison {
-	private static final int ADD_ITERATIONS = 1000000;
+	private static final int ADD_ITERATIONS = 10000000;
 
-	static private final String[] ENV_PROPS = { "java.vm.name",
-			"java.runtime.version", "os.name", "os.arch", "os.version" };
+	static private final String[] ENV_PROPS = {"java.vm.name",
+												  "java.runtime.version", "os.name", "os.arch", "os.version"};
 
 	private PrintWriter out = new PrintWriter(
-			new OutputStreamWriter(System.out), true);
+												 new OutputStreamWriter(System.out), true);
 	private List<Operation> operations = new ArrayList<Operation>();
 
 	public RunAddIntComparison() {
-		operations.add(createArrayListAddOperation());
 		operations.add(createTIntArrayListAddOperation());
-		operations.add(createFastListtAddOperation());
+		operations.add(createArrayQueueAddOperation());
+		operations.add(createListAddOperation(ArrayList.class));
+		operations.add(createListAddOperation(LinkedList.class));
+		operations.add(createListAddOperation(Vector.class));
+		operations.add(createListAddOperation(Stack.class));
+		operations.add(createListAddOperation(FastList.class));
+		operations.add(createListAddOperation(FastTable.class));
 		//TODO add HugeCollection
 		//TODO add Google Collections - http://code.google.com/p/guava-libraries
 		//TODO add PCJ - http://pcj.sourceforge.net
 		//TODO add Apache Commons Collections - http://commons.apache.org/collections
 		//TODO add Fastutil - http://fastutil.dsi.unimi.it
-	}
-		
 
-	private Operation createArrayListAddOperation() {
-		return new Operation("Performing {0} ArrayList.add(int) operations", ADD_ITERATIONS) {
+// takes too long.
+//		operations.add(createListAddOperation(CopyOnWriteArrayList.class));
+	}
+
+	private Operation createListAddOperation(final Class<? extends List> listClass) {
+		return new Operation("Performing {0} " + listClass.getSimpleName() + ".add(int) operations", ADD_ITERATIONS) {
+
+			@Override
+			public Object execute() throws InstantiationException, IllegalAccessException {
+				List<Integer> list = (List) listClass.newInstance();
+				for (int i = 0; i < iterations; i++) {
+					list.add(i);
+				}
+				return list;
+			}
+		};
+	}
+
+	private Operation createArrayQueueAddOperation() {
+		return new Operation("Performing {0} ArrayQueue.add(int) operations", ADD_ITERATIONS) {
 
 			@Override
 			public Object execute() {
-				List<Integer> list = new ArrayList<Integer>();
+				List<Integer> list = new ArrayQueue<Integer>(ADD_ITERATIONS);
 				for (int i = 0; i < iterations; i++) {
 					list.add(i);
 				}
@@ -64,21 +84,7 @@ public class RunAddIntComparison {
 			}
 		};
 	}
-	
-	private Operation createFastListtAddOperation() {
-		return new Operation("Performing {0} FastList.add(int) operations", ADD_ITERATIONS) {
 
-			@Override
-			public Object execute() {
-				FastList<Integer> list = new FastList<Integer>();
-				for (int i = 0; i < iterations; i++) {
-					list.add(i);
-				}
-				return list;
-			}
-		};
-	}
-	
 	public void setPrintWriter(PrintWriter out) {
 		this.out = out;
 	}
@@ -86,12 +92,29 @@ public class RunAddIntComparison {
 	public void run() {
 		printHeader();
 		for (Operation operation : operations) {
-			out.println(operation.getDescription());
-			long elapsed = System.currentTimeMillis();
-			Object list = operation.execute();
-			elapsed = System.currentTimeMillis() - elapsed;
-			out.println("Elapsed time (ms)      : " + elapsed);
-			out.println("Memory consumed (bytes): " + ObjectSizeFetcher.getObjectSize(list));
+			out.print(operation.getDescription());
+			out.flush();
+			long[] times = new long[31];
+			try {
+				Object list = null;
+				for (int i = 0; i < times.length; i++) {
+					// slower with recycling.
+//					if (list instanceof FastList) FastList.recycle((FastList) list);
+					if (list instanceof FastTable) FastTable.recycle((FastTable) list);
+
+					long start = System.nanoTime();
+					list = operation.execute();
+					times[i] = System.nanoTime() - start;
+				}
+				Arrays.sort(times);
+				long median = times[times.length / 2];
+				out.print(", took (ms), " + median / 1000000);
+				long ninetyth = times[times.length * 9 / 10];
+				out.print(", 90%tile took (ms), " + ninetyth / 1000000);
+				out.print(", memory consumed (bytes), " + ObjectSizeFetcher.getObjectSize(list));
+			} catch (Exception e) {
+				e.printStackTrace(out);
+			}
 			out.println();
 		}
 	}
@@ -100,11 +123,10 @@ public class RunAddIntComparison {
 		out.println("--------------------------------");
 		out.println("Collections Comparison");
 		out.println("--------------------------------");
-		for (int i = 0; i < ENV_PROPS.length; i++) {
-			String key = ENV_PROPS[i];
-			out.println(key + "=" + System.getProperty(key));
-		}
-		out.println("maxMemory=" + Runtime.getRuntime().maxMemory());
+		Map<String, String> props = new LinkedHashMap<String, String>((Map) System.getProperties());
+		props.keySet().retainAll(Arrays.asList(ENV_PROPS));
+		props.put("maxMemory", String.format("%,d MB", Runtime.getRuntime().maxMemory() / 1024 / 1024));
+		out.println(props);
 		out.println("--------------------------------");
 		out.println();
 	}
