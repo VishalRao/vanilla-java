@@ -189,6 +189,7 @@ public abstract class AbstractHugeArrayList<T, TA extends HugeAllocation, TE ext
             } catch (IOException ignored) {
             }
         }
+        super.close();
     }
     // imported from AbstractList
 
