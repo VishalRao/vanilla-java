@@ -24,96 +24,96 @@ import java.io.ObjectOutput;
 import java.nio.LongBuffer;
 
 public class LongFieldModel extends AbstractFieldModel<Long> {
-  public LongFieldModel(String fieldName, int fieldNumber) {
-    super(fieldName, fieldNumber);
-  }
+    public LongFieldModel(String fieldName, int fieldNumber) {
+        super(fieldName, fieldNumber);
+    }
 
-  @Override
-  public Object arrayOfField(int size) {
-    return newArrayOfField(size, null);
-  }
+    @Override
+    public Object arrayOfField(int size) {
+        return newArrayOfField(size, null);
+    }
 
-  @Override
-  public int sizeOf(int elements) {
-    return sizeOf0(elements);
-  }
+    @Override
+    public int sizeOf(int elements) {
+        return sizeOf0(elements);
+    }
 
-  private static int sizeOf0(int elements) {
-    return elements * 8;
-  }
+    private static int sizeOf0(int elements) {
+        return elements * 8;
+    }
 
-  public static LongBuffer newArrayOfField(int size, MappedFileChannel mfc) {
-    return acquireByteBuffer(mfc, sizeOf0(size)).asLongBuffer();
-  }
+    public static LongBuffer newArrayOfField(int size, MappedFileChannel mfc) {
+        return acquireByteBuffer(mfc, sizeOf0(size)).asLongBuffer();
+    }
 
-  @Override
-  public Class storeType() {
-    return LongBuffer.class;
-  }
+    @Override
+    public Class storeType() {
+        return LongBuffer.class;
+    }
 
-  @Override
-  public Long getAllocation(Object[] arrays, int index) {
-    LongBuffer array = (LongBuffer) arrays[fieldNumber];
-    return get(array, index);
-  }
+    @Override
+    public Long getAllocation(Object[] arrays, int index) {
+        LongBuffer array = (LongBuffer) arrays[fieldNumber];
+        return get(array, index);
+    }
 
-  public static long get(LongBuffer array, int index) {
-    return array.get(index);
-  }
+    public static long get(LongBuffer array, int index) {
+        return array.get(index);
+    }
 
-  @Override
-  public void setAllocation(Object[] arrays, int index, Long value) {
-    LongBuffer array = (LongBuffer) arrays[fieldNumber];
-    set(array, index, value);
-  }
+    @Override
+    public void setAllocation(Object[] arrays, int index, Long value) {
+        LongBuffer array = (LongBuffer) arrays[fieldNumber];
+        set(array, index, value);
+    }
 
-  public static void set(LongBuffer array, int index, long value) {
-    array.put(index, value);
-  }
+    public static void set(LongBuffer array, int index, long value) {
+        array.put(index, value);
+    }
 
-  @Override
-  public Class<Long> type() {
-    return (Class) long.class;
-  }
+    @Override
+    public Class<Long> type() {
+        return (Class) long.class;
+    }
 
-  @Override
-  public int bcFieldSize() {
-    return 2;
-  }
+    @Override
+    public int bcFieldSize() {
+        return 2;
+    }
 
-  @Override
-  public String bcLFieldType() {
-    return "J";
-  }
+    @Override
+    public String bcLFieldType() {
+        return "J";
+    }
 
-  @Override
-  public BCType bcType() {
-    return BCType.Long;
-  }
+    @Override
+    public BCType bcType() {
+        return BCType.Long;
+    }
 
-  @Override
-  public boolean isCallsNotEquals() {
-    return true;
-  }
+    @Override
+    public boolean isCallsNotEquals() {
+        return true;
+    }
 
-  public static boolean equals(long l1, long l2) {
-    return l1 == l2;
-  }
+    public static boolean equals(long l1, long l2) {
+        return l1 == l2;
+    }
 
-  public static int hashCode(long l) {
-    return (int) (l >>> 32 ^ l);
-  }
+    public static int hashCode(long l) {
+        return (int) (l >>> 32 ^ l);
+    }
 
-  @Override
-  public short equalsPreference() {
-    return 30; // 64; lower due to the increased memory requirement
-  }
+    @Override
+    public short equalsPreference() {
+        return 30; // 64; lower due to the increased memory requirement
+    }
 
-  public static void write(ObjectOutput out, long l) throws IOException {
-    out.writeLong(l);
-  }
+    public static void write(ObjectOutput out, long l) throws IOException {
+        out.writeLong(l);
+    }
 
-  public static long read(ObjectInput in) throws IOException {
-    return in.readLong();
-  }
+    public static long read(ObjectInput in) throws IOException {
+        return in.readLong();
+    }
 }

@@ -21,52 +21,52 @@ import vanilla.java.collections.api.Id;
 import java.lang.annotation.ElementType;
 
 public interface MutableTypes {
-  public void setInt(int i);
+    public void setInt(int i);
 
-  @Id
-  public int getInt();
+    @Id
+    public int getInt();
 
-  public void setBoolean(boolean b);
+    public void setBoolean(boolean b);
 
-  public boolean getBoolean();
+    public boolean getBoolean();
 
-  public void setBoolean2(Boolean b);
+    public void setBoolean2(Boolean b);
 
-  public Boolean getBoolean2();
+    public Boolean getBoolean2();
 
-  public void setByte(byte b);
+    public void setByte(byte b);
 
-  public byte getByte();
+    public byte getByte();
 
-  public void setByte2(Byte b);
+    public void setByte2(Byte b);
 
-  public Byte getByte2();
+    public Byte getByte2();
 
-  public void setChar(char ch);
+    public void setChar(char ch);
 
-  public char getChar();
+    public char getChar();
 
-  public void setShort(short s);
+    public void setShort(short s);
 
-  public short getShort();
+    public short getShort();
 
-  public void setFloat(float f);
+    public void setFloat(float f);
 
-  public float getFloat();
+    public float getFloat();
 
-  public void setLong(long l);
+    public void setLong(long l);
 
-  public long getLong();
+    public long getLong();
 
-  public void setDouble(double d);
+    public void setDouble(double d);
 
-  public double getDouble();
+    public double getDouble();
 
-  public void setElementType(ElementType elementType);
+    public void setElementType(ElementType elementType);
 
-  public ElementType getElementType();
+    public ElementType getElementType();
 
-  public void setString(String text);
+    public void setString(String text);
 
-  public String getString();
+    public String getString();
 }

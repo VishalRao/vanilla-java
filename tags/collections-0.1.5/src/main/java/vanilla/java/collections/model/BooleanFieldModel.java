@@ -24,93 +24,93 @@ import java.io.ObjectOutput;
 import java.nio.IntBuffer;
 
 public class BooleanFieldModel extends AbstractFieldModel<Boolean> {
-  public BooleanFieldModel(String fieldName, int fieldNumber) {
-    super(fieldName, fieldNumber);
-  }
+    public BooleanFieldModel(String fieldName, int fieldNumber) {
+        super(fieldName, fieldNumber);
+    }
 
-  @Override
-  public Object arrayOfField(int size) {
-    return newArrayOfField(size, null);
-  }
+    @Override
+    public Object arrayOfField(int size) {
+        return newArrayOfField(size, null);
+    }
 
-  @Override
-  public int sizeOf(int elements) {
-    return sizeOf0(elements);
-  }
+    @Override
+    public int sizeOf(int elements) {
+        return sizeOf0(elements);
+    }
 
-  private static int sizeOf0(int elements) {
-    return (elements + 7) / 8;
-  }
+    private static int sizeOf0(int elements) {
+        return (elements + 7) / 8;
+    }
 
-  public static IntBuffer newArrayOfField(int size, MappedFileChannel mfc) {
-    return acquireByteBuffer(mfc, sizeOf0(size)).asIntBuffer();
-  }
+    public static IntBuffer newArrayOfField(int size, MappedFileChannel mfc) {
+        return acquireByteBuffer(mfc, sizeOf0(size)).asIntBuffer();
+    }
 
-  @Override
-  public Class storeType() {
-    return IntBuffer.class;
-  }
+    @Override
+    public Class storeType() {
+        return IntBuffer.class;
+    }
 
-  @Override
-  public Boolean getAllocation(Object[] arrays, int index) {
-    IntBuffer array = (IntBuffer) arrays[fieldNumber];
-    return get(array, index);
-  }
+    @Override
+    public Boolean getAllocation(Object[] arrays, int index) {
+        IntBuffer array = (IntBuffer) arrays[fieldNumber];
+        return get(array, index);
+    }
 
-  public static boolean get(IntBuffer array, int index) {
-    return ((array.get(index >>> 5) >> index) & 1) != 0;
-  }
+    public static boolean get(IntBuffer array, int index) {
+        return ((array.get(index >>> 5) >> index) & 1) != 0;
+    }
 
-  @Override
-  public void setAllocation(Object[] arrays, int index, Boolean value) {
-    IntBuffer array = (IntBuffer) arrays[fieldNumber];
-    set(array, index, value);
-  }
+    @Override
+    public void setAllocation(Object[] arrays, int index, Boolean value) {
+        IntBuffer array = (IntBuffer) arrays[fieldNumber];
+        set(array, index, value);
+    }
 
-  public static void set(IntBuffer array, int index, boolean value) {
-    int index2 = index >>> 5;
-    if (value)
-      array.put(index2, (array.get(index2) | (1 << index)));
-    else
-      array.put(index2, (array.get(index2) & ~(1 << index)));
-  }
+    public static void set(IntBuffer array, int index, boolean value) {
+        int index2 = index >>> 5;
+        if (value)
+            array.put(index2, (array.get(index2) | (1 << index)));
+        else
+            array.put(index2, (array.get(index2) & ~(1 << index)));
+    }
 
-  public static void write(ObjectOutput oo, boolean b) throws IOException {
-    oo.writeByte(b ? 1 : 0);
-  }
+    public static void write(ObjectOutput oo, boolean b) throws IOException {
+        oo.writeByte(b ? 1 : 0);
+    }
 
-  public static boolean read(ObjectInput oi) throws IOException {
-    byte b = oi.readByte();
-    return (b > 0);
-  }
+    public static boolean read(ObjectInput oi) throws IOException {
+        byte b = oi.readByte();
+        return (b > 0);
+    }
 
-  @Override
-  public Class<Boolean> type() {
-    return (Class) boolean.class;
-  }
+    @Override
+    public Class<Boolean> type() {
+        return (Class) boolean.class;
+    }
 
-  @Override
-  public String bcLFieldType() {
-    return "Z";
-  }
+    @Override
+    public String bcLFieldType() {
+        return "Z";
+    }
 
-  @Override
-  public boolean isCallsHashCode() {
-    return true;
-  }
+    @Override
+    public boolean isCallsHashCode() {
+        return true;
+    }
 
-  public static int hashCode(boolean b) {
-    return b ? 1 : 0;
-  }
+    public static int hashCode(boolean b) {
+        return b ? 1 : 0;
+    }
 
 
-  @Override
-  public boolean copySimpleValue() {
-    return false;
-  }
+    @Override
+    public boolean copySimpleValue() {
+        return false;
+    }
 
-  @Override
-  public short equalsPreference() {
-    return 1;
-  }
+    @Override
+    public short equalsPreference() {
+        return 1;
+    }
 }

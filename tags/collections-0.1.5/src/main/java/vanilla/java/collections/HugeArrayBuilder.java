@@ -24,75 +24,75 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class HugeArrayBuilder<T> extends HugeCollectionBuilder<T> {
-  private Class<?> arrayListClass;
+    private Class<?> arrayListClass;
 
 
-  protected HugeArrayBuilder() {
-    super(0);
-  }
-
-
-  public HugeArrayList<T> create() {
-    normaliseArgs();
-
-    try {
-      if (arrayListClass == null)
-        arrayListClass = classLoader().loadClass(typeModel.type().getName() + "ArrayList");
-
-    } catch (ClassNotFoundException e) {
-      acquireImplClass();
-      defineClass(GenerateHugeArrays.dumpElement(typeModel));
-      defineClass(GenerateHugeArrays.dumpAllocation(typeModel));
-      arrayListClass = defineClass(GenerateHugeArrays.dumpArrayList(typeModel));
+    protected HugeArrayBuilder() {
+        super(0);
     }
-    try {
-      return (HugeArrayList<T>) arrayListClass.getConstructor(HugeArrayBuilder.class).newInstance(this);
-    } catch (NoSuchMethodException e) {
-      throw new AssertionError(e);
-    } catch (InstantiationException e) {
-      throw new AssertionError(e);
-    } catch (IllegalAccessException e) {
-      throw new AssertionError(e);
-    } catch (InvocationTargetException e) {
-      throw new AssertionError(e.getCause());
+
+
+    public HugeArrayList<T> create() {
+        normaliseArgs();
+
+        try {
+            if (arrayListClass == null)
+                arrayListClass = classLoader().loadClass(typeModel.type().getName() + "ArrayList");
+
+        } catch (ClassNotFoundException e) {
+            acquireImplClass();
+            defineClass(GenerateHugeArrays.dumpElement(typeModel));
+            defineClass(GenerateHugeArrays.dumpAllocation(typeModel));
+            arrayListClass = defineClass(GenerateHugeArrays.dumpArrayList(typeModel));
+        }
+        try {
+            return (HugeArrayList<T>) arrayListClass.getConstructor(HugeArrayBuilder.class).newInstance(this);
+        } catch (NoSuchMethodException e) {
+            throw new AssertionError(e);
+        } catch (InstantiationException e) {
+            throw new AssertionError(e);
+        } catch (IllegalAccessException e) {
+            throw new AssertionError(e);
+        } catch (InvocationTargetException e) {
+            throw new AssertionError(e.getCause());
+        }
     }
-  }
 
-  public T createBean() {
-    Class implClass = acquireImplClass();
-    try {
-      return (T) implClass.newInstance();
-    } catch (InstantiationException e) {
-      throw new AssertionError(e);
-    } catch (IllegalAccessException e) {
-      throw new AssertionError(e);
+    public T createBean() {
+        Class implClass = acquireImplClass();
+        try {
+            return (T) implClass.newInstance();
+        } catch (InstantiationException e) {
+            throw new AssertionError(e);
+        } catch (IllegalAccessException e) {
+            throw new AssertionError(e);
+        }
     }
-  }
 
-  Class implClass = null;
+    Class implClass = null;
 
-  private Class acquireImplClass() {
-    try {
-      if (implClass == null)
-        implClass = classLoader().loadClass(typeModel.type().getName() + "Impl");
+    private Class acquireImplClass() {
+        try {
+            if (implClass == null)
+                implClass = classLoader().loadClass(typeModel.type().getName() + "Impl");
 
-    } catch (ClassNotFoundException e) {
-      implClass = defineClass(GenerateHugeArrays.dumpImpl(typeModel));
+        } catch (ClassNotFoundException e) {
+            implClass = defineClass(GenerateHugeArrays.dumpImpl(typeModel));
+        }
+        return implClass;
     }
-    return implClass;
-  }
 
-  private Class defineClass(byte[] bytes) {
-    try {
-      Method defineClass = ClassLoader.class.getDeclaredMethod("defineClass", String.class /*name*/, byte[].class /*b*/, int.class /*off*/, int.class /*len*/);
-      defineClass.setAccessible(true);
-      return (Class) defineClass.invoke(classLoader, null, bytes, 0, bytes.length);
-    } catch (NoSuchMethodException e) {
-      throw new AssertionError(e);
-    } catch (IllegalAccessException e) {
-      throw new AssertionError(e);
-    } catch (InvocationTargetException e) {
-      throw new AssertionError(e.getCause());
+    private Class defineClass(byte[] bytes) {
+        try {
+            Method defineClass = ClassLoader.class.getDeclaredMethod("defineClass", String.class /*name*/, byte[].class /*b*/, int.class /*off*/, int.class /*len*/);
+            defineClass.setAccessible(true);
+            return (Class) defineClass.invoke(classLoader, null, bytes, 0, bytes.length);
+        } catch (NoSuchMethodException e) {
+            throw new AssertionError(e);
+        } catch (IllegalAccessException e) {
+            throw new AssertionError(e);
+        } catch (InvocationTargetException e) {
+            throw new AssertionError(e.getCause());
+        }
     }
-  }
 }

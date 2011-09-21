@@ -19,15 +19,15 @@ package vanilla.java.collections.api;
 import java.util.ListIterator;
 
 public interface HugeIterator<T> extends ListIterator<T>, Recycleable {
-  public HugeIterator<T> toStart();
+    public HugeIterator<T> toStart();
 
-  public HugeIterator<T> toEnd();
+    public HugeIterator<T> toEnd();
 
-  public HugeIterator<T> index(long n);
+    public HugeIterator<T> index(long n);
 
-  public long previousLongIndex();
+    public long previousLongIndex();
 
-  public long nextLongIndex();
+    public long nextLongIndex();
 
-  public void recycle();
+    public void recycle();
 }

@@ -17,13 +17,13 @@ package vanilla.java.collections.api;
  */
 
 public interface HugeElement<T> {
-  HugeElementType hugeElementType();
+    HugeElementType hugeElementType();
 
-  void copyOf(T t);
+    void copyOf(T t);
 
-  void index(long n);
+    void index(long n);
 
-  long index();
+    long index();
 
-  long longHashCode();
+    long longHashCode();
 }

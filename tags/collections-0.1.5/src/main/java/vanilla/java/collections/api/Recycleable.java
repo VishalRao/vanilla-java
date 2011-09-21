@@ -17,5 +17,5 @@ package vanilla.java.collections.api;
  */
 
 public interface Recycleable {
-  public void recycle();
+    public void recycle();
 }
