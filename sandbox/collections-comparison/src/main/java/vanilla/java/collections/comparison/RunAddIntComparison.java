@@ -17,7 +17,7 @@ import java.util.*;
  * @author c.cerbo
  */
 public class RunAddIntComparison {
-    private static final int ADD_ITERATIONS = 100000000;
+    private static final int ADD_ITERATIONS = 50000000;
 
     static private final String[] ENV_PROPS = {"java.vm.name",
             "java.runtime.version", "os.name", "os.arch", "os.version"};
@@ -158,7 +158,7 @@ public class RunAddIntComparison {
         out.println("--------------------------------");
         Map<String, String> props = new LinkedHashMap<String, String>((Map) System.getProperties());
         props.keySet().retainAll(Arrays.asList(ENV_PROPS));
-        props.put("maxMemory", String.format("%,d MB", Runtime.getRuntime().maxMemory() / 1024 / 1024));
+        props.put("maxMemory", String.format("%,d MB", Runtime.getRuntime().maxMemory() / 1000 / 1000));
         out.println(props);
         out.println("--------------------------------");
         out.println();
