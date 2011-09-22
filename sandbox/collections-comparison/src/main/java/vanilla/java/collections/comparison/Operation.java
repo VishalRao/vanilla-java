@@ -21,6 +21,8 @@ public abstract class Operation {
 		return MessageFormat.format(descriptionPattern, iterations);
 	}
 
+	public void init() throws Exception {}
+	
 	/**
 	 * Execute the operation and return the collection object.
 	 *

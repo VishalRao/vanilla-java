@@ -16,8 +16,9 @@ import java.util.*;
  *
  * @author c.cerbo
  */
-public class RunAddIntComparison {
-    private static final int ADD_ITERATIONS = 50000000;
+@SuppressWarnings("restriction")
+public class AddIntComparison {
+	static private final int ITERATIONS = System.getProperty("iterations") != null ? Integer.parseInt(System.getProperty("iterations")) :  1000000;
 
     static private final String[] ENV_PROPS = {"java.vm.name",
             "java.runtime.version", "os.name", "os.arch", "os.version"};
@@ -26,7 +27,7 @@ public class RunAddIntComparison {
             new OutputStreamWriter(System.out), true);
     private List<Operation> operations = new ArrayList<Operation>();
 
-    public RunAddIntComparison() {
+    public AddIntComparison() {
         operations.add(createHugeArrayListAddOperation());
         operations.add(createTIntArrayListAddOperation());
         operations.add(createListAddOperation(ArrayList.class));
@@ -47,12 +48,14 @@ public class RunAddIntComparison {
 //		operations.add(createListAddOperation(CopyOnWriteArrayList.class));
     }
 
-    private Operation createListAddOperation(final Class<? extends List> listClass) {
-        return new Operation("Performing {0} " + listClass.getSimpleName() + ".add(int) operations", ADD_ITERATIONS) {
-
-            @Override
+    @SuppressWarnings("rawtypes")
+	private Operation createListAddOperation(final Class<? extends List> listClass) {
+        return new Operation("Performing {0} " + listClass.getSimpleName() + ".add(int) operations", ITERATIONS) {
+           
+			@Override
+			 @SuppressWarnings("unchecked")
             public Object execute() throws InstantiationException, IllegalAccessException {
-                List<Integer> list = (List) listClass.newInstance();
+                List<Integer> list = (List<Integer>) listClass.newInstance();
                 for (int i = 0; i < iterations; i++) {
                     list.add(i);
                 }
@@ -62,11 +65,11 @@ public class RunAddIntComparison {
     }
 
     private Operation createArrayQueueAddOperation() {
-        return new Operation("Performing {0} ArrayQueue.add(int) operations", ADD_ITERATIONS) {
-
-            @Override
+        return new Operation("Performing {0} ArrayQueue.add(int) operations", ITERATIONS) {
+            
+			@Override
             public Object execute() {
-                List<Integer> list = new ArrayQueue<Integer>(ADD_ITERATIONS);
+                List<Integer> list = new ArrayQueue<Integer>(ITERATIONS);
                 for (int i = 0; i < iterations; i++) {
                     list.add(i);
                 }
@@ -76,7 +79,7 @@ public class RunAddIntComparison {
     }
 
     private Operation createTIntArrayListAddOperation() {
-        return new Operation("Performing {0} TIntArrayList.add(int) operations", ADD_ITERATIONS) {
+        return new Operation("Performing {0} TIntArrayList.add(int) operations", ITERATIONS) {
 
             @Override
             public Object execute() {
@@ -89,19 +92,13 @@ public class RunAddIntComparison {
         };
     }
 
-    interface Int {
-        public void setInt(int i);
-
-        public int getInt();
-    }
-
     private Operation createHugeArrayListAddOperation() {
-        return new Operation("Performing {0} HugeArrayList<Int>.add(int) operations", ADD_ITERATIONS) {
+        return new Operation("Performing {0} HugeArrayList<Int>.add(int) operations", ITERATIONS) {
 
             @Override
             public Object execute() {
                 final HugeArrayBuilder<Int> builder = new HugeArrayBuilder<Int>() {{
-                    capacity = ADD_ITERATIONS;
+                    capacity = ITERATIONS;
                     setRemoveReturnsNull = true;
                 }};
                 List<Int> list = builder.create();
@@ -119,7 +116,8 @@ public class RunAddIntComparison {
         this.out = out;
     }
 
-    public void run() {
+    @SuppressWarnings("rawtypes")
+	public void run() {
         ObjectSizeFetcher.getObjectSize(1);
         printHeader();
         for (Operation operation : operations) {
@@ -152,7 +150,8 @@ public class RunAddIntComparison {
         }
     }
 
-    private void printHeader() {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	private void printHeader() {
         out.println("--------------------------------");
         out.println("Collections Comparison");
         out.println("--------------------------------");
@@ -165,6 +164,6 @@ public class RunAddIntComparison {
     }
 
     public static void main(String[] args) {
-        new RunAddIntComparison().run();
+        new AddIntComparison().run();
     }
 }

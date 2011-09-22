@@ -15,12 +15,11 @@ public class ObjectSizeFetcher {
         instrumentation = inst;
     }
 
-    //TODO instrumentation
     public static long getObjectSize(Object o) {
         if (instrumentation == null) {
             if (!logged) {
                 // TODO add instructions here
-                System.err.println("To enable the ObjectSizeFetcher add to the command line: .........");
+                System.err.println("To enable the ObjectSizeFetcher add to the command line: -javaagent:/path/to/collections-comparison-0.2.0.jar");
                 logged = true;
             }
             return -1;
