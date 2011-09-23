@@ -125,13 +125,14 @@ public class ContainsIntComparison {
     private Operation createHugeArrayListContainsOperation() {
         return new Operation("Performing {0} HugeArrayList<Int>.contains(int) operations", ITERATIONS) {
         	private List<Int> list;
-        	
+        	private final HugeArrayBuilder<Int> builder = new HugeArrayBuilder<Int>() {{
+                capacity = ITERATIONS;
+                setRemoveReturnsNull = true;
+            }};
+            
             @Override
             public void init() {
-                final HugeArrayBuilder<Int> builder = new HugeArrayBuilder<Int>() {{
-                    capacity = ITERATIONS;
-                    setRemoveReturnsNull = true;
-                }};
+                
                 list = builder.create();
                 Int element = builder.createBean();
                 for (int i = 0; i < iterations; i++) {
@@ -141,9 +142,11 @@ public class ContainsIntComparison {
             }
             
             @Override
-            public Object execute() {            	
+            public Object execute() {     
+            	Int element = builder.createBean();            	
             	for (int i = 0; i < iterations; i++) {
-                    if(!list.contains(new IntImpl(i))) {
+            		element.setInt(i);
+                    if(!list.contains(element)) {
                     	throw new IllegalStateException("The list does not contain the element " + i);
                     }
                 }
